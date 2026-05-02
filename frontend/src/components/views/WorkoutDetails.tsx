@@ -63,6 +63,7 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
 
   const displayDuration = selectedSession.durationMins || (isPureStrava && primaryStravaActivity ? primaryStravaActivity.durationSeconds / 60 : 0);
   const displayHr = selectedSession.avgHeartRate || (isPureStrava && primaryStravaActivity ? primaryStravaActivity.avgHeartrate : null);
+  const displayMaxHr = isPureStrava && primaryStravaActivity ? primaryStravaActivity.maxHeartrate : null;
 
   return (
     <motion.div 
@@ -155,6 +156,18 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
             </p>
           </div>
         ) : null}
+
+        {displayMaxHr && displayMaxHr > 0 ? (
+          <div className="p-4 rounded-2xl glass-surface border border-white/10">
+            <div className="flex items-center gap-2 mb-2">
+              <Heart className="w-4 h-4" style={{ color: 'hsl(0, 72%, 58%)' }} />
+              <span className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Max HR</span>
+            </div>
+            <p className="text-2xl font-bold" style={{ color: 'hsl(0, 72%, 58%)' }}>
+              {Math.round(displayMaxHr)} <span className="text-sm font-medium text-muted-foreground">bpm</span>
+            </p>
+          </div>
+        ) : null}
         
         {isPureStrava && primaryStravaActivity?.distanceMeters && primaryStravaActivity.distanceMeters > 0 ? (
             <div className="p-4 rounded-2xl glass-surface border border-white/10">
@@ -234,9 +247,10 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
               </div>
               <div className="text-right">
                 <p className="font-bold text-primary">{formatDuration(act.durationSeconds / 60)}</p>
-                {act.avgHeartrate && (
+                {(act.avgHeartrate || act.maxHeartrate) && (
                   <p className="text-sm mt-1" style={{ color: 'hsl(0, 72%, 58%)' }}>
-                    ❤️ {Math.round(act.avgHeartrate)} bpm
+                    ❤️ {act.avgHeartrate ? Math.round(act.avgHeartrate) : '--'} bpm
+                    {act.maxHeartrate ? ` (Max: ${Math.round(act.maxHeartrate)})` : ''}
                   </p>
                 )}
               </div>

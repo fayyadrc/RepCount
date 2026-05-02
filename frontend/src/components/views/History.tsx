@@ -7,17 +7,19 @@ import { Button } from '@/components/ui/button';
 import { Clock, Dumbbell, Trash2, Weight, Heart, Activity, Timer, Flame, ChevronRight, Mountain, Gauge } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { WorkoutSession, StravaActivity } from '@/lib/types';
-import { Footprints, Bike, Zap } from 'lucide-react';
+import { Footprints, Bike, Zap, SportShoe } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const getStravaIcon = (type: string, className: string) => {
   switch (type) {
     case 'Run':
+      return <SportShoe className={className}/>;
     case 'Walk':
       return <Footprints className={className} />;
     case 'Ride':
       return <Bike className={className} />;
     case 'WeightTraining':
+      return <Dumbbell className={className} />;
     case 'Workout':
       return <Dumbbell className={className} />;
     default:
