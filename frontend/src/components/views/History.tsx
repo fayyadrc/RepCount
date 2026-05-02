@@ -5,15 +5,10 @@ import { useWorkoutStore } from '@/lib/workout-store';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Clock, Dumbbell, Trash2, Weight, Heart, Activity, Timer, Flame, ChevronRight, Mountain, Gauge } from 'lucide-react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { useToast } from '@/hooks/use-toast';
 import type { WorkoutSession, StravaActivity } from '@/lib/types';
 import { Footprints, Bike, Zap } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const getStravaIcon = (type: string, className: string) => {
   switch (type) {
@@ -30,10 +25,13 @@ const getStravaIcon = (type: string, className: string) => {
   }
 };
 
-export const History: React.FC = () => {
+interface HistoryProps {
+  onViewDetails?: (id: string) => void;
+}
+
+export const History: React.FC<HistoryProps> = ({ onViewDetails }) => {
   const { sessions, clearSessions } = useWorkoutStore();
   const { toast } = useToast();
-  const [selectedSession, setSelectedSession] = React.useState<WorkoutSession | null>(null);
 
   const handleClear = () => {
     clearSessions();
@@ -59,7 +57,13 @@ export const History: React.FC = () => {
   };
 
   return (
-    <div className="space-y-10 animate-fade-up">
+    <motion.div 
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: 20 }}
+      transition={{ duration: 0.15, ease: "easeOut" }}
+      className="space-y-10 animate-fade-up"
+    >
       <header className="flex justify-between items-end">
         <div className="space-y-2">
           <h2 className="text-[28px] md:text-3xl font-bold tracking-tight text-primary">Workout History</h2>
@@ -115,7 +119,7 @@ export const History: React.FC = () => {
             return (
               <div
                 key={session.id}
-                onClick={() => setSelectedSession(session)}
+                onClick={() => onViewDetails?.(session.id)}
                 className={`cursor-pointer glass-surface rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300 animate-slide-up hover:scale-[1.02] active:scale-[0.98] stagger-${Math.min(idx + 1, 5)}`}
               >
                 <div className="p-5">
@@ -211,238 +215,6 @@ export const History: React.FC = () => {
           })}
         </div>
       )}
-
-      {/* ─── Detail Modal ─── */}
-      <Dialog
-        open={!!selectedSession}
-        onOpenChange={(open) => {
-          if (!open) setSelectedSession(null);
-        }}
-      >
-        <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto rounded-2xl glass-surface border border-white/10 text-foreground">
-          {selectedSession && (() => {
-            const hasStrava = selectedSession.stravaActivities && selectedSession.stravaActivities.length > 0;
-            const isPureStrava = selectedSession.entries.length === 0 && hasStrava;
-            const primaryStravaActivity = isPureStrava ? selectedSession.stravaActivities![0] : null;
-
-            const displayDuration = selectedSession.durationMins || (isPureStrava && primaryStravaActivity ? primaryStravaActivity.durationSeconds / 60 : 0);
-            const displayHr = selectedSession.avgHeartRate || (isPureStrava && primaryStravaActivity ? primaryStravaActivity.avgHeartrate : null);
-
-            return (
-              <>
-                <DialogHeader>
-                  <DialogTitle className="text-xl font-bold flex items-center gap-2">
-                    {isPureStrava && primaryStravaActivity && selectedSession.stravaActivities!.length === 1 ? (
-                      <>
-                        {getStravaIcon(primaryStravaActivity.type, "w-5 h-5 text-primary")}
-                        {primaryStravaActivity.name}
-                      </>
-                    ) : (
-                      "Workout Details"
-                    )}
-                  </DialogTitle>
-                  <p className="text-sm text-muted-foreground">
-                    {new Date(selectedSession.date + 'T00:00:00').toLocaleDateString('en-US', {
-                      weekday: 'long',
-                      month: 'long',
-                      day: 'numeric',
-                      year: 'numeric'
-                    })}
-                  </p>
-                </DialogHeader>
-
-                {/* Summary Stats Grid */}
-                <div className="grid grid-cols-2 gap-2 mt-3">
-                  {selectedSession.entries.length > 0 && (
-                    <>
-                      <div className="p-3 rounded-xl glass-surface border border-white/10">
-                        <div className="flex items-center gap-1.5 mb-1">
-                          <Weight className="w-3.5 h-3.5 text-primary" />
-                          <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Volume</span>
-                        </div>
-                        <p className="text-lg font-bold text-primary">
-                          {(selectedSession.totalVolumeKg
-                            ?? selectedSession.entries.reduce((s, e) => s + e.weight * e.sets * e.reps, 0)
-                          ).toLocaleString()} <span className="text-xs font-medium text-muted-foreground">kg</span>
-                        </p>
-                      </div>
-
-                      <div className="p-3 rounded-xl glass-surface border border-white/10">
-                        <div className="flex items-center gap-1.5 mb-1">
-                          <Dumbbell className="w-3.5 h-3.5 text-primary" />
-                          <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Sets</span>
-                        </div>
-                        <p className="text-lg font-bold text-primary">
-                          {selectedSession.entries.length} <span className="text-xs font-medium text-muted-foreground">total</span>
-                        </p>
-                      </div>
-                    </>
-                  )}
-
-                  {displayDuration > 0 && (
-                    <div className="p-3 rounded-xl glass-surface border border-white/10">
-                      <div className="flex items-center gap-1.5 mb-1">
-                        <Timer className="w-3.5 h-3.5 text-primary" />
-                        <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Duration</span>
-                      </div>
-                      <p className="text-lg font-bold text-primary">
-                        {formatDuration(displayDuration)}
-                      </p>
-                    </div>
-                  )}
-
-                  {displayHr && displayHr > 0 ? (
-                    <div className="p-3 rounded-xl glass-surface border border-white/10">
-                      <div className="flex items-center gap-1.5 mb-1">
-                        <Heart className="w-3.5 h-3.5" style={{ color: 'hsl(0, 72%, 58%)' }} />
-                        <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Avg HR</span>
-                      </div>
-                      <p className="text-lg font-bold" style={{ color: 'hsl(0, 72%, 58%)' }}>
-                        {Math.round(displayHr)} <span className="text-xs font-medium text-muted-foreground">bpm</span>
-                      </p>
-                    </div>
-                  ) : null}
-                  
-                  {isPureStrava && primaryStravaActivity?.distanceMeters && primaryStravaActivity.distanceMeters > 0 ? (
-                     <div className="p-3 rounded-xl glass-surface border border-white/10">
-                       <div className="flex items-center gap-1.5 mb-1">
-                         <Activity className="w-3.5 h-3.5 text-primary" />
-                         <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Distance</span>
-                       </div>
-                       <p className="text-lg font-bold text-primary">
-                         {(primaryStravaActivity.distanceMeters / 1000).toFixed(2)} <span className="text-xs font-medium text-muted-foreground">km</span>
-                       </p>
-                     </div>
-                  ) : null}
-                  
-                  {isPureStrava && primaryStravaActivity?.avgSpeedMps && primaryStravaActivity.avgSpeedMps > 0 ? (
-                     <div className="p-3 rounded-xl glass-surface border border-white/10">
-                       <div className="flex items-center gap-1.5 mb-1">
-                         <Gauge className="w-3.5 h-3.5 text-primary" />
-                         <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Avg Pace / Speed</span>
-                       </div>
-                       <p className="text-lg font-bold text-primary">
-                         {primaryStravaActivity.type === 'Run' || primaryStravaActivity.type === 'Walk' 
-                              ? `${Math.floor((1000 / primaryStravaActivity.avgSpeedMps) / 60)}:${Math.floor((1000 / primaryStravaActivity.avgSpeedMps) % 60).toString().padStart(2, '0')}`
-                              : `${(primaryStravaActivity.avgSpeedMps * 3.6).toFixed(1)}`
-                         } <span className="text-xs font-medium text-muted-foreground">{primaryStravaActivity.type === 'Run' || primaryStravaActivity.type === 'Walk' ? '/km' : 'km/h'}</span>
-                       </p>
-                     </div>
-                  ) : null}
-                  
-                  {isPureStrava && primaryStravaActivity?.elevationGain && primaryStravaActivity.elevationGain > 0 ? (
-                     <div className="p-3 rounded-xl glass-surface border border-white/10">
-                       <div className="flex items-center gap-1.5 mb-1">
-                         <Mountain className="w-3.5 h-3.5 text-primary" />
-                         <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Elevation</span>
-                       </div>
-                       <p className="text-lg font-bold text-primary">
-                         {Math.round(primaryStravaActivity.elevationGain)} <span className="text-xs font-medium text-muted-foreground">m</span>
-                       </p>
-                     </div>
-                  ) : null}
-
-                  {isPureStrava && primaryStravaActivity?.calories ? (
-                     <div className="p-3 rounded-xl glass-surface border border-white/10">
-                       <div className="flex items-center gap-1.5 mb-1">
-                         <Flame className="w-3.5 h-3.5" style={{ color: 'hsl(25, 95%, 53%)' }} />
-                         <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Calories</span>
-                       </div>
-                       <p className="text-lg font-bold" style={{ color: 'hsl(25, 95%, 53%)' }}>
-                         {Math.round(primaryStravaActivity.calories)} <span className="text-xs font-medium text-muted-foreground">kcal</span>
-                       </p>
-                     </div>
-                  ) : null}
-                </div>
-
-              {/* Strava Activities */}
-              {selectedSession.stravaActivities && selectedSession.stravaActivities.length > 0 && (!isPureStrava || selectedSession.stravaActivities.length > 1) && (
-                <div className="mt-4">
-                  <h4 className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-2 flex items-center gap-1.5">
-                    <Flame className="w-3.5 h-3.5" style={{ color: 'hsl(25, 95%, 53%)' }} />
-                    Strava Activities
-                  </h4>
-                  <div className="space-y-2">
-                    {selectedSession.stravaActivities.map((act: StravaActivity, i: number) => (
-                      <div
-                        key={i}
-                        className="p-3 rounded-xl glass-surface border border-white/10 flex items-center justify-between"
-                      >
-                        <div>
-                          <p className="text-sm font-semibold">{act.name}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {act.type === 'WeightTraining' ? '🏋️ Weights' :
-                              act.type === 'Run' ? '🏃 Run' :
-                              act.type === 'Walk' ? '🚶 Walk' :
-                              act.type === 'Workout' ? '⚡ Workout' :
-                              act.type}
-                            {act.distanceMeters > 0 && ` · ${(act.distanceMeters / 1000).toFixed(1)} km`}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm font-semibold">{formatDuration(act.durationSeconds / 60)}</p>
-                          {act.avgHeartrate && (
-                            <p className="text-xs" style={{ color: 'hsl(0, 72%, 58%)' }}>
-                              ❤️ {Math.round(act.avgHeartrate)} bpm
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Exercises Breakdown */}
-              {selectedSession.entries.length > 0 && (
-                <div className="mt-4">
-                  <h4 className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-2">
-                    Exercise Breakdown
-                  </h4>
-                  <div className="space-y-2">
-                    {(() => {
-                      // Group entries by exercise name
-                      const grouped: Record<string, typeof selectedSession.entries> = {};
-                      selectedSession.entries.forEach(entry => {
-                        if (!grouped[entry.exercise]) grouped[entry.exercise] = [];
-                        grouped[entry.exercise].push(entry);
-                      });
-
-                      return Object.entries(grouped).map(([exercise, sets], i) => {
-                        const exVolume = sets.reduce((s, e) => s + e.weight * e.sets * e.reps, 0);
-                        return (
-                          <div
-                            key={i}
-                            className="p-3 rounded-xl glass-surface border border-white/10"
-                          >
-                            <div className="flex items-center justify-between mb-1.5">
-                              <p className="font-semibold text-sm capitalize">{exercise}</p>
-                              <span className="text-xs text-muted-foreground font-medium">
-                                {exVolume.toLocaleString()} kg
-                              </span>
-                            </div>
-                            <div className="flex flex-wrap gap-1.5">
-                              {sets.map((set, j) => (
-                                <span
-                                  key={j}
-                                  className="text-[11px] px-2 py-0.5 rounded-full glass-surface border border-white/15 text-muted-foreground font-medium"
-                                >
-                                  {set.weight}kg × {set.reps}
-                                  {set.notes ? ` · ${set.notes}` : ''}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                        );
-                      });
-                    })()}
-                  </div>
-                </div>
-              )}
-            </>
-          );})()}
-        </DialogContent>
-      </Dialog>
-    </div>
+    </motion.div>
   );
 };

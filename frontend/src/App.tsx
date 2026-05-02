@@ -7,8 +7,10 @@ import { NextSession } from '@/components/views/NextSession';
 import { DataHealth } from '@/components/views/DataHealth';
 import { Analytics } from '@/components/views/Analytics';
 import { History } from '@/components/views/History';
+import { WorkoutDetails } from '@/components/views/WorkoutDetails';
 import { ViewState } from '@/lib/types';
 import { Toaster } from '@/components/ui/toaster';
+import { AnimatePresence } from 'framer-motion';
 import { WorkoutProvider, useWorkoutStore } from '@/lib/workout-store';
 
 // ─── Error Boundary ───
@@ -65,6 +67,7 @@ class ViewErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState
 
 function AppContent() {
   const [activeView, setActiveView] = useState<ViewState>('quick-log');
+  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
   const { sessions } = useWorkoutStore();
 
   // Derive anomaly count from sessions:
@@ -83,7 +86,9 @@ function AppContent() {
       case 'data-health':
         return <DataHealth onAnomalyCountChange={setAnomalyCount} />;
       case 'history':
-        return <History />;
+        return <History onViewDetails={(id) => { setSelectedSessionId(id); setActiveView('workout-details'); }} />;
+      case 'workout-details':
+        return <WorkoutDetails sessionId={selectedSessionId} onBack={() => setActiveView('history')} />;
       default:
         return <QuickLog />;
     }
@@ -96,12 +101,14 @@ function AppContent() {
         setActiveView={setActiveView} 
         anomalyCount={anomalyCount}
       >
-        <ViewErrorBoundary 
-          key={activeView} 
-          onReset={() => setActiveView('quick-log')}
-        >
-          {renderView()}
-        </ViewErrorBoundary>
+        <AnimatePresence mode="wait">
+          <ViewErrorBoundary 
+            key={activeView} 
+            onReset={() => setActiveView('quick-log')}
+          >
+            {renderView()}
+          </ViewErrorBoundary>
+        </AnimatePresence>
       </Shell>
       <Toaster />
     </>
