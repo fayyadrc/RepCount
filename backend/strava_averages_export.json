@@ -13,7 +13,7 @@
     "max_heartrate": 148.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 379.0
   },
   {
     "id": 18319111917,
@@ -29,7 +29,7 @@
     "max_heartrate": 182.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 409.0
   },
   {
     "id": 18308288095,
@@ -45,7 +45,7 @@
     "max_heartrate": 116.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 91.0
   },
   {
     "id": 18278713904,
@@ -61,7 +61,7 @@
     "max_heartrate": 174.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 143.0
   },
   {
     "id": 18271205929,
@@ -77,7 +77,7 @@
     "max_heartrate": 190.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 414.0
   },
   {
     "id": 18242408075,
@@ -93,7 +93,7 @@
     "max_heartrate": 178.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 586.0
   },
   {
     "id": 18212637082,
@@ -109,7 +109,7 @@
     "max_heartrate": 152.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 339.0
   },
   {
     "id": 18196556307,
@@ -125,7 +125,7 @@
     "max_heartrate": 167.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 315.0
   },
   {
     "id": 18187358440,
@@ -141,7 +141,7 @@
     "max_heartrate": 184.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 528.0
   },
   {
     "id": 18185226703,
@@ -157,7 +157,7 @@
     "max_heartrate": 166.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 265.0
   },
   {
     "id": 18147177544,
@@ -173,7 +173,7 @@
     "max_heartrate": 173.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 357.0
   },
   {
     "id": 18120675095,
@@ -189,7 +189,7 @@
     "max_heartrate": 149.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 269.0
   },
   {
     "id": 18119595801,
@@ -205,7 +205,7 @@
     "max_heartrate": 189.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 202.0
   },
   {
     "id": 18105584386,
@@ -221,7 +221,7 @@
     "max_heartrate": 156.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 430.0
   },
   {
     "id": 18093421776,
@@ -237,7 +237,7 @@
     "max_heartrate": 170.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 390.0
   },
   {
     "id": 18070467970,
@@ -253,7 +253,7 @@
     "max_heartrate": 163.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 376.0
   },
   {
     "id": 18054780492,
@@ -269,7 +269,7 @@
     "max_heartrate": 185.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 184.0
   },
   {
     "id": 18042398360,
@@ -285,7 +285,7 @@
     "max_heartrate": 167.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 366.0
   },
   {
     "id": 18017357798,
@@ -301,7 +301,7 @@
     "max_heartrate": 184.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 392.0
   },
   {
     "id": 18002479215,
@@ -317,7 +317,7 @@
     "max_heartrate": 175.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 90.0
   },
   {
     "id": 18002479190,
@@ -333,7 +333,7 @@
     "max_heartrate": 172.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 361.0
   },
   {
     "id": 17977260198,
@@ -349,7 +349,7 @@
     "max_heartrate": 126.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 182.0
   },
   {
     "id": 17976758229,
@@ -365,7 +365,7 @@
     "max_heartrate": 167.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 268.0
   },
   {
     "id": 17964834510,
@@ -381,7 +381,7 @@
     "max_heartrate": 142.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 161.0
   },
   {
     "id": 17964254725,
@@ -397,7 +397,7 @@
     "max_heartrate": 182.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 175.0
   },
   {
     "id": 17951060557,
@@ -413,7 +413,7 @@
     "max_heartrate": 175.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 390.0
   },
   {
     "id": 17938677506,
@@ -429,7 +429,7 @@
     "max_heartrate": 187.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 132.0
   },
   {
     "id": 17925494830,
@@ -445,7 +445,7 @@
     "max_heartrate": 162.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 264.0
   },
   {
     "id": 17913776662,
@@ -461,7 +461,7 @@
     "max_heartrate": null,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 134.0
   },
   {
     "id": 17913761316,
@@ -477,7 +477,7 @@
     "max_heartrate": 180.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 571.0
   },
   {
     "id": 17902350878,
@@ -493,7 +493,7 @@
     "max_heartrate": null,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 295.0
   },
   {
     "id": 17890075193,
@@ -509,7 +509,7 @@
     "max_heartrate": null,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 133.0
   },
   {
     "id": 17866447252,
@@ -525,7 +525,7 @@
     "max_heartrate": null,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 271.0
   },
   {
     "id": 17854054820,
@@ -573,7 +573,7 @@
     "max_heartrate": null,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 49.0
   },
   {
     "id": 17446095305,
@@ -589,7 +589,7 @@
     "max_heartrate": 142.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 188.0
   },
   {
     "id": 17443159175,
@@ -605,7 +605,7 @@
     "max_heartrate": 180.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 216.0
   },
   {
     "id": 17428786755,
@@ -621,7 +621,7 @@
     "max_heartrate": 135.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 371.0
   },
   {
     "id": 17416862284,
@@ -637,7 +637,7 @@
     "max_heartrate": 188.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 291.0
   },
   {
     "id": 17416861695,
@@ -653,7 +653,7 @@
     "max_heartrate": 151.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 62.0
   },
   {
     "id": 17406628100,
@@ -669,7 +669,7 @@
     "max_heartrate": 172.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 332.0
   },
   {
     "id": 17375043153,
@@ -685,7 +685,7 @@
     "max_heartrate": 145.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 421.0
   },
   {
     "id": 17363801393,
@@ -701,7 +701,7 @@
     "max_heartrate": 195.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 541.0
   },
   {
     "id": 17354169091,
@@ -717,7 +717,7 @@
     "max_heartrate": 162.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 512.0
   },
   {
     "id": 17339990557,
@@ -733,7 +733,7 @@
     "max_heartrate": 184.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 524.0
   },
   {
     "id": 17330484415,
@@ -749,7 +749,7 @@
     "max_heartrate": 105.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 265.0
   },
   {
     "id": 17272849545,
@@ -765,7 +765,7 @@
     "max_heartrate": 176.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 431.0
   },
   {
     "id": 17251570218,
@@ -781,7 +781,7 @@
     "max_heartrate": 198.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 509.0
   },
   {
     "id": 18288839318,
@@ -861,7 +861,7 @@
     "max_heartrate": null,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 181.0
   },
   {
     "id": 17186904835,
@@ -877,7 +877,7 @@
     "max_heartrate": null,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 220.0
   },
   {
     "id": 16894710422,
@@ -893,7 +893,7 @@
     "max_heartrate": null,
     "avg_cadence": 58.3,
     "avg_temp": null,
-    "calories": null
+    "calories": 79.0
   },
   {
     "id": 16863513882,
@@ -909,7 +909,7 @@
     "max_heartrate": 103.0,
     "avg_cadence": 27.5,
     "avg_temp": null,
-    "calories": null
+    "calories": 142.0
   },
   {
     "id": 16804619495,
@@ -925,7 +925,7 @@
     "max_heartrate": 178.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 2076.0
   },
   {
     "id": 16758952659,
@@ -941,7 +941,7 @@
     "max_heartrate": 160.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 437.0
   },
   {
     "id": 16744101706,
@@ -957,7 +957,7 @@
     "max_heartrate": 179.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 880.0
   },
   {
     "id": 16724424637,
@@ -973,7 +973,7 @@
     "max_heartrate": null,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": 237.3
+    "calories": 265.0
   },
   {
     "id": 16724427044,
@@ -989,7 +989,7 @@
     "max_heartrate": 180.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": 183.0
+    "calories": 676.0
   },
   {
     "id": 16723825054,
@@ -1005,7 +1005,7 @@
     "max_heartrate": 161.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 53.0
   },
   {
     "id": 16713730334,
@@ -1021,7 +1021,7 @@
     "max_heartrate": 167.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 537.0
   },
   {
     "id": 16703735982,
@@ -1037,7 +1037,7 @@
     "max_heartrate": null,
     "avg_cadence": 55.5,
     "avg_temp": null,
-    "calories": null
+    "calories": 624.0
   },
   {
     "id": 16692327197,
@@ -1053,7 +1053,7 @@
     "max_heartrate": 174.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 90.0
   },
   {
     "id": 16692272097,
@@ -1069,7 +1069,7 @@
     "max_heartrate": 154.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 380.0
   },
   {
     "id": 16684872750,
@@ -1085,7 +1085,7 @@
     "max_heartrate": 166.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 459.0
   },
   {
     "id": 16649293428,
@@ -1101,7 +1101,7 @@
     "max_heartrate": null,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": 118.3
+    "calories": 132.0
   },
   {
     "id": 16641685397,
@@ -1117,7 +1117,7 @@
     "max_heartrate": 159.0,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 101.0
   },
   {
     "id": 16624773223,
@@ -1133,7 +1133,7 @@
     "max_heartrate": null,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 413.0
   },
   {
     "id": 15422192132,
@@ -1149,7 +1149,7 @@
     "max_heartrate": null,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 353.0
   },
   {
     "id": 14479305977,
@@ -1165,6 +1165,6 @@
     "max_heartrate": null,
     "avg_cadence": null,
     "avg_temp": null,
-    "calories": null
+    "calories": 933.0
   }
 ]

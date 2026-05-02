@@ -80,9 +80,13 @@ def get_all_activity_summaries(token):
             break
             
         for activity in data:
-            # We extract only the average and summary fields
+            # The summary API doesn't return calories for most activities,
+            # so we fetch the detailed activity
+            activity_id = activity.get("id")
+            detailed = safe_get(f"{BASE_URL}/activities/{activity_id}", token)
+            
             summary = {
-                "id": activity.get("id"),
+                "id": activity_id,
                 "name": activity.get("name"),
                 "type": activity.get("type"),
                 "start_date": activity.get("start_date"),
@@ -95,9 +99,13 @@ def get_all_activity_summaries(token):
                 "max_heartrate": activity.get("max_heartrate"),
                 "avg_cadence": activity.get("average_cadence"),
                 "avg_temp": activity.get("average_temp"),
-                "calories": activity.get("kilojoules")
+                "calories": detailed.get("calories") or activity.get("kilojoules")
             }
             all_summaries.append(summary)
+            
+            # Sleep slightly to avoid Strava's 100 req / 15 min limit if possible
+            # (If you have > 100 activities, you might hit the limit)
+            time.sleep(0.2)
 
         print(f"📄 Page {page}: Processed {len(data)} activities")
         

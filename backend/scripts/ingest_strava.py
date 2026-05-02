@@ -118,7 +118,7 @@ def main():
     # Insert the data
     try:
         print("\n🚀 Inserting data into Supabase...")
-        response = supabase.table("strava_activities").insert(data).execute()
+        response = supabase.table("strava_activities").upsert(data).execute()
         
         inserted_count = len(response.data) if hasattr(response, 'data') and response.data else len(data)
         print(f"✅ Successfully inserted {inserted_count} activities!")
