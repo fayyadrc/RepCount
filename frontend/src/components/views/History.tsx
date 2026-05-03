@@ -4,11 +4,12 @@ import React from 'react';
 import { useWorkoutStore } from '@/lib/workout-store';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Clock, Dumbbell, Trash2, Weight, Heart, Activity, Timer, Flame, ChevronRight, Mountain, Gauge } from 'lucide-react';
+import { Clock, Dumbbell, Trash2, Weight, Heart, Activity, Timer, Flame, ChevronRight, Mountain, Gauge, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { WorkoutSession, StravaActivity } from '@/lib/types';
 import { Footprints, Bike, Zap, SportShoe } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useState } from 'react';
 
 const getStravaIcon = (type: string, className: string) => {
   switch (type) {
@@ -32,8 +33,9 @@ interface HistoryProps {
 }
 
 export const History: React.FC<HistoryProps> = ({ onViewDetails }) => {
-  const { sessions, clearSessions } = useWorkoutStore();
+  const { sessions, clearSessions, syncStrava } = useWorkoutStore();
   const { toast } = useToast();
+  const [isSyncing, setIsSyncing] = useState(false);
 
   const handleClear = () => {
     clearSessions();
@@ -41,6 +43,25 @@ export const History: React.FC<HistoryProps> = ({ onViewDetails }) => {
       title: "History Cleared",
       description: "All workout sessions have been removed.",
     });
+  };
+
+  const handleSync = async () => {
+    setIsSyncing(true);
+    try {
+      await syncStrava();
+      toast({
+        title: "Strava Sync Started",
+        description: "Fetching your latest activities from Strava. This may take a moment to reflect.",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Sync Failed",
+        description: "Could not trigger Strava synchronization.",
+      });
+    } finally {
+      setIsSyncing(false);
+    }
   };
 
   const formatDuration = (mins: number) => {
@@ -76,17 +97,29 @@ export const History: React.FC<HistoryProps> = ({ onViewDetails }) => {
             }
           </p>
         </div>
-        {sessions.length > 0 && (
+        <div className="flex items-center gap-2">
           <Button
             variant="ghost"
             size="sm"
-            className="text-muted-foreground hover:text-destructive"
-            onClick={handleClear}
+            className="text-muted-foreground hover:text-primary"
+            onClick={handleSync}
+            disabled={isSyncing}
           >
-            <Trash2 className="w-4 h-4 mr-1" />
-            Clear All
+            <RefreshCw className={`w-4 h-4 mr-1 ${isSyncing ? 'animate-spin' : ''}`} />
+            {isSyncing ? 'Syncing...' : 'Sync Strava'}
           </Button>
-        )}
+          {sessions.length > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground hover:text-destructive"
+              onClick={handleClear}
+            >
+              <Trash2 className="w-4 h-4 mr-1" />
+              Clear All
+            </Button>
+          )}
+        </div>
       </header>
 
       {sessions.length === 0 ? (
