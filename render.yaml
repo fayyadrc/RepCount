@@ -1,20 +1,26 @@
 services:
+  # Combined Service: Backend + Frontend
   - type: web
-    name: nlp-gymtracker
-    env: docker
-    healthCheckPath: /api/health
+    name: gymtracker
+    runtime: python
+    # Build frontend first, then install backend dependencies
+    buildCommand: cd frontend && npm install && npm run build && cd .. && pip install -r requirements.txt
+    # Run Uvicorn from the root
+    startCommand: uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.3
+      - key: SUPABASE_URL
+        value: "YOUR_SUPABASE_URL_HERE"
+      - key: SUPABASE_KEY
+        value: "YOUR_SUPABASE_KEY_HERE"
+      - key: GROQ_API_KEY
+        sync: false
+      - key: OPENROUTER_API_KEY
+        sync: false
+    # Rebuild if anything in backend or frontend changes
     buildFilter:
       paths:
         - backend/**
         - frontend/**
         - requirements.txt
-        - Dockerfile
-    envVars:
-      - key: SUPABASE_URL
-        sync: false
-      - key: SUPABASE_KEY
-        sync: false
-      - key: GROQ_API_KEY
-        sync: false
-      - key: OPENROUTER_API_KEY
-        sync: false
