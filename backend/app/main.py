@@ -39,6 +39,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Root route
+@app.get("/")
+def read_root():
+    return {
+        "message": "GymTracker AI API is running",
+        "health_check": "/api/health",
+        "docs": "/docs"
+    }
+
 # Include routers
 app.include_router(health_router, prefix="/api", tags=["Health"])
 app.include_router(history_router, prefix="/api", tags=["History"])

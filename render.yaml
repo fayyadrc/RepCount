@@ -39,7 +39,7 @@ services:
       # Proxy API requests to the backend
       - type: rewrite
         source: /api/*
-        destination: https://gym-tracker-api.onrender.com/api/*
+        destination: https://nlp-gymtracker.onrender.com/api/*
       # Single Page App routing: fallback to index.html
       - type: rewrite
         source: /*
