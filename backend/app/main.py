@@ -1,6 +1,8 @@
 import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -39,19 +41,42 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Root route
-@app.get("/")
-def read_root():
-    return {
-        "message": "GymTracker AI API is running",
-        "health_check": "/api/health",
-        "docs": "/docs"
-    }
+# Serve static files from the frontend/dist directory
+# Get the absolute path to the frontend/dist directory
+# This assumes the file is in backend/app/main.py and we want to reach frontend/dist
+current_dir = os.path.dirname(os.path.abspath(__file__))
+# current_dir is backend/app
+# go up one level to backend/, then one more to root
+root_dir = os.path.dirname(os.path.dirname(current_dir))
+frontend_dist_path = os.path.join(root_dir, "frontend", "dist")
 
 # Include routers
 app.include_router(health_router, prefix="/api", tags=["Health"])
 app.include_router(history_router, prefix="/api", tags=["History"])
 app.include_router(strava_router, prefix="/api", tags=["Strava"])
+
+# Serve frontend static assets
+if os.path.exists(os.path.join(frontend_dist_path, "assets")):
+    app.mount("/assets", StaticFiles(directory=os.path.join(frontend_dist_path, "assets")), name="assets")
+
+# Catch-all route to serve the frontend (SPA routing)
+@app.get("/{rest_of_path:path}")
+async def serve_frontend(rest_of_path: str):
+    # If the path looks like an API call but wasn't caught by the routers above, return 404
+    if rest_of_path.startswith("api/"):
+        return {"detail": "Not Found"}, 404
+    
+    # Check if the built frontend exists
+    index_path = os.path.join(frontend_dist_path, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
+    
+    # Fallback message if frontend isn't built yet
+    return {
+        "message": "GymTracker AI API is running, but the frontend has not been built yet.",
+        "health_check": "/api/health",
+        "docs": "/docs"
+    }
 
 if __name__ == "__main__":
     import uvicorn
