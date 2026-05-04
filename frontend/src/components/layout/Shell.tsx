@@ -71,8 +71,8 @@ export const Shell: React.FC<ShellProps> = ({
       </aside>
 
       {/* ─── Main Content ─── */}
-      <main className="flex-1 h-full overflow-y-auto pb-28 md:pb-0">
-        <div className="max-w-5xl mx-auto px-5 py-8 md:px-12 md:py-12 lg:px-20 h-full">
+      <main className="flex-1 h-full overflow-y-auto">
+        <div className="max-w-5xl mx-auto px-5 py-8 md:px-12 md:py-12 lg:px-20 pb-32 md:pb-12 safe-bottom">
           {children}
         </div>
       </main>

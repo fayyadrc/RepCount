@@ -71,7 +71,7 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
       transition={{ duration: 0.15, ease: "easeOut" }}
-      className="space-y-6 pb-20"
+      className="space-y-6"
     >
       <header className="flex flex-col gap-4">
         <Button 
