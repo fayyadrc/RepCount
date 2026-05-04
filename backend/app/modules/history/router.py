@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 from typing import List
-from app.db.supabase import supabase
+from ...db.supabase import supabase
 from .schemas import WorkoutSession
 from .service import HistoryService
 

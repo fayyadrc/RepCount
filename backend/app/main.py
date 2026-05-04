@@ -7,10 +7,10 @@ load_dotenv()
 
 from contextlib import asynccontextmanager
 from apscheduler.schedulers.background import BackgroundScheduler
-from app.modules.health.router import router as health_router
-from app.modules.history.router import router as history_router
-from app.modules.strava.router import router as strava_router
-from app.modules.strava.service import sync_strava_data
+from .modules.health.router import router as health_router
+from .modules.history.router import router as history_router
+from .modules.strava.router import router as strava_router
+from .modules.strava.service import sync_strava_data
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
