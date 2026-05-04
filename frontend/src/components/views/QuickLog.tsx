@@ -7,75 +7,22 @@ import { useWorkoutStore } from '@/lib/workout-store';
 import { NotesInput } from '@/components/layout/NotesInput';
 import type { WorkoutEntry } from '@/lib/types';
 
-/**
- * Simple mock parser: extracts exercises from natural language input.
- * Looks for common patterns like "80kg bench press 3x8" or "bench press 80kg for 3 sets of 8".
- * Falls back to a sensible mock if parsing fails.
- */
-function parseMockWorkout(input: string): WorkoutEntry[] {
-  const lines = input.split(/[.\n]+/).map(l => l.trim()).filter(Boolean);
-  const entries: WorkoutEntry[] = [];
-
-  for (const line of lines) {
-    const lower = line.toLowerCase();
-
-    // Try to extract weight (number followed by kg/lbs)
-    const weightMatch = lower.match(/(\d+(?:\.\d+)?)\s*(kg|lbs?)/);
-    const weight = weightMatch ? parseFloat(weightMatch[1]) : 0;
-    const weightUnit = weightMatch ? (weightMatch[2] === 'lb' || weightMatch[2] === 'lbs' ? 'lbs' : 'kg') : 'kg';
-
-    // Try to extract sets x reps patterns
-    const setsRepsMatch = lower.match(/(\d+)\s*(?:sets?\s*(?:of|x|×)\s*(\d+)|x\s*(\d+))/);
-    const sets = setsRepsMatch ? parseInt(setsRepsMatch[1]) : 3;
-    const reps = setsRepsMatch ? parseInt(setsRepsMatch[2] || setsRepsMatch[3]) : 10;
-
-    // Also try "for X reps" pattern
-    const repsOnlyMatch = !setsRepsMatch ? lower.match(/(\d+)\s*reps/) : null;
-    const finalReps = repsOnlyMatch ? parseInt(repsOnlyMatch[1]) : reps;
-
-    // Extract exercise name: remove numbers, units, and common filler words
-    let exercise = line
-      .replace(/\d+(?:\.\d+)?\s*(kg|lbs?|reps?|sets?)/gi, '')
-      .replace(/\b(for|of|x|×|with|felt|did|hit|on)\b/gi, '')
-      .replace(/\s+/g, ' ')
-      .trim();
-
-    // Remove trailing/leading punctuation
-    exercise = exercise.replace(/^[,.\-–—]+|[,.\-–—]+$/g, '').trim();
-
-    if (!exercise || exercise.length < 2) {
-      exercise = 'General Exercise';
-    }
-
-    // Capitalize first letter of each word
-    exercise = exercise.replace(/\b\w/g, c => c.toUpperCase());
-
-    if (weight > 0 || exercise !== 'General Exercise') {
-      entries.push({
-        exercise,
-        weight: weight || 20,
-        weightUnit,
-        sets,
-        reps: finalReps,
-        notes: line.length > 40 ? line.slice(0, 80) + '...' : undefined,
-      });
-    }
-  }
-
-  // If nothing was parsed, return a fallback based on the input
-  if (entries.length === 0) {
-    entries.push({
-      exercise: 'Workout Entry',
-      weight: 20,
-      weightUnit: 'kg',
-      sets: 3,
-      reps: 10,
-      notes: input.slice(0, 80),
-    });
-  }
-
-  return entries;
+interface APIParsedWorkoutEntry {
+  date: string;
+  exercise_name: string;
+  weight: number | null;
+  unit: string;
+  reps: number;
+  failure: boolean;
+  rir: number | null;
 }
+
+interface APIParsedWorkoutLog {
+  entries: APIParsedWorkoutEntry[];
+}
+
+// Adjust this if your FastAPI backend runs on a different port/host
+const API_BASE_URL = "/api";
 
 export const QuickLog: React.FC = () => {
   const [input, setInput] = useState('');
@@ -95,11 +42,49 @@ export const QuickLog: React.FC = () => {
 
     setIsSubmitting(true);
 
-    // Simulate a brief processing delay
-    await new Promise(resolve => setTimeout(resolve, 600));
+    const payload = { raw_text: input };
+    console.log('Sending payload:', payload);
 
     try {
-      const result = parseMockWorkout(input);
+      // Call the FastAPI endpoint we just built
+      const response = await fetch(`${API_BASE_URL}/log/quick`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        // Grab any JSON error the server sent (otherwise fallback to plain text)
+        const errorData = await response.json().catch(async () => {
+          const text = await response.text();
+          return { detail: text || 'Unknown server error' };
+        });
+        
+        console.error('Server error response:', errorData);
+        const errorMessage = typeof errorData.detail === 'string' 
+          ? errorData.detail 
+          : JSON.stringify(errorData.detail) || 'Failed to parse workout on the server';
+        throw new Error(errorMessage);
+      }
+
+      const jsonResponse = await response.json();
+      const parsedData: APIParsedWorkoutLog = jsonResponse.data;
+
+      // Map the flat API entries into the WorkoutEntry[] shape the UI expects
+      const result: WorkoutEntry[] = parsedData.entries.map((entry) => ({
+        exercise: entry.exercise_name,
+        weight: entry.weight ?? 0,
+        weightUnit: entry.unit || 'kg',
+        sets: 1, // Gemini parses individual lines as individual sets
+        reps: entry.reps,
+        notes: `${entry.failure ? 'To failure. ' : ''}${entry.rir !== null ? `RIR ${entry.rir}. ` : ''}${entry.notes || ''}`.trim(),
+      }));
+
+      if (result.length === 0) {
+        throw new Error("No workout data could be extracted.");
+      }
 
       // Persist to store
       addSession(result, input);
@@ -108,14 +93,14 @@ export const QuickLog: React.FC = () => {
       setInput('');
       toast({
         title: "Workout Processed",
-        description: `Successfully logged ${result.length} exercise${result.length !== 1 ? 's' : ''}.`,
+        description: `Successfully logged ${result.length} set${result.length !== 1 ? 's' : ''}.`,
       });
     } catch (error) {
       console.error('Failed to log workout:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to process your workout. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to process your workout. Please try again.",
       });
     } finally {
       setIsSubmitting(false);
@@ -145,7 +130,7 @@ export const QuickLog: React.FC = () => {
         onChange={setInput}
         onSubmit={handleSubmit}
         isSubmitting={isSubmitting}
-        placeholder="Start typing what you worked out today..."
+        placeholder="Start typing what you worked out today... (e.g., Bench Press 80kg 3x8)"
       />
 
       {/* Captured data results */}

@@ -221,91 +221,90 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
         ) : null}
       </div>
 
-    {/* Strava Activities */}
-    {selectedSession.stravaActivities && selectedSession.stravaActivities.length > 0 && (!isPureStrava || selectedSession.stravaActivities.length > 1) && (
-      <div className="mt-6">
-        <h4 className="text-sm uppercase tracking-wider text-muted-foreground font-semibold mb-3 flex items-center gap-2">
-          <Flame className="w-4 h-4" style={{ color: 'hsl(25, 95%, 53%)' }} />
-          Strava Activities
-        </h4>
-        <div className="space-y-3">
-          {selectedSession.stravaActivities.map((act: StravaActivity, i: number) => (
-            <div
-              key={i}
-              className="p-4 rounded-2xl glass-surface border border-white/10 flex items-center justify-between hover:bg-white/5 transition-colors"
-            >
-              <div>
-                <p className="font-bold text-primary">{act.name}</p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {act.type === 'WeightTraining' ? '🏋️ Weights' :
-                    act.type === 'Run' ? '🏃 Run' :
-                    act.type === 'Walk' ? '🚶 Walk' :
-                    act.type === 'Workout' ? '⚡ Workout' :
-                    act.type}
-                  {act.distanceMeters > 0 && ` · ${(act.distanceMeters / 1000).toFixed(1)} km`}
-                </p>
-              </div>
-              <div className="text-right">
-                <p className="font-bold text-primary">{formatDuration(act.durationSeconds / 60)}</p>
-                {(act.avgHeartrate || act.maxHeartrate) && (
-                  <p className="text-sm mt-1" style={{ color: 'hsl(0, 72%, 58%)' }}>
-                    ❤️ {act.avgHeartrate ? Math.round(act.avgHeartrate) : '--'} bpm
-                    {act.maxHeartrate ? ` (Max: ${Math.round(act.maxHeartrate)})` : ''}
+      {/* Strava Activities */}
+      {selectedSession.stravaActivities && selectedSession.stravaActivities.length > 0 && (!isPureStrava || selectedSession.stravaActivities.length > 1) && (
+        <section className="pt-8 border-t border-white/5">
+          <h4 className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/50 font-bold mb-5 flex items-center gap-2 px-1">
+            <Flame className="w-3.5 h-3.5" style={{ color: 'hsl(25, 95%, 53%)' }} />
+            Strava Activities
+          </h4>
+          <div className="space-y-3">
+            {selectedSession.stravaActivities.map((act: StravaActivity, i: number) => (
+              <div
+                key={i}
+                className="p-4 rounded-2xl glass-surface border border-white/10 flex items-center justify-between hover:bg-white/5 transition-colors"
+              >
+                <div>
+                  <p className="font-bold text-primary">{act.name}</p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {act.type === 'WeightTraining' ? '🏋️ Weights' :
+                      act.type === 'Run' ? '🏃 Run' :
+                      act.type === 'Walk' ? '🚶 Walk' :
+                      act.type === 'Workout' ? '⚡ Workout' :
+                      act.type}
+                    {act.distanceMeters > 0 && ` · ${(act.distanceMeters / 1000).toFixed(1)} km`}
                   </p>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    )}
-
-    {/* Exercises Breakdown */}
-    {selectedSession.entries.length > 0 && (
-      <div className="mt-6">
-        <h4 className="text-sm uppercase tracking-wider text-muted-foreground font-semibold mb-3">
-          Exercise Breakdown
-        </h4>
-        <div className="space-y-3">
-          {(() => {
-            // Group entries by exercise name
-            const grouped: Record<string, typeof selectedSession.entries> = {};
-            selectedSession.entries.forEach(entry => {
-              if (!grouped[entry.exercise]) grouped[entry.exercise] = [];
-              grouped[entry.exercise].push(entry);
-            });
-
-            return Object.entries(grouped).map(([exercise, sets], i) => {
-              const exVolume = sets.reduce((s, e) => s + e.weight * e.sets * e.reps, 0);
-              return (
-                <div
-                  key={i}
-                  className="p-4 rounded-2xl glass-surface border border-white/10"
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <p className="font-bold text-lg capitalize text-primary">{exercise}</p>
-                    <span className="text-sm text-muted-foreground font-medium bg-background/50 px-3 py-1 rounded-full">
-                      {exVolume.toLocaleString()} kg
-                    </span>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {sets.map((set, j) => (
-                      <span
-                        key={j}
-                        className="text-sm px-3 py-1.5 rounded-full glass-surface border border-white/15 text-muted-foreground font-medium"
-                      >
-                        <strong className="text-primary">{set.weight}kg</strong> × {set.reps}
-                        {set.notes ? ` · ${set.notes}` : ''}
-                      </span>
-                    ))}
-                  </div>
                 </div>
-              );
-            });
-          })()}
-        </div>
-      </div>
-    )}
+                <div className="text-right">
+                  <p className="font-bold text-primary">{formatDuration(act.durationSeconds / 60)}</p>
+                  {(act.avgHeartrate || act.maxHeartrate) && (
+                    <p className="text-sm mt-1" style={{ color: 'hsl(0, 72%, 58%)' }}>
+                      ❤️ {act.avgHeartrate ? Math.round(act.avgHeartrate) : '--'} bpm
+                      {act.maxHeartrate ? ` (Max: ${Math.round(act.maxHeartrate)})` : ''}
+                    </p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Exercises Breakdown */}
+      {selectedSession.entries.length > 0 && (
+        <section className="pt-8 border-t border-white/5">
+          <h4 className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/50 font-bold mb-5 px-1">
+            Exercise Breakdown
+          </h4>
+          <div className="space-y-4">
+            {(() => {
+              const grouped: Record<string, typeof selectedSession.entries> = {};
+              selectedSession.entries.forEach(entry => {
+                if (!grouped[entry.exercise]) grouped[entry.exercise] = [];
+                grouped[entry.exercise].push(entry);
+              });
+
+              return Object.entries(grouped).map(([exercise, sets], i) => {
+                const exVolume = sets.reduce((s, e) => s + e.weight * e.sets * e.reps, 0);
+                return (
+                  <div
+                    key={i}
+                    className="p-4 rounded-2xl glass-surface border border-white/10"
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <p className="font-bold text-lg capitalize text-primary tracking-tight">{exercise}</p>
+                      <span className="text-xs text-muted-foreground font-semibold bg-white/5 px-3 py-1 rounded-full border border-white/5">
+                        {exVolume.toLocaleString()} kg
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {sets.map((set, j) => (
+                        <span
+                          key={j}
+                          className="text-sm px-3 py-1.5 rounded-full glass-surface border border-white/10 text-muted-foreground font-medium"
+                        >
+                          <strong className="text-primary font-bold">{set.weight}kg</strong> × {set.reps}
+                          {set.notes ? ` · ${set.notes}` : ''}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                );
+              });
+            })()}
+          </div>
+        </section>
+      )}
     </motion.div>
   );
 };
