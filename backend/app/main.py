@@ -45,10 +45,12 @@ app.add_middleware(
 # Get the absolute path to the frontend/dist directory
 # This assumes the file is in backend/app/main.py and we want to reach frontend/dist
 current_dir = os.path.dirname(os.path.abspath(__file__))
-# current_dir is backend/app
-# go up one level to backend/, then one more to root
-root_dir = os.path.dirname(os.path.dirname(current_dir))
+# current_dir is backend/app/
+root_dir = os.path.abspath(os.path.join(current_dir, "../../"))
 frontend_dist_path = os.path.join(root_dir, "frontend", "dist")
+
+print(f"📂 Serving frontend from: {frontend_dist_path}")
+print(f"🏠 Root directory: {root_dir}")
 
 # Include routers
 app.include_router(health_router, prefix="/api", tags=["Health"])
