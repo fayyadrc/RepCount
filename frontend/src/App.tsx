@@ -70,6 +70,11 @@ function AppContent() {
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
   const { sessions } = useWorkoutStore();
 
+  // Expose setActiveView globally for simple navigation from nested components
+  React.useEffect(() => {
+    (window as any).setActiveView = setActiveView;
+  }, [setActiveView]);
+
   // Derive anomaly count from sessions:
   // For now, track how many sessions have potential issues (non-empty store = realistic scan needed)
   // This will be dynamically updated when DataHealth actually scans data

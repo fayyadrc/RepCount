@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, BackgroundTasks
-from app.services.strava_service import sync_strava_data
+from .service import sync_strava_data
 
 router = APIRouter()
 

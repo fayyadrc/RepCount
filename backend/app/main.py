@@ -7,8 +7,10 @@ load_dotenv()
 
 from contextlib import asynccontextmanager
 from apscheduler.schedulers.background import BackgroundScheduler
-from app.api.routes import health, history, strava
-from app.services.strava_service import sync_strava_data
+from app.modules.health.router import router as health_router
+from app.modules.history.router import router as history_router
+from app.modules.strava.router import router as strava_router
+from app.modules.strava.service import sync_strava_data
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -38,9 +40,9 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(health.router, prefix="/api", tags=["Health"])
-app.include_router(history.router, prefix="/api", tags=["History"])
-app.include_router(strava.router, prefix="/api", tags=["Strava"])
+app.include_router(health_router, prefix="/api", tags=["Health"])
+app.include_router(history_router, prefix="/api", tags=["History"])
+app.include_router(strava_router, prefix="/api", tags=["Strava"])
 
 if __name__ == "__main__":
     import uvicorn

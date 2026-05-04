@@ -1,7 +1,7 @@
 from typing import List
 from collections import defaultdict
 import uuid
-from app.schemas.workout import WorkoutSession, WorkoutEntry, StravaActivity
+from .schemas import WorkoutSession, WorkoutEntry, StravaActivity
 
 class HistoryService:
     @staticmethod

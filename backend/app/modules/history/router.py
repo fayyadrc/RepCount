@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException
 from typing import List
-from app.schemas.workout import WorkoutSession
 from app.db.supabase import supabase
-from app.services.history_service import HistoryService
+from .schemas import WorkoutSession
+from .service import HistoryService
 
 router = APIRouter()
 

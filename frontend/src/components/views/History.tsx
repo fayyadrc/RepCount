@@ -4,7 +4,7 @@ import React from 'react';
 import { useWorkoutStore } from '@/lib/workout-store';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Clock, Dumbbell, Trash2, Weight, Heart, Activity, Timer, Flame, ChevronRight, Mountain, Gauge, RefreshCw } from 'lucide-react';
+import { Plus, Clock, Dumbbell, Trash2, Weight, Heart, Activity, Timer, Flame, ChevronRight, Mountain, Gauge, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { WorkoutSession, StravaActivity } from '@/lib/types';
 import { Footprints, Bike, Zap, SportShoe } from 'lucide-react';
@@ -81,58 +81,47 @@ export const History: React.FC<HistoryProps> = ({ onViewDetails }) => {
 
   return (
     <motion.div 
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: 20 }}
-      transition={{ duration: 0.15, ease: "easeOut" }}
-      className="space-y-10 animate-fade-up"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="space-y-8 animate-fade-up"
     >
-      <header className="flex justify-between items-end">
-        <div className="space-y-2">
-          <h2 className="text-[28px] md:text-3xl font-bold tracking-tight text-primary">Workout History</h2>
-          <p className="text-muted-foreground text-sm">
-            {sessions.length === 0
-              ? 'No sessions logged yet. Head to Quick Log to get started.'
-              : `${sessions.length} session${sessions.length !== 1 ? 's' : ''} recorded`
-            }
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-muted-foreground hover:text-primary"
+      <header className="flex justify-between items-start pt-4">
+        <h2 className="text-[34px] font-bold tracking-tight text-black leading-tight">
+          Good morning
+        </h2>
+        <div className="flex gap-2">
+          <button 
             onClick={handleSync}
             disabled={isSyncing}
+            className="w-12 h-12 rounded-full bg-white border border-gray-100 shadow-sm flex items-center justify-center hover:scale-105 active:scale-95 transition-all disabled:opacity-50"
           >
-            <RefreshCw className={`w-4 h-4 mr-1 ${isSyncing ? 'animate-spin' : ''}`} />
-            {isSyncing ? 'Syncing...' : 'Sync Strava'}
-          </Button>
-          {sessions.length > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-muted-foreground hover:text-destructive"
-              onClick={handleClear}
-            >
-              <Trash2 className="w-4 h-4 mr-1" />
-              Clear All
-            </Button>
-          )}
+            <RefreshCw className={`w-5 h-5 text-black ${isSyncing ? 'animate-spin' : ''}`} />
+          </button>
+          <button 
+            onClick={() => (window as any).setActiveView?.('quick-log')}
+            className="w-12 h-12 rounded-full bg-white border border-gray-100 shadow-sm flex items-center justify-center hover:scale-105 active:scale-95 transition-all"
+          >
+            <Plus className="w-6 h-6 text-black" />
+          </button>
         </div>
       </header>
 
       {sessions.length === 0 ? (
-        <div className="py-20 flex flex-col items-center justify-center text-center space-y-4">
-          <div className="w-16 h-16 glass-surface rounded-full flex items-center justify-center">
-            <Clock className="w-8 h-8 text-muted-foreground" />
-          </div>
-          <div>
-            <h3 className="text-lg font-bold text-primary">No History Yet</h3>
-            <p className="text-muted-foreground text-sm max-w-xs">
-              Your logged workouts will appear here. Start by logging a session in Quick Log.
+        <div className="py-24 flex flex-col items-center justify-center text-center space-y-6">
+          <Dumbbell className="w-16 h-16 text-gray-100" strokeWidth={1} />
+          <div className="space-y-2">
+            <h3 className="text-xl font-bold text-black">No workouts yet</h3>
+            <p className="text-gray-400 text-[15px] max-w-[240px] mx-auto leading-relaxed">
+              Start your first workout to begin tracking your progress.
             </p>
           </div>
+          <button
+            onClick={() => (window as any).setActiveView?.('quick-log')}
+            className="mt-4 px-8 py-3.5 rounded-full bg-black text-white text-[13px] font-bold tracking-widest uppercase hover:scale-[1.02] active:scale-[0.98] transition-all"
+          >
+            + Start Workout
+          </button>
         </div>
       ) : (
         <div className="space-y-3">
@@ -155,7 +144,7 @@ export const History: React.FC<HistoryProps> = ({ onViewDetails }) => {
               <div
                 key={session.id}
                 onClick={() => onViewDetails?.(session.id)}
-                className={`cursor-pointer glass-surface rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300 animate-slide-up hover:scale-[1.02] active:scale-[0.98] stagger-${Math.min(idx + 1, 5)}`}
+                className="cursor-pointer bg-white border border-gray-100 rounded-[20px] p-5 hover:shadow-md transition-all active:scale-[0.98] animate-fade-up"
               >
                 <div className="p-5">
                   {/* Top row: date + stats */}
