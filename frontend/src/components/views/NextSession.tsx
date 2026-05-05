@@ -83,7 +83,7 @@ export const NextSession: React.FC = () => {
           <div>
             <h3 className="text-lg font-bold text-primary">Log Your First Workout</h3>
             <p className="text-muted-foreground text-sm max-w-xs">
-              Head to Quick Log and record a session. RepCout will then generate
+              Head to Quick Log and record a session. RepCount will then generate
               personalized suggestions for your next workout.
             </p>
           </div>

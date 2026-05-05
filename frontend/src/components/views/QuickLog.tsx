@@ -115,7 +115,7 @@ export const QuickLog: React.FC = () => {
           New Session
         </h2>
         <p className="text-muted-foreground text-sm leading-relaxed">
-          Tell RepCout about your performance. We&apos;ll handle the numbers.
+          Tell RepCount about your performance. We&apos;ll handle the numbers.
           {sessions.length > 0 && (
             <span className="ml-2 text-primary/50 font-medium">
               ({sessions.length} session{sessions.length !== 1 ? 's' : ''} logged)
