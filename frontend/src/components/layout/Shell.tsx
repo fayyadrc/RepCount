@@ -37,7 +37,7 @@ export const Shell: React.FC<ShellProps> = ({
       <aside className="hidden md:flex md:w-20 lg:w-64 bg-white border-r border-gray-100 flex-col items-center lg:items-stretch transition-all duration-300 shrink-0">
         {/* Brand */}
         <div className="px-6 py-6 hidden lg:block">
-          <h1 className="text-xl font-bold tracking-tight text-black">Synapse</h1>
+          <h1 className="text-xl font-bold tracking-tight text-black">RepCout</h1>
           <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold">AI Gym Intelligence</p>
         </div>
 
