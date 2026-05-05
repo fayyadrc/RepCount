@@ -59,4 +59,4 @@ export interface WorkoutSession {
 
 // ─── UI State Types ───
 
-export type ViewState = 'quick-log' | 'next-session' | 'profile' | 'history' | 'data-health' | 'workout-details' | 'analytics';
+export type ViewState = 'quick-log' | 'next-session' | 'profile' | 'history' | 'data-health' | 'workout-details' | 'analytics' | 'ai-insights';
