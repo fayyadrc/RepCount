@@ -2,8 +2,14 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
+import mimetypes
 from dotenv import load_dotenv
+
+# Ensure common web types are registered correctly
+mimetypes.init()
+mimetypes.add_type('application/javascript', '.js')
+mimetypes.add_type('text/css', '.css')
 
 load_dotenv()
 
@@ -42,43 +48,47 @@ app.add_middleware(
 )
 
 # Serve static files from the frontend/dist directory
-# Get the absolute path to the frontend/dist directory
 # This assumes the file is in backend/app/main.py and we want to reach frontend/dist
-current_dir = os.path.dirname(os.path.abspath(__file__))
-# current_dir is backend/app/
-root_dir = os.path.abspath(os.path.join(current_dir, "../../"))
-frontend_dist_path = os.path.join(root_dir, "frontend", "dist")
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+frontend_dist_path = os.path.join(BASE_DIR, "frontend", "dist")
 
 print(f"📂 Serving frontend from: {frontend_dist_path}")
-print(f"🏠 Root directory: {root_dir}")
+print(f"🏠 Project root: {BASE_DIR}")
 
 # Include routers
 app.include_router(health_router, prefix="/api", tags=["Health"])
 app.include_router(history_router, prefix="/api", tags=["History"])
 app.include_router(strava_router, prefix="/api", tags=["Strava"])
 
-# Serve frontend static assets
-if os.path.exists(os.path.join(frontend_dist_path, "assets")):
-    app.mount("/assets", StaticFiles(directory=os.path.join(frontend_dist_path, "assets")), name="assets")
-
-# Catch-all route to serve the frontend (SPA routing)
+# Catch-all route to serve the frontend (SPA routing and static files)
 @app.get("/{rest_of_path:path}")
 async def serve_frontend(rest_of_path: str):
     # If the path looks like an API call but wasn't caught by the routers above, return 404
     if rest_of_path.startswith("api/"):
-        return {"detail": "Not Found"}, 404
+        return JSONResponse(status_code=404, content={"detail": f"API endpoint '{rest_of_path}' not found"})
     
-    # Check if the built frontend exists
+    # 1. Check if the requested path corresponds to a real file in the dist directory
+    # (e.g., assets/index-xxx.js, vite.svg, favicon.ico)
+    if rest_of_path:
+        file_path = os.path.join(frontend_dist_path, rest_of_path)
+        if os.path.isfile(file_path):
+            return FileResponse(file_path)
+    
+    # 2. Fallback to index.html for SPA routing (e.g., /dashboard, /history)
     index_path = os.path.join(frontend_dist_path, "index.html")
     if os.path.exists(index_path):
         return FileResponse(index_path)
     
-    # Fallback message if frontend isn't built yet
-    return {
-        "message": "GymTracker AI API is running, but the frontend has not been built yet.",
-        "health_check": "/api/health",
-        "docs": "/docs"
-    }
+    # 3. Fallback message if frontend isn't built yet
+    return JSONResponse(
+        status_code=404,
+        content={
+            "message": "GymTracker AI API is running, but the frontend has not been built yet or the requested file was not found.",
+            "health_check": "/api/health",
+            "docs": "/docs",
+            "path_attempted": rest_of_path
+        }
+    )
 
 if __name__ == "__main__":
     import uvicorn
