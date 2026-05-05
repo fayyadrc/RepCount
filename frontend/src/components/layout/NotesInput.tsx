@@ -44,33 +44,9 @@ export const NotesInput: React.FC<NotesInputProps> = ({
   };
 
   return (
-    <div className="flex flex-col w-full h-full bg-white animate-fade-up">
-      {/* Apple Notes Header */}
-      <div className="flex items-center justify-end gap-6 px-6 py-4">
-        <button 
-          className="text-[#007AFF] hover:opacity-70 transition-opacity"
-          disabled={disabled}
-        >
-          <MoreHorizontal className="w-6 h-6" strokeWidth={2} />
-        </button>
-        <button
-          onClick={onSubmit}
-          disabled={isSubmitting || !value.trim()}
-          className={cn(
-            "text-[#007AFF] font-semibold text-[17px] flex items-center gap-2 hover:opacity-70 transition-opacity disabled:opacity-30",
-          )}
-        >
-          {isSubmitting ? (
-            <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
-          ) : (
-            <Check className="w-6 h-6" strokeWidth={2.5} />
-          )}
-          <span>Done</span>
-        </button>
-      </div>
-
+    <div className="flex flex-col w-full h-full bg-white">
       {/* Writing Surface */}
-      <div className="flex-1 px-6 pt-2 overflow-y-auto">
+      <div className="flex-1 px-8 pt-8 overflow-y-auto relative">
         <textarea
           ref={textareaRef}
           value={value}
@@ -85,7 +61,7 @@ export const NotesInput: React.FC<NotesInputProps> = ({
             "disabled:opacity-50 disabled:cursor-not-allowed",
           )}
           style={{
-            minHeight: '500px',
+            minHeight: '300px',
             fontFamily: 'var(--font-body)',
           }}
           autoFocus

@@ -1,10 +1,24 @@
+
 "use client";
 
 import React, { useEffect } from 'react';
 import { useWorkoutStore } from '@/lib/workout-store';
-import { Button } from '@/components/ui/button';
-import { ChevronLeft, Weight, Dumbbell, Timer, Heart, Activity, Gauge, Mountain, Flame, Footprints, Bike, Zap } from 'lucide-react';
-import type { StravaActivity } from '@/lib/types';
+import { 
+  ChevronLeft, 
+  Weight, 
+  Dumbbell, 
+  Timer, 
+  Heart, 
+  Activity, 
+  Gauge, 
+  Mountain, 
+  Flame, 
+  Footprints, 
+  Bike, 
+  Zap,
+  Info
+} from 'lucide-react';
+import type { StravaActivity, WorkoutEntry } from '@/lib/types';
 import { motion } from 'framer-motion';
 
 const getStravaIcon = (type: string, className: string) => {
@@ -38,16 +52,20 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
 
   if (!selectedSession) {
     return (
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -20 }}
-        transition={{ duration: 0.15 }}
-        className="py-20 flex flex-col items-center justify-center text-center space-y-4"
-      >
-        <h3 className="text-lg font-bold text-primary">Session Not Found</h3>
-        <Button variant="outline" onClick={onBack}>Go Back</Button>
-      </motion.div>
+      <div className="py-20 flex flex-col items-center justify-center text-center space-y-4">
+        <div className="w-16 h-16 bg-[#F2F2F7] rounded-full flex items-center justify-center">
+          <Info className="w-8 h-8 text-gray-300" />
+        </div>
+        <div className="space-y-1">
+          <h3 className="text-lg font-bold text-black">Session Not Found</h3>
+          <button 
+            onClick={onBack}
+            className="text-gray-400 text-sm font-bold uppercase tracking-widest hover:text-black transition-colors"
+          >
+            Go Back
+          </button>
+        </div>
+      </div>
     );
   }
 
@@ -63,212 +81,100 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
 
   const displayDuration = selectedSession.durationMins || (isPureStrava && primaryStravaActivity ? primaryStravaActivity.durationSeconds / 60 : 0);
   const displayHr = selectedSession.avgHeartRate || (isPureStrava && primaryStravaActivity ? primaryStravaActivity.avgHeartrate : null);
-  const displayMaxHr = isPureStrava && primaryStravaActivity ? primaryStravaActivity.maxHeartrate : null;
+  const maxHr = selectedSession.stravaActivities?.reduce((max, act) => Math.max(max, act.maxHeartrate || 0), 0) || 0;
+  const totalCalories = selectedSession.stravaActivities?.reduce((sum, act) => sum + (act.calories || 0), 0) || 0;
 
   return (
     <motion.div 
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -20 }}
-      transition={{ duration: 0.15, ease: "easeOut" }}
-      className="space-y-6"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="space-y-8 pt-4 pb-24"
     >
-      <header className="flex flex-col gap-4">
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          className="w-fit text-muted-foreground hover:text-primary -ml-2"
+      <header className="space-y-4">
+        <button 
           onClick={onBack}
+          className="flex items-center gap-1.5 text-gray-400 hover:text-black transition-colors"
         >
-          <ChevronLeft className="w-4 h-4 mr-1" />
-          Back to History
-        </Button>
+          <ChevronLeft className="w-4 h-4" />
+          <span className="text-[10px] font-bold uppercase tracking-widest">Back to History</span>
+        </button>
         <div>
-          <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-primary flex items-center gap-2">
-            {isPureStrava && primaryStravaActivity && selectedSession.stravaActivities!.length === 1 ? (
-              <>
-                {getStravaIcon(primaryStravaActivity.type, "w-6 h-6 text-primary")}
-                {primaryStravaActivity.name}
-              </>
-            ) : (
-              "Workout Details"
-            )}
+          <h2 className="text-3xl font-bold text-black tracking-tight">
+            {isPureStrava && primaryStravaActivity && selectedSession.stravaActivities!.length === 1 
+              ? primaryStravaActivity.name 
+              : "Workout Details"
+            }
           </h2>
-          <p className="text-muted-foreground text-sm mt-1">
+          <p className="text-gray-400 text-sm font-medium mt-1">
             {new Date(selectedSession.date + 'T00:00:00').toLocaleDateString('en-US', {
               weekday: 'long',
               month: 'long',
-              day: 'numeric',
-              year: 'numeric'
+              day: 'numeric'
             })}
           </p>
         </div>
       </header>
 
       {/* Summary Stats Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 gap-4">
         {selectedSession.entries.length > 0 && (
-          <>
-            <div className="p-4 rounded-2xl glass-surface border border-white/10">
-              <div className="flex items-center gap-2 mb-2">
-                <Weight className="w-4 h-4 text-primary" />
-                <span className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Volume</span>
-              </div>
-              <p className="text-2xl font-bold text-primary">
-                {(selectedSession.totalVolumeKg
-                  ?? selectedSession.entries.reduce((s, e) => s + e.weight * e.sets * e.reps, 0)
-                ).toLocaleString()} <span className="text-sm font-medium text-muted-foreground">kg</span>
-              </p>
-            </div>
-
-            <div className="p-4 rounded-2xl glass-surface border border-white/10">
-              <div className="flex items-center gap-2 mb-2">
-                <Dumbbell className="w-4 h-4 text-primary" />
-                <span className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Sets</span>
-              </div>
-              <p className="text-2xl font-bold text-primary">
-                {selectedSession.entries.length} <span className="text-sm font-medium text-muted-foreground">total</span>
-              </p>
-            </div>
-          </>
+          <StatCard 
+            icon={<Weight className="w-4 h-4" />}
+            label="Total Volume"
+            value={(selectedSession.totalVolumeKg ?? selectedSession.entries.reduce((s, e) => s + e.weight * e.sets * e.reps, 0)).toLocaleString()}
+            subtext="kg"
+          />
         )}
-
         {displayDuration > 0 && (
-          <div className="p-4 rounded-2xl glass-surface border border-white/10">
-            <div className="flex items-center gap-2 mb-2">
-              <Timer className="w-4 h-4 text-primary" />
-              <span className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Duration</span>
-            </div>
-            <p className="text-2xl font-bold text-primary">
-              {formatDuration(displayDuration)}
-            </p>
-          </div>
+          <StatCard 
+            icon={<Timer className="w-4 h-4" />}
+            label="Duration"
+            value={formatDuration(displayDuration)}
+            subtext="active time"
+          />
         )}
-
-        {displayHr && displayHr > 0 ? (
-          <div className="p-4 rounded-2xl glass-surface border border-white/10">
-            <div className="flex items-center gap-2 mb-2">
-              <Heart className="w-4 h-4" style={{ color: 'hsl(0, 72%, 58%)' }} />
-              <span className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Avg HR</span>
-            </div>
-            <p className="text-2xl font-bold" style={{ color: 'hsl(0, 72%, 58%)' }}>
-              {Math.round(displayHr)} <span className="text-sm font-medium text-muted-foreground">bpm</span>
-            </p>
-          </div>
-        ) : null}
-
-        {displayMaxHr && displayMaxHr > 0 ? (
-          <div className="p-4 rounded-2xl glass-surface border border-white/10">
-            <div className="flex items-center gap-2 mb-2">
-              <Heart className="w-4 h-4" style={{ color: 'hsl(0, 72%, 58%)' }} />
-              <span className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Max HR</span>
-            </div>
-            <p className="text-2xl font-bold" style={{ color: 'hsl(0, 72%, 58%)' }}>
-              {Math.round(displayMaxHr)} <span className="text-sm font-medium text-muted-foreground">bpm</span>
-            </p>
-          </div>
-        ) : null}
-        
-        {isPureStrava && primaryStravaActivity?.distanceMeters && primaryStravaActivity.distanceMeters > 0 ? (
-            <div className="p-4 rounded-2xl glass-surface border border-white/10">
-              <div className="flex items-center gap-2 mb-2">
-                <Activity className="w-4 h-4 text-primary" />
-                <span className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Distance</span>
+        {(displayHr || maxHr > 0) && (
+          <StatCard 
+            icon={<Heart className="w-4 h-4 text-red-500/70" />}
+            label="Heart Rate"
+            value={
+              <div className="flex items-baseline gap-2">
+                <span>{displayHr ? Math.round(displayHr) : '--'}</span>
+                {maxHr > 0 && <span className="text-sm text-gray-400 font-medium">/ {Math.round(maxHr)} max</span>}
               </div>
-              <p className="text-2xl font-bold text-primary">
-                {(primaryStravaActivity.distanceMeters / 1000).toFixed(2)} <span className="text-sm font-medium text-muted-foreground">km</span>
-              </p>
-            </div>
-        ) : null}
-        
-        {isPureStrava && primaryStravaActivity?.avgSpeedMps && primaryStravaActivity.avgSpeedMps > 0 ? (
-            <div className="p-4 rounded-2xl glass-surface border border-white/10">
-              <div className="flex items-center gap-2 mb-2">
-                <Gauge className="w-4 h-4 text-primary" />
-                <span className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Pace/Speed</span>
-              </div>
-              <p className="text-2xl font-bold text-primary">
-                {primaryStravaActivity.type === 'Run' || primaryStravaActivity.type === 'Walk' 
-                    ? `${Math.floor((1000 / primaryStravaActivity.avgSpeedMps) / 60)}:${Math.floor((1000 / primaryStravaActivity.avgSpeedMps) % 60).toString().padStart(2, '0')}`
-                    : `${(primaryStravaActivity.avgSpeedMps * 3.6).toFixed(1)}`
-                } <span className="text-sm font-medium text-muted-foreground">{primaryStravaActivity.type === 'Run' || primaryStravaActivity.type === 'Walk' ? '/km' : 'km/h'}</span>
-              </p>
-            </div>
-        ) : null}
-        
-        {isPureStrava && primaryStravaActivity?.elevationGain && primaryStravaActivity.elevationGain > 0 ? (
-            <div className="p-4 rounded-2xl glass-surface border border-white/10">
-              <div className="flex items-center gap-2 mb-2">
-                <Mountain className="w-4 h-4 text-primary" />
-                <span className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Elevation</span>
-              </div>
-              <p className="text-2xl font-bold text-primary">
-                {Math.round(primaryStravaActivity.elevationGain)} <span className="text-sm font-medium text-muted-foreground">m</span>
-              </p>
-            </div>
-        ) : null}
-
-        {isPureStrava && primaryStravaActivity?.calories ? (
-            <div className="p-4 rounded-2xl glass-surface border border-white/10">
-              <div className="flex items-center gap-2 mb-2">
-                <Flame className="w-4 h-4" style={{ color: 'hsl(25, 95%, 53%)' }} />
-                <span className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Calories</span>
-              </div>
-              <p className="text-2xl font-bold" style={{ color: 'hsl(25, 95%, 53%)' }}>
-                {Math.round(primaryStravaActivity.calories)} <span className="text-sm font-medium text-muted-foreground">kcal</span>
-              </p>
-            </div>
-        ) : null}
+            }
+            subtext="bpm"
+          />
+        )}
+        {totalCalories > 0 && (
+          <StatCard 
+            icon={<Flame className="w-4 h-4 text-orange-500" />}
+            label="Calories"
+            value={Math.round(totalCalories)}
+            subtext="kcal burnt"
+          />
+        )}
+        {isPureStrava && primaryStravaActivity?.distanceMeters && (
+          <StatCard 
+            icon={<Activity className="w-4 h-4" />}
+            label="Distance"
+            value={(primaryStravaActivity.distanceMeters / 1000).toFixed(2)}
+            subtext="km"
+          />
+        )}
       </div>
-
-      {/* Strava Activities */}
-      {selectedSession.stravaActivities && selectedSession.stravaActivities.length > 0 && (!isPureStrava || selectedSession.stravaActivities.length > 1) && (
-        <section className="pt-8 border-t border-white/5">
-          <h4 className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/50 font-bold mb-5 flex items-center gap-2 px-1">
-            <Flame className="w-3.5 h-3.5" style={{ color: 'hsl(25, 95%, 53%)' }} />
-            Strava Activities
-          </h4>
-          <div className="space-y-3">
-            {selectedSession.stravaActivities.map((act: StravaActivity, i: number) => (
-              <div
-                key={i}
-                className="p-4 rounded-2xl glass-surface border border-white/10 flex items-center justify-between hover:bg-white/5 transition-colors"
-              >
-                <div>
-                  <p className="font-bold text-primary">{act.name}</p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {act.type === 'WeightTraining' ? '🏋️ Weights' :
-                      act.type === 'Run' ? '🏃 Run' :
-                      act.type === 'Walk' ? '🚶 Walk' :
-                      act.type === 'Workout' ? '⚡ Workout' :
-                      act.type}
-                    {act.distanceMeters > 0 && ` · ${(act.distanceMeters / 1000).toFixed(1)} km`}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="font-bold text-primary">{formatDuration(act.durationSeconds / 60)}</p>
-                  {(act.avgHeartrate || act.maxHeartrate) && (
-                    <p className="text-sm mt-1" style={{ color: 'hsl(0, 72%, 58%)' }}>
-                      ❤️ {act.avgHeartrate ? Math.round(act.avgHeartrate) : '--'} bpm
-                      {act.maxHeartrate ? ` (Max: ${Math.round(act.maxHeartrate)})` : ''}
-                    </p>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
 
       {/* Exercises Breakdown */}
       {selectedSession.entries.length > 0 && (
-        <section className="pt-8 border-t border-white/5">
-          <h4 className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/50 font-bold mb-5 px-1">
-            Exercise Breakdown
-          </h4>
+        <section className="space-y-6">
+          <div className="flex items-center gap-2 px-1">
+            <Dumbbell className="w-4 h-4 text-black" />
+            <span className="text-[11px] font-bold text-[#8E8E93] uppercase tracking-[0.05em]">Exercise Breakdown</span>
+          </div>
+          
           <div className="space-y-4">
             {(() => {
-              const grouped: Record<string, typeof selectedSession.entries> = {};
+              const grouped: Record<string, WorkoutEntry[]> = {};
               selectedSession.entries.forEach(entry => {
                 if (!grouped[entry.exercise]) grouped[entry.exercise] = [];
                 grouped[entry.exercise].push(entry);
@@ -277,25 +183,29 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
               return Object.entries(grouped).map(([exercise, sets], i) => {
                 const exVolume = sets.reduce((s, e) => s + e.weight * e.sets * e.reps, 0);
                 return (
-                  <div
-                    key={i}
-                    className="p-4 rounded-2xl glass-surface border border-white/10"
-                  >
-                    <div className="flex items-center justify-between mb-4">
-                      <p className="font-bold text-lg capitalize text-primary tracking-tight">{exercise}</p>
-                      <span className="text-xs text-muted-foreground font-semibold bg-white/5 px-3 py-1 rounded-full border border-white/5">
+                  <div key={i} className="bg-[#F2F2F7]/50 rounded-[24px] p-6 space-y-4">
+                    <div className="flex justify-between items-start">
+                      <h4 className="text-lg font-bold text-black capitalize">{exercise}</h4>
+                      <div className="px-3 py-1 bg-white rounded-full border border-gray-100 text-[10px] font-bold text-gray-500 uppercase tracking-tight">
                         {exVolume.toLocaleString()} kg
-                      </span>
+                      </div>
                     </div>
-                    <div className="flex flex-wrap gap-2">
+                    
+                    <div className="space-y-2">
                       {sets.map((set, j) => (
-                        <span
-                          key={j}
-                          className="text-sm px-3 py-1.5 rounded-full glass-surface border border-white/10 text-muted-foreground font-medium"
-                        >
-                          <strong className="text-primary font-bold">{set.weight}kg</strong> × {set.reps}
-                          {set.notes ? ` · ${set.notes}` : ''}
-                        </span>
+                        <div key={j} className="flex items-center justify-between text-sm py-1 border-b border-gray-200/50 last:border-0">
+                          <div className="flex items-center gap-3">
+                            <span className="text-[10px] font-bold text-gray-400 uppercase w-8">Set {j+1}</span>
+                            <span className="font-bold text-black">{set.weight}<span className="text-[10px] text-gray-400 font-medium ml-0.5">kg</span></span>
+                            <span className="text-gray-300">×</span>
+                            <span className="font-bold text-black">{set.reps}<span className="text-[10px] text-gray-400 font-medium ml-0.5">reps</span></span>
+                          </div>
+                          {set.notes && (
+                            <span className="text-[10px] font-bold text-orange-500 uppercase tracking-tight truncate max-w-[120px]">
+                              {set.notes}
+                            </span>
+                          )}
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -305,6 +215,49 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
           </div>
         </section>
       )}
+
+      {/* Strava Details if available */}
+      {hasStrava && (
+        <section className="space-y-6">
+          <div className="flex items-center gap-2 px-1">
+            <Flame className="w-4 h-4 text-orange-500" />
+            <span className="text-[11px] font-bold text-[#8E8E93] uppercase tracking-[0.05em]">Strava Activities</span>
+          </div>
+          
+          <div className="space-y-3">
+            {selectedSession.stravaActivities?.map((act, i) => (
+              <div key={i} className="bg-white rounded-[24px] p-5 border border-gray-100 shadow-sm flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center">
+                    {getStravaIcon(act.type, "w-5 h-5 text-orange-600")}
+                  </div>
+                  <div>
+                    <p className="font-bold text-black">{act.name}</p>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{act.type}</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="font-bold text-black">{formatDuration(act.durationSeconds / 60)}</p>
+                  {act.calories && <p className="text-[10px] font-bold text-orange-500 uppercase tracking-tight">{Math.round(act.calories)} kcal</p>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
     </motion.div>
   );
 };
+
+const StatCard: React.FC<{ icon: React.ReactNode, label: string, value: React.ReactNode, subtext: string }> = ({ icon, label, value, subtext }) => (
+  <div className="bg-[#F2F2F7]/50 rounded-[24px] p-5 space-y-3">
+    <div className="flex items-center gap-2">
+      <div className="text-black">{icon}</div>
+      <span className="text-[10px] font-bold text-[#8E8E93] uppercase tracking-wider">{label}</span>
+    </div>
+    <div>
+      <div className="text-2xl font-bold text-black">{value}</div>
+      <p className="text-[10px] font-semibold text-gray-400 mt-1">{subtext}</p>
+    </div>
+  </div>
+);
