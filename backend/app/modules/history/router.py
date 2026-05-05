@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 from typing import List
 from ...db.supabase import supabase
-from .schemas import WorkoutSession
+from .schemas import WorkoutSession, WorkoutEntry
 from .service import HistoryService
 
 router = APIRouter()
@@ -80,3 +80,17 @@ async def quick_log_workout(request: Request, log_data: RawLogRequest):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database insertion error: {str(e)}")
+
+@router.put("/history/log/{log_id}")
+def update_workout_log(log_id: str, entry: WorkoutEntry):
+    success = HistoryService.update_log(log_id, entry)
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to update workout log")
+    return {"status": "success"}
+
+@router.delete("/history/log/{log_id}")
+def delete_workout_log(log_id: str):
+    success = HistoryService.delete_log(log_id)
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to delete workout log")
+    return {"status": "success"}

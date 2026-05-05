@@ -81,6 +81,8 @@ interface WorkoutContextValue {
   clearSessions: () => void;
   refreshSessions: () => Promise<void>;
   syncStrava: () => Promise<void>;
+  updateLog: (logId: string, entry: WorkoutEntry) => Promise<void>;
+  deleteLog: (logId: string) => Promise<void>;
 }
 
 const WorkoutContext = createContext<WorkoutContextValue | null>(null);
@@ -138,6 +140,26 @@ export function WorkoutProvider({ children }: { children: React.ReactNode }) {
     }
   }, [refreshSessions]);
 
+  const updateLog = useCallback(async (logId: string, entry: WorkoutEntry) => {
+    try {
+      await api.updateWorkoutLog(logId, entry);
+      await refreshSessions();
+    } catch (error) {
+      console.error('Update log error:', error);
+      throw error;
+    }
+  }, [refreshSessions]);
+
+  const deleteLog = useCallback(async (logId: string) => {
+    try {
+      await api.deleteWorkoutLog(logId);
+      await refreshSessions();
+    } catch (error) {
+      console.error('Delete log error:', error);
+      throw error;
+    }
+  }, [refreshSessions]);
+
   return (
     <WorkoutContext.Provider value={{ 
       sessions: state.sessions, 
@@ -146,7 +168,9 @@ export function WorkoutProvider({ children }: { children: React.ReactNode }) {
       addSession, 
       clearSessions,
       refreshSessions,
-      syncStrava
+      syncStrava,
+      updateLog,
+      deleteLog
     }}>
       {children}
     </WorkoutContext.Provider>

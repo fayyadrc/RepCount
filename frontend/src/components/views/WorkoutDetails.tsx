@@ -16,8 +16,13 @@ import {
   Footprints, 
   Bike, 
   Zap,
-  Info
+  Info,
+  Pencil,
+  Trash2,
+  Check,
+  X
 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 import type { StravaActivity, WorkoutEntry } from '@/lib/types';
 import { motion } from 'framer-motion';
 
@@ -42,8 +47,19 @@ interface WorkoutDetailsProps {
 }
 
 export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBack }) => {
-  const { sessions } = useWorkoutStore();
+  const { sessions, updateLog, deleteLog } = useWorkoutStore();
+  const { toast } = useToast();
   const selectedSession = sessions.find(s => s.id === sessionId);
+
+  const [editingId, setEditingId] = React.useState<string | null>(null);
+  const [isDeletingId, setIsDeletingId] = React.useState<string | null>(null);
+  const [editValues, setEditValues] = React.useState<{ weight: number, reps: number, exercise: string, notes: string }>({
+    weight: 0,
+    reps: 0,
+    exercise: '',
+    notes: ''
+  });
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   // Scroll to top when view loads
   useEffect(() => {
@@ -180,6 +196,47 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
                 grouped[entry.exercise].push(entry);
               });
 
+              const handleStartEdit = (entry: WorkoutEntry) => {
+                if (!entry.id) return;
+                setEditingId(entry.id);
+                setEditValues({
+                  weight: entry.weight,
+                  reps: entry.reps,
+                  exercise: entry.exercise,
+                  notes: entry.notes || ''
+                });
+              };
+
+              const handleSaveEdit = async (id: string) => {
+                setIsSubmitting(true);
+                try {
+                  await updateLog(id, {
+                    ...editValues,
+                    sets: 1, // Individual rows are usually treated as 1 set in the update logic
+                    weightUnit: 'kg'
+                  });
+                  setEditingId(null);
+                  toast({ title: "Updated", description: "Log entry updated successfully." });
+                } catch (e) {
+                  toast({ variant: "destructive", title: "Error", description: "Failed to update log." });
+                } finally {
+                  setIsSubmitting(false);
+                }
+              };
+
+              const handleDelete = async (id: string) => {
+                setIsSubmitting(true);
+                try {
+                  await deleteLog(id);
+                  toast({ title: "Deleted", description: "Log entry removed." });
+                } catch (e) {
+                  toast({ variant: "destructive", title: "Error", description: "Failed to delete entry." });
+                } finally {
+                  setIsSubmitting(false);
+                  setIsDeletingId(null);
+                }
+              };
+
               return Object.entries(grouped).map(([exercise, sets], i) => {
                 const exVolume = sets.reduce((s, e) => s + e.weight * e.sets * e.reps, 0);
                 return (
@@ -192,21 +249,105 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
                     </div>
                     
                     <div className="space-y-2">
-                      {sets.map((set, j) => (
-                        <div key={j} className="flex items-center justify-between text-sm py-1 border-b border-gray-200/50 last:border-0">
-                          <div className="flex items-center gap-3">
-                            <span className="text-[10px] font-bold text-gray-400 uppercase w-8">Set {j+1}</span>
-                            <span className="font-bold text-black">{set.weight}<span className="text-[10px] text-gray-400 font-medium ml-0.5">kg</span></span>
-                            <span className="text-gray-300">×</span>
-                            <span className="font-bold text-black">{set.reps}<span className="text-[10px] text-gray-400 font-medium ml-0.5">reps</span></span>
+                      {sets.map((set, j) => {
+                        const isEditing = set.id && editingId === set.id;
+                        const isDeleting = set.id && isDeletingId === set.id;
+
+                        if (isEditing) {
+                          return (
+                            <div key={j} className="flex flex-col gap-3 p-3 bg-white rounded-xl border border-black/5 shadow-sm">
+                              <div className="flex items-center gap-2">
+                                <div className="flex-1">
+                                  <label className="text-[9px] font-bold text-gray-400 uppercase ml-1">Weight (kg)</label>
+                                  <input 
+                                    type="number" 
+                                    value={editValues.weight}
+                                    onChange={(e) => setEditValues({...editValues, weight: parseFloat(e.target.value)})}
+                                    className="w-full bg-gray-50 border-0 rounded-lg p-2 text-sm font-bold focus:ring-1 focus:ring-black outline-none"
+                                  />
+                                </div>
+                                <div className="flex-1">
+                                  <label className="text-[9px] font-bold text-gray-400 uppercase ml-1">Reps</label>
+                                  <input 
+                                    type="number" 
+                                    value={editValues.reps}
+                                    onChange={(e) => setEditValues({...editValues, reps: parseInt(e.target.value)})}
+                                    className="w-full bg-gray-50 border-0 rounded-lg p-2 text-sm font-bold focus:ring-1 focus:ring-black outline-none"
+                                  />
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <button 
+                                  onClick={() => handleSaveEdit(set.id!)}
+                                  disabled={isSubmitting}
+                                  className="flex-1 bg-black text-white rounded-lg py-2 text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 active:scale-95 transition-transform"
+                                >
+                                  <Check className="w-3 h-3" /> Save
+                                </button>
+                                <button 
+                                  onClick={() => setEditingId(null)}
+                                  disabled={isSubmitting}
+                                  className="px-3 bg-gray-100 text-gray-500 rounded-lg py-2 flex items-center justify-center active:scale-95 transition-transform"
+                                >
+                                  <X className="w-3 h-3" />
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        }
+
+                        return (
+                          <div key={j} className="group flex items-center justify-between text-sm py-2 border-b border-gray-200/50 last:border-0">
+                            <div className="flex items-center gap-3">
+                              <span className="text-[10px] font-bold text-gray-400 uppercase w-8">Set {j+1}</span>
+                              <span className="font-bold text-black">{set.weight}<span className="text-[10px] text-gray-400 font-medium ml-0.5">kg</span></span>
+                              <span className="text-gray-300">×</span>
+                              <span className="font-bold text-black">{set.reps}<span className="text-[10px] text-gray-400 font-medium ml-0.5">reps</span></span>
+                            </div>
+                            
+                            <div className="flex items-center gap-4">
+                              {set.notes && !isDeleting && (
+                                <span className="text-[10px] font-bold text-orange-500 uppercase tracking-tight truncate max-w-[100px]">
+                                  {set.notes}
+                                </span>
+                              )}
+                              
+                              {!isDeleting ? (
+                                <div className="flex items-center gap-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
+                                  <button 
+                                    onClick={() => handleStartEdit(set)}
+                                    className="p-1.5 hover:bg-white rounded-lg text-gray-400 hover:text-black transition-colors"
+                                  >
+                                    <Pencil className="w-3 h-3" />
+                                  </button>
+                                  <button 
+                                    onClick={() => setIsDeletingId(set.id || null)}
+                                    className="p-1.5 hover:bg-red-50 rounded-lg text-gray-400 hover:text-red-500 transition-colors"
+                                  >
+                                    <Trash2 className="w-3 h-3" />
+                                  </button>
+                                </div>
+                              ) : (
+                                <div className="flex items-center gap-2">
+                                  <span className="text-[9px] font-bold text-red-500 uppercase">Confirm Delete?</span>
+                                  <button 
+                                    onClick={() => handleDelete(set.id!)}
+                                    className="p-1.5 bg-red-500 text-white rounded-lg transition-colors"
+                                  >
+                                    <Check className="w-3 h-3" />
+                                  </button>
+                                  <button 
+                                    onClick={() => setIsDeletingId(null)}
+                                    className="p-1.5 bg-gray-100 text-gray-500 rounded-lg transition-colors"
+                                  >
+                                    <X className="w-3 h-3" />
+                                  </button>
+                                </div>
+                              )}
+                            </div>
                           </div>
-                          {set.notes && (
-                            <span className="text-[10px] font-bold text-orange-500 uppercase tracking-tight truncate max-w-[120px]">
-                              {set.notes}
-                            </span>
-                          )}
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 );

@@ -1,8 +1,8 @@
 
 "use client";
 
-import React, { useState, useMemo } from 'react';
-import { CheckCircle2, Loader2, Sparkles, AlertCircle } from 'lucide-react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { CheckCircle2, Loader2, Sparkles, AlertCircle, Check } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useWorkoutStore } from '@/lib/workout-store';
 import { NotesInput } from '@/components/layout/NotesInput';
@@ -27,11 +27,26 @@ interface APIParsedWorkoutLog {
 const API_BASE_URL = "/api";
 
 export const QuickLog: React.FC = () => {
-  const [input, setInput] = useState('');
+  const STORAGE_KEY = 'gym_tracker_draft';
+  const [input, setInput] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem(STORAGE_KEY) || '';
+    }
+    return '';
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [lastLogged, setLastLogged] = useState<WorkoutEntry[] | null>(null);
   const { toast } = useToast();
   const { addSession, sessions } = useWorkoutStore();
+
+  // Autosave draft on input change
+  useEffect(() => {
+    if (input.trim()) {
+      localStorage.setItem(STORAGE_KEY, input);
+    } else {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  }, [input]);
 
   const entryDisplayIds = useMemo(() => {
     if (!lastLogged) return [];
@@ -78,6 +93,7 @@ export const QuickLog: React.FC = () => {
       addSession(result, input);
       setLastLogged(result);
       setInput('');
+      localStorage.removeItem(STORAGE_KEY);
       toast({
         title: "Workout Processed",
         description: `Successfully logged ${result.length} sets.`,
@@ -101,16 +117,27 @@ export const QuickLog: React.FC = () => {
     >
       <header>
         <div className="flex items-center gap-3 mb-1">
-          <h2 className="text-3xl font-bold text-black tracking-tight">New Session</h2>
+          <h2 className="text-3xl font-bold text-black tracking-tight">Log your workout</h2>
           {isSubmitting && <Loader2 className="w-5 h-5 animate-spin text-gray-300" />}
         </div>
         <p className="text-gray-400 text-sm font-medium">
-          Log your workout in natural language. RepCount handles the rest.
+          Start typing in natural language and let RepCount worry about the details.
         </p>
       </header>
 
       {/* Input Section */}
       <div className="bg-white rounded-[24px] border border-gray-100 shadow-sm overflow-hidden min-h-[400px] flex flex-col group relative">
+        {/* Action Button - Top Right Circle Tick */}
+        <div className="absolute top-6 right-6 z-10">
+          <button
+            onClick={handleSubmit}
+            disabled={isSubmitting || !input.trim()}
+            className="w-12 h-12 flex items-center justify-center bg-black text-white rounded-full hover:scale-[1.05] active:scale-[0.95] transition-all disabled:opacity-10 shadow-xl shadow-black/10 group-focus-within:shadow-black/20"
+          >
+            {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check className="w-6 h-6" />}
+          </button>
+        </div>
+
         <NotesInput
           value={input}
           onChange={setInput}
@@ -118,18 +145,6 @@ export const QuickLog: React.FC = () => {
           isSubmitting={isSubmitting}
           placeholder="E.g. Bench press 80kg 8 reps rir 1, 3 sets..."
         />
-        
-        {/* Floating Action Button for Submission */}
-        <div className="p-6 pt-0 flex justify-end">
-          <button
-            onClick={handleSubmit}
-            disabled={isSubmitting || !input.trim()}
-            className="flex items-center gap-2 px-6 py-3 bg-black text-white rounded-full text-[13px] font-bold tracking-widest uppercase hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-20 shadow-lg shadow-black/10"
-          >
-            {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-            <span>Log Workout</span>
-          </button>
-        </div>
       </div>
 
       {/* Captured Data Section */}
