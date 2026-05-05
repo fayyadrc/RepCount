@@ -7,6 +7,7 @@ import {
   History,
   User,
   Settings,
+  BarChart2,
 } from 'lucide-react';
 import { ViewState } from '@/lib/types';
 import { FloatingNavBar } from './FloatingNavBar';
@@ -21,6 +22,7 @@ interface ShellProps {
 const NAV_ITEMS = [
   { id: 'quick-log', icon: PencilLine, label: 'New Session' },
   { id: 'history', icon: History, label: 'History' },
+  { id: 'analytics', icon: BarChart2, label: 'Analytics' },
   { id: 'profile', icon: User, label: 'Profile' },
 ] as const;
 

@@ -8,6 +8,7 @@ import { DataHealth } from '@/components/views/DataHealth';
 import { Profile } from '@/components/views/Profile';
 import { History } from '@/components/views/History';
 import { WorkoutDetails } from '@/components/views/WorkoutDetails';
+import { Analytics } from '@/components/views/Analytics';
 import { ViewState } from '@/lib/types';
 import { Toaster } from '@/components/ui/toaster';
 import { AnimatePresence } from 'framer-motion';
@@ -94,6 +95,8 @@ function AppContent() {
         return <History onViewDetails={(id) => { setSelectedSessionId(id); setActiveView('workout-details'); }} />;
       case 'workout-details':
         return <WorkoutDetails sessionId={selectedSessionId} onBack={() => setActiveView('history')} />;
+      case 'analytics':
+        return <Analytics />;
       default:
         return <QuickLog />;
     }
