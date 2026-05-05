@@ -57,7 +57,7 @@ export const NotesInput: React.FC<NotesInputProps> = ({
           className={cn(
             "w-full bg-transparent border-none outline-none resize-none",
             "text-[19px] leading-[1.5] text-black",
-            "placeholder:text-gray-300",
+            "placeholder:text-gray-300 placeholder:text-[14px]",
             "disabled:opacity-50 disabled:cursor-not-allowed",
           )}
           style={{

@@ -38,5 +38,43 @@ export const api = {
       console.error('API Error:', error);
       throw error;
     }
+  },
+
+  /**
+   * Updates a specific workout log entry.
+   */
+  updateWorkoutLog: async (logId: string, entry: any): Promise<{ status: string }> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/history/log/${logId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(entry),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to update workout log');
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('API Error:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Deletes a specific workout log entry.
+   */
+  deleteWorkoutLog: async (logId: string): Promise<{ status: string }> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/history/log/${logId}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to delete workout log');
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('API Error:', error);
+      throw error;
+    }
   }
 };

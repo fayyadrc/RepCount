@@ -66,6 +66,7 @@ class HistoryService:
                 if base_notes: enhanced_notes.append(base_notes)
                 
                 entries.append(WorkoutEntry(
+                    id=log.get("id"),
                     exercise=log.get("exercise", "Unknown"),
                     weight=weight,
                     weightUnit=log.get("weight_unit", "kg"),
@@ -115,7 +116,7 @@ class HistoryService:
             duration_mins = total_duration_secs / 60.0 if total_duration_secs > 0 else None
 
             session = WorkoutSession(
-                id=f"session-{uuid.uuid4().hex[:8]}",
+                id=f"session-{date_str}",
                 date=date_str,
                 entries=entries,
                 rawInput="Fetched from database",
@@ -256,3 +257,38 @@ class HistoryService:
                 content = content.split("```")[1].split("```")[0].strip()
             
             return content
+
+    @staticmethod
+    def update_log(log_id: str, entry: WorkoutEntry) -> bool:
+        from ...db.supabase import supabase
+        if not supabase:
+            return False
+            
+        data = {
+            "exercise": entry.exercise,
+            "exercise_name": entry.exercise,
+            "weight": entry.weight,
+            "weight_unit": entry.weightUnit,
+            "reps": entry.reps,
+            "notes": entry.notes
+        }
+        
+        try:
+            supabase.table("gym_logs").update(data).eq("id", log_id).execute()
+            return True
+        except Exception as e:
+            print(f"Error updating log: {e}")
+            return False
+
+    @staticmethod
+    def delete_log(log_id: str) -> bool:
+        from ...db.supabase import supabase
+        if not supabase:
+            return False
+            
+        try:
+            supabase.table("gym_logs").delete().eq("id", log_id).execute()
+            return True
+        except Exception as e:
+            print(f"Error deleting log: {e}")
+            return False

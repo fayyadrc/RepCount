@@ -19,6 +19,7 @@ export interface DataAnomaly {
 // ─── Workout Data Types ───
 
 export interface WorkoutEntry {
+  id?: string;
   exercise: string;
   weight: number;
   weightUnit?: string;

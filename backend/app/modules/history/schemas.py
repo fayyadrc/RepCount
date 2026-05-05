@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 
 class WorkoutEntry(BaseModel):
+    id: Optional[str] = None
     exercise: str
     weight: float
     weightUnit: str = "kg"
@@ -36,6 +37,7 @@ class WorkoutSession(BaseModel):
     stravaActivities: List[StravaActivity] = []
 
 class ParsedWorkoutEntry(BaseModel):
+    id: Optional[str] = None
     date: str
     exercise_name: str
     weight: Optional[float] = None
