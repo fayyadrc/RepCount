@@ -1,11 +1,19 @@
+import os
 import requests
 import time
 import json
+from dotenv import load_dotenv
+from pathlib import Path
+
+# Load environment variables from backend/.env
+# This script is in backend/dev_tools/data_scripts/ so .env is 2 levels up
+env_path = Path(__file__).resolve().parent.parent.parent / '.env'
+load_dotenv(dotenv_path=env_path)
 
 # ===== CONFIG =====
-CLIENT_ID = "234307"
-CLIENT_SECRET = "d22469f5cc510482fff2b760ab9f82b7113c5d4c"
-REFRESH_TOKEN = "3f0d290b37cc0bdb0c118bb67ba21980a3c5634e"
+CLIENT_ID = os.getenv("CLIENT_ID")
+CLIENT_SECRET = os.getenv("CLIENT_SECRET")
+REFRESH_TOKEN = os.getenv("REFRESH_TOKEN")
 
 BASE_URL = "https://www.strava.com/api/v3"
 

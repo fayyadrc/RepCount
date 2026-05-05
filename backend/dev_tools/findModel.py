@@ -1,8 +1,7 @@
 import os
 import google.generativeai as genai
 
-# 1. Grab the API key from your environment variables
-# (Alternatively, you can replace this with your actual key: api_key = "AIzaSy...")
+
 api_key = os.environ.get("GEMINI_API_KEY")
 
 if not api_key:
