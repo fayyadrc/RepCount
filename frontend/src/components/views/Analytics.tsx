@@ -41,7 +41,7 @@ export const Analytics: React.FC = () => {
     const fetchAnalytics = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:8002/api/analytics');
+        const response = await fetch('/api/analytics');
         if (!response.ok) throw new Error('Failed to fetch analytics');
         const result = await response.json();
         setData(result);
