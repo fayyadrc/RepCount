@@ -16,6 +16,7 @@ import {
   AlertCircle,
   X,
   Inbox,
+  ChevronLeft
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useWorkoutStore } from '@/lib/workout-store';
@@ -23,6 +24,7 @@ import type { WorkoutEntry, WorkoutSession } from '@/lib/types';
 
 interface DataHealthProps {
   onAnomalyCountChange?: (count: number) => void;
+  onBack?: () => void;
 }
 
 /**
@@ -89,7 +91,7 @@ function detectAnomalies(sessions: WorkoutSession[]): DataAnomaly[] {
   return anomalies;
 }
 
-export const DataHealth: React.FC<DataHealthProps> = ({ onAnomalyCountChange }) => {
+export const DataHealth: React.FC<DataHealthProps> = ({ onAnomalyCountChange, onBack }) => {
   const { sessions } = useWorkoutStore();
   const [anomalies, setAnomalies] = useState<DataAnomaly[]>([]);
   const { toast } = useToast();
@@ -129,9 +131,20 @@ export const DataHealth: React.FC<DataHealthProps> = ({ onAnomalyCountChange }) 
   if (sessions.length === 0) {
     return (
       <div className="space-y-10 animate-fade-up">
-        <header className="space-y-2">
-          <h2 className="text-[28px] md:text-3xl font-bold tracking-tight text-primary">Data Health</h2>
-          <p className="text-muted-foreground text-sm">Review anomalies in your workout data.</p>
+        <header className="space-y-4">
+          {onBack && (
+            <button 
+              onClick={onBack}
+              className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors -ml-1"
+            >
+              <ChevronLeft className="w-5 h-5" />
+              <span className="text-[13px] font-bold uppercase tracking-wider">Back to Profile</span>
+            </button>
+          )}
+          <div className="space-y-2">
+            <h2 className="text-[28px] md:text-3xl font-bold tracking-tight text-primary">Data Health</h2>
+            <p className="text-muted-foreground text-sm">Review anomalies in your workout data.</p>
+          </div>
         </header>
         <div className="py-20 flex flex-col items-center justify-center text-center space-y-4">
           <div className="w-16 h-16 glass-surface rounded-full flex items-center justify-center">
@@ -150,11 +163,22 @@ export const DataHealth: React.FC<DataHealthProps> = ({ onAnomalyCountChange }) 
 
   return (
     <div className="space-y-10 animate-fade-up">
-      <header className="space-y-2">
-        <h2 className="text-[28px] md:text-3xl font-bold tracking-tight text-primary">Data Health</h2>
-        <p className="text-muted-foreground text-sm">
-          Scanned {Math.min(sessions.length, 5)} recent session{Math.min(sessions.length, 5) !== 1 ? 's' : ''} for anomalies.
-        </p>
+      <header className="space-y-4">
+        {onBack && (
+          <button 
+            onClick={onBack}
+            className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors -ml-1"
+          >
+            <ChevronLeft className="w-5 h-5" />
+            <span className="text-[13px] font-bold uppercase tracking-wider">Back to Profile</span>
+          </button>
+        )}
+        <div className="space-y-2">
+          <h2 className="text-[28px] md:text-3xl font-bold tracking-tight text-primary">Data Health</h2>
+          <p className="text-muted-foreground text-sm">
+            Scanned {Math.min(sessions.length, 5)} recent session{Math.min(sessions.length, 5) !== 1 ? 's' : ''} for anomalies.
+          </p>
+        </div>
       </header>
 
       {anomalies.length === 0 ? (

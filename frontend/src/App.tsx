@@ -5,7 +5,7 @@ import { Shell } from '@/components/layout/Shell';
 import { QuickLog } from '@/components/views/QuickLog';
 import { NextSession } from '@/components/views/NextSession';
 import { DataHealth } from '@/components/views/DataHealth';
-import { Analytics } from '@/components/views/Analytics';
+import { Profile } from '@/components/views/Profile';
 import { History } from '@/components/views/History';
 import { WorkoutDetails } from '@/components/views/WorkoutDetails';
 import { ViewState } from '@/lib/types';
@@ -86,10 +86,10 @@ function AppContent() {
         return <QuickLog />;
       case 'next-session':
         return <NextSession />;
-      case 'analytics':
-        return <Analytics />;
+      case 'profile':
+        return <Profile />;
       case 'data-health':
-        return <DataHealth onAnomalyCountChange={setAnomalyCount} />;
+        return <DataHealth onAnomalyCountChange={setAnomalyCount} onBack={() => setActiveView('profile')} />;
       case 'history':
         return <History onViewDetails={(id) => { setSelectedSessionId(id); setActiveView('workout-details'); }} />;
       case 'workout-details':

@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 import {
   PencilLine,
   History as HistoryIcon,
-  TrendingUp,
+  User,
   Settings,
 } from 'lucide-react';
 import { ViewState } from '@/lib/types';
@@ -19,8 +19,7 @@ interface FloatingNavBarProps {
 const NAV_ITEMS = [
   { id: 'quick-log', icon: PencilLine, label: 'New Session' },
   { id: 'history', icon: HistoryIcon, label: 'History' },
-  { id: 'analytics', icon: TrendingUp, label: 'Progress' },
-  { id: 'data-health', icon: Settings, label: 'Settings' },
+  { id: 'profile', icon: User, label: 'Profile' },
 ] as const;
 
 export const FloatingNavBar: React.FC<FloatingNavBarProps> = ({
