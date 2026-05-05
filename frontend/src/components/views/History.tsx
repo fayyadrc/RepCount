@@ -142,6 +142,7 @@ export const History: React.FC<HistoryProps> = ({ onViewDetails }) => {
             const hasStrava = session.stravaActivities && session.stravaActivities.length > 0;
             const isPureStrava = session.entries.length === 0 && hasStrava;
             const primaryStravaActivity = isPureStrava ? session.stravaActivities![0] : null;
+            const totalCalories = session.stravaActivities?.reduce((sum, act) => sum + (act.calories || 0), 0) || 0;
 
             return (
               <motion.div
@@ -200,6 +201,17 @@ export const History: React.FC<HistoryProps> = ({ onViewDetails }) => {
                         <span className="text-[9px] font-bold uppercase tracking-wider">Avg HR</span>
                       </div>
                       <span className="text-sm font-bold text-black">{Math.round(session.avgHeartRate)} <span className="text-[10px] text-gray-400">bpm</span></span>
+                    </div>
+                  )}
+
+                  {/* Calories Stat */}
+                  {totalCalories > 0 && (
+                    <div className="bg-white/60 rounded-2xl p-3 flex flex-col gap-1">
+                      <div className="flex items-center gap-1.5 text-orange-500">
+                        <Flame className="w-3 h-3" />
+                        <span className="text-[9px] font-bold uppercase tracking-wider">Calories</span>
+                      </div>
+                      <span className="text-sm font-bold text-black">{Math.round(totalCalories)} <span className="text-[10px] text-gray-400">kcal</span></span>
                     </div>
                   )}
 
