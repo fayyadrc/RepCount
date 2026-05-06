@@ -9,6 +9,7 @@ import { Profile } from '@/components/views/Profile';
 import { History } from '@/components/views/History';
 import { WorkoutDetails } from '@/components/views/WorkoutDetails';
 import { Analytics } from '@/components/views/Analytics';
+import { AIInsights } from '@/components/views/AIInsights';
 import { ViewState } from '@/lib/types';
 import { Toaster } from '@/components/ui/toaster';
 import { AnimatePresence } from 'framer-motion';
@@ -97,6 +98,8 @@ function AppContent() {
         return <WorkoutDetails sessionId={selectedSessionId} onBack={() => setActiveView('history')} />;
       case 'analytics':
         return <Analytics />;
+      case 'ai-insights':
+        return <AIInsights onBack={() => setActiveView('analytics')} />;
       default:
         return <QuickLog />;
     }

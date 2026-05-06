@@ -143,7 +143,7 @@ export const QuickLog: React.FC = () => {
           onChange={setInput}
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}
-          placeholder="E.g. Bench press 80kg 8 reps rir 1, 3 sets..."
+          placeholder="What did you do today?"
         />
       </div>
 

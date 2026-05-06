@@ -17,7 +17,8 @@ import {
   Calendar, 
   Dumbbell,
   AlertCircle,
-  Loader2
+  Loader2,
+  ArrowRight
 } from 'lucide-react';
 
 interface AnalyticsData {
@@ -84,9 +85,18 @@ export const Analytics: React.FC = () => {
       animate={{ opacity: 1, y: 0 }}
       className="space-y-8 pt-4 pb-24"
     >
-      <header>
-        <h2 className="text-3xl font-bold text-black tracking-tight">Analytics</h2>
-        <p className="text-gray-400 text-sm font-medium mt-1">Your performance at a glance</p>
+      <header className="flex items-center justify-between">
+        <div>
+          <h2 className="text-3xl font-bold text-black tracking-tight">Analytics</h2>
+          <p className="text-gray-400 text-sm font-medium mt-1">Your performance at a glance</p>
+        </div>
+        <button 
+          onClick={() => (window as any).setActiveView?.('ai-insights')}
+          className="p-3 bg-black text-white rounded-full hover:bg-black/80 transition-colors shadow-lg"
+          title="AI Insights"
+        >
+          <ArrowRight className="w-5 h-5" />
+        </button>
       </header>
 
       {/* Overview Cards */}

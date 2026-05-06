@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState } from 'react';
@@ -14,27 +13,33 @@ import {
   ChevronRight, 
   RefreshCw,
   Mountain,
-  Gauge,
   Footprints,
   Bike,
   Zap,
-  CheckCircle2
+  Waves,
+  Flower2
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import type { WorkoutSession, StravaActivity } from '@/lib/types';
+import type { WorkoutSession } from '@/lib/types';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const getStravaIcon = (type: string, className: string) => {
   switch (type) {
     case 'Run':
-      return <Activity className={className}/>;
+      return <Footprints className={className}/>;
     case 'Walk':
       return <Footprints className={className} />;
     case 'Ride':
       return <Bike className={className} />;
+    case 'Swim':
+      return <Waves className={className} />;
+    case 'Hike':
+      return <Mountain className={className} />;
+    case 'Yoga':
+      return <Flower2 className={className} />;
     case 'WeightTraining':
-      return <Dumbbell className={className} />;
     case 'Workout':
+    case 'Crossfit':
       return <Dumbbell className={className} />;
     default:
       return <Zap className={className} />;
@@ -91,7 +96,7 @@ export const History: React.FC<HistoryProps> = ({ onViewDetails }) => {
       animate={{ opacity: 1, y: 0 }}
       className="space-y-8 pt-4 pb-24"
     >
-      <header className="flex justify-between items-end">
+      <header className="flex justify-between items-end px-1">
         <div>
           <h2 className="text-3xl font-bold text-black tracking-tight">History</h2>
           <p className="text-gray-400 text-sm font-medium mt-1">Your past sessions and activities</p>
@@ -126,7 +131,7 @@ export const History: React.FC<HistoryProps> = ({ onViewDetails }) => {
           </div>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-4 px-1">
           {sessions.map((session) => {
             const totalVolume = session.totalVolumeKg
               ?? session.entries.reduce((sum, e) => sum + e.weight * e.sets * e.reps, 0);
@@ -171,7 +176,6 @@ export const History: React.FC<HistoryProps> = ({ onViewDetails }) => {
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 mb-4">
-                  {/* Weight/Volume Stat */}
                   {!isPureStrava && (
                     <div className="bg-white/60 rounded-2xl p-3 flex flex-col gap-1">
                       <div className="flex items-center gap-1.5 text-[#8E8E93]">
@@ -182,7 +186,6 @@ export const History: React.FC<HistoryProps> = ({ onViewDetails }) => {
                     </div>
                   )}
                   
-                  {/* Duration Stat */}
                   {session.durationMins && (
                     <div className="bg-white/60 rounded-2xl p-3 flex flex-col gap-1">
                       <div className="flex items-center gap-1.5 text-[#8E8E93]">
@@ -193,7 +196,6 @@ export const History: React.FC<HistoryProps> = ({ onViewDetails }) => {
                     </div>
                   )}
 
-                  {/* HR Stat */}
                   {session.avgHeartRate && (
                     <div className="bg-white/60 rounded-2xl p-3 flex flex-col gap-1">
                       <div className="flex items-center gap-1.5 text-red-500/70">
@@ -204,7 +206,6 @@ export const History: React.FC<HistoryProps> = ({ onViewDetails }) => {
                     </div>
                   )}
 
-                  {/* Calories Stat */}
                   {totalCalories > 0 && (
                     <div className="bg-white/60 rounded-2xl p-3 flex flex-col gap-1">
                       <div className="flex items-center gap-1.5 text-orange-500">
@@ -215,19 +216,19 @@ export const History: React.FC<HistoryProps> = ({ onViewDetails }) => {
                     </div>
                   )}
 
-                  {/* Strava Distance/Type */}
-                  {isPureStrava && primaryStravaActivity && primaryStravaActivity.distanceMeters > 0 && (
+                  {isPureStrava && primaryStravaActivity && (
                     <div className="bg-white/60 rounded-2xl p-3 flex flex-col gap-1">
                       <div className="flex items-center gap-1.5 text-[#8E8E93]">
                         {getStravaIcon(primaryStravaActivity.type, "w-3 h-3")}
                         <span className="text-[9px] font-bold uppercase tracking-wider">{primaryStravaActivity.type}</span>
                       </div>
-                      <span className="text-sm font-bold text-black">{(primaryStravaActivity.distanceMeters / 1000).toFixed(2)} <span className="text-[10px] text-gray-400">km</span></span>
+                      {primaryStravaActivity.distanceMeters > 0 && (
+                        <span className="text-sm font-bold text-black">{(primaryStravaActivity.distanceMeters / 1000).toFixed(2)} <span className="text-[10px] text-gray-400">km</span></span>
+                      )}
                     </div>
                   )}
                 </div>
 
-                {/* Exercise List */}
                 {!isPureStrava && uniqueExercises.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 mt-2">
                     {uniqueExercises.slice(0, 4).map((entry, idx) => (
