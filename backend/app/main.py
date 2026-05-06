@@ -20,6 +20,7 @@ from .modules.history.router import router as history_router
 from .modules.strava.router import router as strava_router
 from .modules.strava.service import sync_strava_data
 from .modules.analytics.router import router as analytics_router
+from .modules.ai.router import router as ai_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -61,6 +62,7 @@ app.include_router(health_router, prefix="/api", tags=["Health"])
 app.include_router(history_router, prefix="/api", tags=["History"])
 app.include_router(strava_router, prefix="/api", tags=["Strava"])
 app.include_router(analytics_router, prefix="/api", tags=["Analytics"])
+app.include_router(ai_router, prefix="/api", tags=["AI Insights"])
 
 # Catch-all route to serve the frontend (SPA routing and static files)
 @app.get("/{rest_of_path:path}")
