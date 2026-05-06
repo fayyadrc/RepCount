@@ -44,7 +44,7 @@ export const NotesInput: React.FC<NotesInputProps> = ({
   };
 
   return (
-    <div className="flex flex-col w-full h-full bg-white">
+    <div className="flex flex-col w-full h-full bg-transparent">
       {/* Writing Surface */}
       <div className="flex-1 px-8 pt-8 overflow-y-auto relative">
         <textarea
@@ -56,8 +56,8 @@ export const NotesInput: React.FC<NotesInputProps> = ({
           placeholder={placeholder}
           className={cn(
             "w-full bg-transparent border-none outline-none resize-none",
-            "text-[19px] leading-[1.5] text-black",
-            "placeholder:text-gray-300 placeholder:text-[14px]",
+            "text-[19px] leading-[1.5] text-foreground",
+            "placeholder:text-muted-foreground placeholder:text-[14px]",
             "disabled:opacity-50 disabled:cursor-not-allowed",
           )}
           style={{

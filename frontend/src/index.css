@@ -47,6 +47,45 @@
   --nav-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
 }
 
+.dark {
+  --background: 0 0% 0%;
+  --foreground: 0 0% 100%;
+
+  --sidebar-background: 0 0% 0%;
+  --sidebar-foreground: 0 0% 100%;
+  --sidebar-border: 0 0% 15%;
+  --sidebar: 0 0% 0%;
+
+  --card: 0 0% 6%;
+  --card-foreground: 0 0% 100%;
+
+  --popover: 0 0% 6%;
+  --popover-foreground: 0 0% 100%;
+
+  --primary: 0 0% 100%;
+  --primary-foreground: 0 0% 0%;
+
+  --secondary: 0 0% 12%;
+  --secondary-foreground: 0 0% 100%;
+
+  --muted: 0 0% 12%;
+  --muted-foreground: 0 0% 60%;
+
+  --accent: 0 0% 16%;
+  --accent-foreground: 0 0% 100%;
+
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+
+  --border: 0 0% 15%;
+  --input: 0 0% 15%;
+  --ring: 0 0% 100%;
+
+  --nav-bg: rgba(0, 0, 0, 0.94);
+  --nav-border: rgba(255, 255, 255, 0.05);
+  --nav-shadow: 0 8px 32px rgba(255, 255, 255, 0.02);
+}
+
 /* ─── Tailwind v4 Theme Mapping ─── */
 @theme inline {
   --color-background: hsl(var(--background));
@@ -109,7 +148,7 @@
     border-color: hsl(var(--border));
   }
   body {
-    background: #FFFFFF;
+    background: hsl(var(--background));
     min-height: 100vh;
     color: hsl(var(--foreground));
     font-family: var(--font-body);
@@ -121,19 +160,19 @@
 
 /* ─── iOS Surfaces ─── */
 .ios-card {
-  background: #FFFFFF;
-  border: 1px solid #F2F2F7;
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
   border-radius: 20px;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
 }
 
 .ios-pill {
-  background: #F2F2F7;
+  background: hsl(var(--secondary));
   border-radius: 999px;
   padding: 4px 12px;
   font-size: 13px;
   font-weight: 600;
-  color: #8E8E93;
+  color: hsl(var(--muted-foreground));
 }
 
 .glass-nav {

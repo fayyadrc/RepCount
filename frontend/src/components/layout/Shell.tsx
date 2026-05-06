@@ -35,10 +35,10 @@ export const Shell: React.FC<ShellProps> = ({
   return (
     <div className="flex flex-col md:flex-row h-screen w-full overflow-hidden selection:bg-accent/30">
       {/* ─── Desktop Sidebar (hidden on mobile) ─── */}
-      <aside className="hidden md:flex md:w-20 lg:w-64 bg-white border-r border-gray-100 flex-col items-center lg:items-stretch transition-all duration-300 shrink-0">
+      <aside className="hidden md:flex md:w-20 lg:w-64 bg-background border-r border-border flex-col items-center lg:items-stretch transition-all duration-300 shrink-0">
         {/* Brand */}
         <div className="px-6 py-6 hidden lg:block">
-          <h1 className="text-xl font-bold tracking-tight text-black">RepCount</h1>
+          <h1 className="text-xl font-bold tracking-tight text-foreground">RepCount</h1>
           <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold">AI Gym Intelligence</p>
         </div>
 
@@ -57,8 +57,8 @@ export const Shell: React.FC<ShellProps> = ({
                 className={cn(
                   "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group",
                   isActive
-                    ? "bg-black text-white shadow-sm"
-                    : "text-gray-400 hover:bg-black/5 hover:text-black"
+                    ? "bg-foreground text-background shadow-sm"
+                    : "text-muted-foreground hover:bg-foreground/5 hover:text-foreground"
                 )}
               >
                 <Icon className={cn("w-5 h-5 shrink-0 transition-transform group-hover:scale-110")} />

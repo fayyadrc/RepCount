@@ -194,7 +194,7 @@ export const DataHealth: React.FC<DataHealthProps> = ({ onAnomalyCountChange, on
       ) : (
         <div className="glass-surface rounded-2xl overflow-hidden animate-slide-up">
           <Table>
-            <TableHeader className="bg-black/[0.02] border-b border-white/10">
+            <TableHeader className="bg-foreground/[0.02] border-b border-foreground/10">
               <TableRow className="hover:bg-transparent border-none">
                 <TableHead className="w-[180px] font-bold text-xs uppercase tracking-widest py-4">Issue</TableHead>
                 <TableHead className="font-bold text-xs uppercase tracking-widest">Detail</TableHead>
@@ -204,7 +204,7 @@ export const DataHealth: React.FC<DataHealthProps> = ({ onAnomalyCountChange, on
             </TableHeader>
             <TableBody>
               {anomalies.map((a, idx) => (
-                <TableRow key={a.id} className={`group transition-colors border-white/10 hover:bg-white/40 stagger-${Math.min(idx + 1, 5)}`}>
+                <TableRow key={a.id} className={`group transition-colors border-foreground/10 hover:bg-foreground/5 stagger-${Math.min(idx + 1, 5)}`}>
                   <TableCell className="font-semibold text-primary">
                     <div className="flex items-center gap-2">
                       <AlertCircle className={a.severity === 'high' ? "text-destructive w-4 h-4" : "text-amber-500 w-4 h-4"} />
@@ -227,7 +227,7 @@ export const DataHealth: React.FC<DataHealthProps> = ({ onAnomalyCountChange, on
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="h-8 w-8 p-0 hover:text-destructive hover:bg-white/50"
+                        className="h-8 w-8 p-0 hover:text-destructive hover:bg-foreground/10"
                         title="Ignore"
                         onClick={() => handleAction(a.id, 'ignore')}
                       >
@@ -236,7 +236,7 @@ export const DataHealth: React.FC<DataHealthProps> = ({ onAnomalyCountChange, on
                       <Button
                         size="sm"
                         variant="secondary"
-                        className="h-8 px-3 text-xs glass-surface text-primary border-white/20 hover:bg-white/50"
+                        className="h-8 px-3 text-xs glass-surface text-primary border-foreground/20 hover:bg-foreground/10"
                         onClick={() => handleAction(a.id, 'fix')}
                       >
                         Note Fix
