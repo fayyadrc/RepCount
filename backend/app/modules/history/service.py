@@ -5,6 +5,7 @@ from collections import defaultdict
 import uuid
 import httpx
 from .schemas import WorkoutSession, WorkoutEntry, StravaActivity, ParsedWorkoutLog
+from ..analytics.muscle_mapping import get_muscle_group
 
 from dotenv import load_dotenv
 from datetime import date
@@ -267,6 +268,7 @@ class HistoryService:
         data = {
             "exercise": entry.exercise,
             "exercise_name": entry.exercise,
+            "exercise_group": get_muscle_group(entry.exercise),
             "weight": entry.weight,
             "weight_unit": entry.weightUnit,
             "reps": entry.reps,

@@ -31,7 +31,7 @@ interface AnalyticsData {
   strava_activity_count: number;
 }
 
-const COLORS = ['#000000', '#333333', '#666666', '#999999', '#CCCCCC', '#E5E5E5'];
+const COLORS = ['hsl(var(--foreground))', 'hsl(var(--foreground) / 0.8)', 'hsl(var(--foreground) / 0.6)', 'hsl(var(--foreground) / 0.4)', 'hsl(var(--foreground) / 0.2)'];
 
 export const Analytics: React.FC = () => {
   const [data, setData] = useState<AnalyticsData | null>(null);
@@ -59,8 +59,8 @@ export const Analytics: React.FC = () => {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-20 space-y-4">
-        <Loader2 className="w-8 h-8 animate-spin text-black" />
-        <p className="text-gray-400 font-medium">Analyzing your progress...</p>
+        <Loader2 className="w-8 h-8 animate-spin text-foreground" />
+        <p className="text-muted-foreground font-medium">Analyzing your progress...</p>
       </div>
     );
   }
@@ -70,8 +70,8 @@ export const Analytics: React.FC = () => {
       <div className="flex flex-col items-center justify-center py-20 text-center space-y-4 px-6">
         <AlertCircle className="w-12 h-12 text-red-500" />
         <div>
-          <h3 className="text-xl font-bold text-black">Analytics Unavailable</h3>
-          <p className="text-gray-500 text-sm max-w-xs mx-auto mt-1">
+          <h3 className="text-xl font-bold text-foreground">Analytics Unavailable</h3>
+          <p className="text-muted-foreground text-sm max-w-xs mx-auto mt-1">
             {error || 'We couldn\'t load your analytics data at this time.'}
           </p>
         </div>
@@ -87,12 +87,12 @@ export const Analytics: React.FC = () => {
     >
       <header className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold text-black tracking-tight">Analytics</h2>
-          <p className="text-gray-400 text-sm font-medium mt-1">Your performance at a glance</p>
+          <h2 className="text-3xl font-bold text-foreground tracking-tight">Analytics</h2>
+          <p className="text-muted-foreground text-sm font-medium mt-1">Your performance at a glance</p>
         </div>
         <button 
           onClick={() => (window as any).setActiveView?.('ai-insights')}
-          className="p-3 bg-black text-white rounded-full hover:bg-black/80 transition-colors shadow-lg"
+          className="p-3 bg-foreground text-background rounded-full hover:bg-foreground/80 transition-colors shadow-lg"
           title="AI Insights"
         >
           <ArrowRight className="w-5 h-5" />
@@ -116,54 +116,54 @@ export const Analytics: React.FC = () => {
       </div>
 
       {/* Focus Insights */}
-      <div className="bg-[#F2F2F7]/50 rounded-[24px] p-6 space-y-4">
+      <div className="bg-secondary/50 rounded-[24px] p-6 space-y-4">
         <div className="flex items-center gap-2">
-          <Activity className="w-4 h-4 text-black" />
-          <span className="text-[11px] font-bold text-[#8E8E93] uppercase tracking-[0.05em]">Focus Distribution</span>
+          <Activity className="w-4 h-4 text-foreground" />
+          <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-[0.05em]">Focus Distribution</span>
         </div>
         
         <div className="grid grid-cols-2 gap-8">
           <div className="space-y-1">
-            <p className="text-[10px] font-bold text-[#8E8E93] uppercase">Most Trained</p>
-            <p className="text-xl font-bold text-black">{data.most_trained}</p>
+            <p className="text-[10px] font-bold text-muted-foreground uppercase">Most Trained</p>
+            <p className="text-xl font-bold text-foreground">{data.most_trained}</p>
           </div>
           <div className="space-y-1">
-            <p className="text-[10px] font-bold text-[#8E8E93] uppercase">Least Trained</p>
-            <p className="text-xl font-bold text-black">{data.least_trained}</p>
+            <p className="text-[10px] font-bold text-muted-foreground uppercase">Least Trained</p>
+            <p className="text-xl font-bold text-foreground">{data.least_trained}</p>
           </div>
         </div>
       </div>
 
       {/* Volume Chart */}
-      <div className="bg-white rounded-[24px] p-6 border border-gray-100 shadow-sm space-y-6">
+      <div className="bg-card rounded-[24px] p-6 border border-border shadow-sm space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Dumbbell className="w-4 h-4 text-black" />
-            <span className="text-[11px] font-bold text-[#8E8E93] uppercase tracking-[0.05em]">Volume by Muscle Group</span>
+            <Dumbbell className="w-4 h-4 text-foreground" />
+            <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-[0.05em]">Volume by Muscle Group</span>
           </div>
-          <span className="text-[10px] font-bold text-[#8E8E93] uppercase">kg • ALL TIME</span>
+          <span className="text-[10px] font-bold text-muted-foreground uppercase">kg • ALL TIME</span>
         </div>
 
         <div className="h-[250px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={data.volume_per_muscle} layout="vertical" margin={{ left: -20, right: 20 }}>
-              <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#F0F0F0" />
+              <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="hsl(var(--border))" />
               <XAxis type="number" hide />
               <YAxis 
                 dataKey="muscle" 
                 type="category" 
                 axisLine={false} 
                 tickLine={false}
-                tick={{ fontSize: 10, fontWeight: 600, fill: '#000' }}
+                tick={{ fontSize: 10, fontWeight: 600, fill: 'currentColor' }}
                 width={80}
               />
               <Tooltip 
-                cursor={{ fill: '#F2F2F7' }}
+                cursor={{ fill: 'hsl(var(--secondary))' }}
                 contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
               />
               <Bar 
                 dataKey="volume" 
-                fill="#000000" 
+                fill="hsl(var(--foreground))" 
                 radius={[0, 4, 4, 0]}
                 barSize={20}
               >
@@ -181,14 +181,14 @@ export const Analytics: React.FC = () => {
 };
 
 const StatCard: React.FC<{ icon: React.ReactNode, label: string, value: number | string, subtext: string }> = ({ icon, label, value, subtext }) => (
-  <div className="bg-[#F2F2F7]/50 rounded-[24px] p-5 space-y-3">
+  <div className="bg-secondary/50 rounded-[24px] p-5 space-y-3">
     <div className="flex items-center gap-2">
-      <div className="text-black">{icon}</div>
-      <span className="text-[10px] font-bold text-[#8E8E93] uppercase tracking-wider">{label}</span>
+      <div className="text-foreground">{icon}</div>
+      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{label}</span>
     </div>
     <div>
-      <div className="text-3xl font-bold text-black">{value}</div>
-      <p className="text-[10px] font-semibold text-gray-400 mt-1">{subtext}</p>
+      <div className="text-3xl font-bold text-foreground">{value}</div>
+      <p className="text-[10px] font-semibold text-muted-foreground mt-1">{subtext}</p>
     </div>
   </div>
 );

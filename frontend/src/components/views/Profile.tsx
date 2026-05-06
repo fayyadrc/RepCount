@@ -1,12 +1,18 @@
 import React from 'react';
-import { ChevronDown, User, Bell } from 'lucide-react';
+import { ChevronDown, User, Bell, Moon, Sun } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { ActivityCalendar, DayActivity, ActivityType } from '@/components/ui/ActivityCalendar';
 import { useWorkoutStore } from '@/lib/workout-store';
 import { WorkoutSession } from '@/lib/types';
+import { useTheme } from '@/hooks/use-theme';
 
 export const Profile: React.FC = () => {
   const { sessions } = useWorkoutStore();
+  const { theme, setTheme } = useTheme();
+
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
 
   // Helper to determine the primary activity type for a session
   const getSessionActivityType = (session: WorkoutSession): ActivityType => {
@@ -84,14 +90,14 @@ export const Profile: React.FC = () => {
       className="space-y-8 pt-4 pb-32 px-3 md:px-4"
     >
       <header className="flex items-center gap-4 px-1">
-        <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center">
-          <User className="text-white w-8 h-8" />
+        <div className="w-16 h-16 bg-foreground rounded-full flex items-center justify-center">
+          <User className="text-background w-8 h-8" />
         </div>
         <div>
-          <h2 className="text-3xl font-bold text-black tracking-tight leading-tight">
+          <h2 className="text-3xl font-bold text-foreground tracking-tight leading-tight">
             @fayyadrc
           </h2>
-          <p className="text-gray-400 text-sm font-medium mt-1">Standard Plan</p>
+          <p className="text-muted-foreground text-sm font-medium mt-1">Standard Plan</p>
         </div>
       </header>
 
@@ -103,11 +109,16 @@ export const Profile: React.FC = () => {
 
       {/* Settings List */}
       <div className="space-y-1">
-        <h3 className="px-2 text-[11px] font-bold text-[#8E8E93] uppercase tracking-[0.05em] mb-3">Preferences</h3>
+        <h3 className="px-2 text-[11px] font-bold text-muted-foreground uppercase tracking-[0.05em] mb-3">Preferences</h3>
         <ProfileItem 
           icon={<Bell className="w-5 h-5" />} 
           label="Data Health" 
           onClick={() => (window as any).setActiveView?.('data-health')}
+        />
+        <ProfileItem 
+          icon={theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />} 
+          label="Dark Mode" 
+          onClick={toggleTheme}
         />
       </div>
     </motion.div>
@@ -117,12 +128,12 @@ export const Profile: React.FC = () => {
 const ProfileItem: React.FC<{ icon: React.ReactNode, label: string, onClick?: () => void }> = ({ icon, label, onClick }) => (
   <button 
     onClick={onClick}
-    className="w-full flex items-center justify-between p-4 bg-white hover:bg-gray-50 transition-colors rounded-2xl border border-gray-50"
+    className="w-full flex items-center justify-between p-4 bg-card hover:bg-secondary transition-colors rounded-2xl border border-border"
   >
     <div className="flex items-center gap-3">
-      <div className="text-black">{icon}</div>
-      <span className="text-[15px] font-semibold text-black">{label}</span>
+      <div className="text-foreground">{icon}</div>
+      <span className="text-[15px] font-semibold text-foreground">{label}</span>
     </div>
-    <ChevronDown className="w-4 h-4 text-gray-300 -rotate-90" />
+    <ChevronDown className="w-4 h-4 text-muted-foreground -rotate-90" />
   </button>
 );

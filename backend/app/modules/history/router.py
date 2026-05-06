@@ -4,6 +4,7 @@ from typing import List
 from ...db.supabase import supabase
 from .schemas import WorkoutSession, WorkoutEntry
 from .service import HistoryService
+from ..analytics.muscle_mapping import get_muscle_group
 
 router = APIRouter()
 
@@ -59,6 +60,7 @@ async def quick_log_workout(request: Request, log_data: RawLogRequest):
                 "date": entry.date,
                 "exercise": entry.exercise_name,
                 "exercise_name": entry.exercise_name,
+                "exercise_group": get_muscle_group(entry.exercise_name),
                 "weight": entry.weight,
                 "weight_unit": entry.unit,
                 "set_number": 1,

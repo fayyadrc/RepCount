@@ -98,7 +98,7 @@ export const NextSession: React.FC = () => {
         <div className="space-y-2">
           <Badge
             variant="secondary"
-            className="glass-surface border-white/30 text-primary mb-2"
+            className="glass-surface border-foreground/30 text-primary mb-2"
           >
             Progressive Overload
           </Badge>
@@ -126,7 +126,7 @@ export const NextSession: React.FC = () => {
               className={`glass-surface rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300 group animate-slide-up stagger-${Math.min(idx + 1, 5)}`}
             >
               <div className="flex flex-col md:flex-row">
-                <div className="p-6 flex-1 border-b md:border-b-0 md:border-r border-white/10">
+                <div className="p-6 flex-1 border-b md:border-b-0 md:border-r border-foreground/10">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="p-2 glass-surface rounded-xl">
                       <Dumbbell className="w-5 h-5 text-primary" />
@@ -141,20 +141,20 @@ export const NextSession: React.FC = () => {
                       <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">Weight</p>
                       <p className="text-2xl font-black text-primary">{s.weight} <span className="text-sm font-medium">kg</span></p>
                     </div>
-                    <div className="h-8 w-px bg-black/10" />
+                    <div className="h-8 w-px bg-foreground/10" />
                     <div className="space-y-0.5">
                       <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">Reps</p>
                       <p className="text-2xl font-black text-primary">{s.reps} <span className="text-sm font-medium">reps</span></p>
                     </div>
                     <div className="ml-auto">
-                      <div className="p-2 rounded-full glass-surface group-hover:bg-white/40 transition-all duration-200">
+                      <div className="p-2 rounded-full glass-surface group-hover:bg-foreground/10 transition-all duration-200">
                         <ArrowRight className="w-5 h-5 text-accent" />
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="p-6 md:w-1/3 bg-black/[0.02]">
+                <div className="p-6 md:w-1/3 bg-foreground/[0.02]">
                   <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest mb-2">Reasoning</p>
                   <p className="text-sm leading-relaxed text-muted-foreground italic">
                     {s.reason}

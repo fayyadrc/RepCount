@@ -95,26 +95,26 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-[24px] md:rounded-[32px] p-4 md:p-6 shadow-sm border border-gray-100 w-full overflow-hidden">
+    <div className="bg-card rounded-[24px] md:rounded-[32px] p-4 md:p-6 shadow-sm border border-border w-full overflow-hidden">
       <div className="flex justify-between items-center mb-6 px-1">
         <div>
-          <h4 className="text-[17px] md:text-[20px] font-bold text-black tracking-tight">
-            {monthName} <span className="text-gray-300 font-medium ml-1">{year}</span>
+          <h4 className="text-[17px] md:text-[20px] font-bold text-foreground tracking-tight">
+            {monthName} <span className="text-muted-foreground font-medium ml-1">{year}</span>
           </h4>
         </div>
         <div className="flex gap-1">
-          <button onClick={() => changeMonth(-1)} className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gray-50 flex items-center justify-center hover:bg-gray-100 transition-colors active:scale-90">
-            <ChevronLeft className="w-5 h-5 text-black" />
+          <button onClick={() => changeMonth(-1)} className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-secondary flex items-center justify-center hover:bg-secondary/80 transition-colors active:scale-90">
+            <ChevronLeft className="w-5 h-5 text-foreground" />
           </button>
-          <button onClick={() => changeMonth(1)} className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gray-50 flex items-center justify-center hover:bg-gray-100 transition-colors active:scale-90">
-            <ChevronRight className="w-5 h-5 text-black" />
+          <button onClick={() => changeMonth(1)} className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-secondary flex items-center justify-center hover:bg-secondary/80 transition-colors active:scale-90">
+            <ChevronRight className="w-5 h-5 text-foreground" />
           </button>
         </div>
       </div>
 
       <div className="grid grid-cols-7 gap-y-4 md:gap-y-6">
         {daysOfWeek.map((day, i) => (
-          <div key={i} className="text-center text-[11px] md:text-[13px] font-bold text-[#8E8E93] uppercase tracking-wider">
+          <div key={i} className="text-center text-[11px] md:text-[13px] font-bold text-muted-foreground uppercase tracking-wider">
             {day}
           </div>
         ))}
@@ -140,21 +140,21 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
                         <motion.div 
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
-                          className="w-10 h-10 md:w-14 md:h-14 bg-black rounded-full flex items-center justify-center text-white relative shadow-lg"
+                          className="w-10 h-10 md:w-14 md:h-14 bg-foreground rounded-full flex items-center justify-center text-background relative shadow-lg"
                         >
                           {renderIcon(activity.type)}
                         </motion.div>
-                        <span className="mt-1 md:mt-2 text-[10px] md:text-[13px] font-medium text-gray-500">
+                        <span className="mt-1 md:mt-2 text-[10px] md:text-[13px] font-medium text-muted-foreground">
                           {cell.day}
                         </span>
                       </div>
                     ) : (
-                      <div className="w-10 h-10 md:w-14 md:h-14 border border-gray-100 rounded-full flex items-center justify-center text-[12px] md:text-[15px] font-medium text-black">
+                      <div className="w-10 h-10 md:w-14 md:h-14 border border-border rounded-full flex items-center justify-center text-[12px] md:text-[15px] font-medium text-foreground">
                         {cell.day}
                       </div>
                     )
                   ) : (
-                    <span className="text-[12px] md:text-[15px] font-medium text-gray-300 pt-2 md:pt-4">
+                    <span className="text-[12px] md:text-[15px] font-medium text-muted-foreground/50 pt-2 md:pt-4">
                       {cell.day}
                     </span>
                   )}

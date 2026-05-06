@@ -40,7 +40,7 @@ export const FloatingNavBar: React.FC<FloatingNavBarProps> = ({
   return (
     <nav className="md:hidden fixed bottom-5 left-0 right-0 z-50 flex justify-center pointer-events-none">
       <div
-        className="pointer-events-auto flex items-center justify-around px-2 py-1.5 bg-white/90 backdrop-blur-xl border border-gray-100 shadow-[0_8px_32px_rgba(0,0,0,0.06)]"
+        className="pointer-events-auto flex items-center justify-around px-2 py-1.5 bg-nav-bg backdrop-blur-xl border border-nav-border shadow-[var(--nav-shadow)]"
         style={{
           borderRadius: '32px',
           width: 'calc(100% - 32px)',
@@ -60,28 +60,28 @@ export const FloatingNavBar: React.FC<FloatingNavBarProps> = ({
               onClick={() => handleTap(item.id)}
               className={cn(
                 "flex flex-col items-center justify-center gap-0.5 px-3 py-1.5 rounded-[24px] transition-all duration-300 relative min-w-[72px]",
-                isActive ? "bg-[#F2F2F7]" : "bg-transparent",
+                isActive ? "bg-secondary" : "bg-transparent",
                 isTapped && "scale-95"
               )}
             >
               <Icon
                 className={cn(
                   "w-[21px] h-[21px] transition-colors duration-200",
-                  isActive ? "text-black" : "text-[#8E8E93]"
+                  isActive ? "text-foreground" : "text-muted-foreground"
                 )}
                 strokeWidth={isActive ? 2.5 : 2}
               />
               <span
                 className={cn(
                   "text-[9px] font-bold tracking-tight transition-colors duration-200 uppercase",
-                  isActive ? "text-black" : "text-[#8E8E93]"
+                  isActive ? "text-foreground" : "text-muted-foreground"
                 )}
               >
                 {item.label}
               </span>
               
               {item.id === 'data-health' && anomalyCount > 0 && (
-                <span className="absolute top-1.5 right-4 w-1.5 h-1.5 rounded-full bg-red-500 border border-white" />
+                <span className="absolute top-1.5 right-4 w-1.5 h-1.5 rounded-full bg-red-500 border border-background" />
               )}
             </button>
           );
