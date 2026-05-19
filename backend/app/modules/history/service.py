@@ -153,10 +153,11 @@ class HistoryService:
         - Normalize exercise names (e.g., "reverse cable rear delt flies" -> "Reverse Cable Rear Delt Fly")
 
         ### Weight
-        - Extract numeric weight value. Default unit = kg.
-        - If weight is given in "plates" (e.g., "7 plates"):
-            - For barbell exercises, assume 20kg bar + 20kg per plate per side (e.g., "1 plate" = 60kg, "2 plates" = 100kg).
-            - For machine/other exercises, assume 20kg per plate (e.g., "7 plates" = 140kg).
+        - Extract numeric weight value.
+        - If weight is explicitly given in "plates" (e.g., "8 plates"), set the weight to that number (e.g., 8) and set unit to "Plate". DO NOT calculate kg.
+        - If a numeric weight is provided without an explicit unit:
+            - If the weight is <= 10, assume the unit is "Plate".
+            - If the weight is > 10, assume the unit is "kg".
         - If no weight mentioned, set weight = null.
 
         ### Reps
