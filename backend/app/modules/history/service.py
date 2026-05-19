@@ -8,7 +8,7 @@ from .schemas import WorkoutSession, WorkoutEntry, StravaActivity, ParsedWorkout
 from ..analytics.muscle_mapping import get_muscle_group
 
 from dotenv import load_dotenv
-from datetime import date
+from datetime import date, timedelta
 
 # Load environment variables
 load_dotenv()
@@ -138,6 +138,7 @@ class HistoryService:
         Takes raw string and uses Groq/OpenRouter to parse them into structured JSON
         """
         current_today = date.today().isoformat()
+        current_yesterday = (date.today() - timedelta(days=1)).isoformat()
         system_prompt = f"""
         You are a fitness workout data extraction agent.
         Your task is to convert raw, unstructured workout logs into structured data.
@@ -167,8 +168,10 @@ class HistoryService:
 
         ### Date Handling
         - Normalize to ISO format: YYYY-MM-DD.
-        - Use today's date {current_today} if not specified.
-        - Handle relative dates ("today", "yesterday").
+        - The user will mention dates relative to today.
+        - Today's date is: {current_today}
+        - Yesterday's date is: {current_yesterday}
+        - Use today's date if no date is specified.
 
         Return structured JSON ONLY in this format:
         {{
