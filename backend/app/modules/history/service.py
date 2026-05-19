@@ -153,6 +153,9 @@ class HistoryService:
 
         ### Weight
         - Extract numeric weight value. Default unit = kg.
+        - If weight is given in "plates" (e.g., "7 plates"):
+            - For barbell exercises, assume 20kg bar + 20kg per plate per side (e.g., "1 plate" = 60kg, "2 plates" = 100kg).
+            - For machine/other exercises, assume 20kg per plate (e.g., "7 plates" = 140kg).
         - If no weight mentioned, set weight = null.
 
         ### Reps

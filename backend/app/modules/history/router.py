@@ -61,7 +61,7 @@ async def quick_log_workout(request: Request, log_data: RawLogRequest):
                 "exercise": entry.exercise_name,
                 "exercise_name": entry.exercise_name,
                 "exercise_group": get_muscle_group(entry.exercise_name),
-                "weight": entry.weight,
+                "weight": entry.weight if entry.weight is not None else 0.0,
                 "weight_unit": entry.unit,
                 "set_number": 1,
                 "reps": entry.reps,
