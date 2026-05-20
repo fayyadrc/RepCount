@@ -38,50 +38,42 @@ export const FloatingNavBar: React.FC<FloatingNavBarProps> = ({
   };
 
   return (
-    <nav className="md:hidden fixed bottom-5 left-0 right-0 z-50 flex justify-center pointer-events-none">
+    <nav className="md:hidden fixed bottom-6 left-0 right-0 z-50 flex justify-center pointer-events-none">
       <div
-        className="pointer-events-auto flex items-center justify-around px-2 py-1.5 bg-nav-bg backdrop-blur-xl border border-nav-border shadow-[var(--nav-shadow)]"
-        style={{
-          borderRadius: '32px',
-          width: 'calc(100% - 32px)',
-          maxWidth: '400px',
-          height: '62px',
-        }}
+        className="pointer-events-auto flex items-center justify-around px-3 py-1.5 glass-nav w-[calc(100%-32px)] max-w-[380px] h-[64px] rounded-[32px]"
       >
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
           const isActive = activeView === item.id || 
                            (item.id === 'history' && activeView === 'workout-details');
-          const isTapped = tappedId === item.id;
 
           return (
             <button
               key={item.id}
               onClick={() => handleTap(item.id)}
               className={cn(
-                "flex flex-col items-center justify-center gap-0.5 px-3 py-1.5 rounded-[24px] transition-all duration-300 relative min-w-[72px]",
-                isActive ? "bg-secondary" : "bg-transparent",
-                isTapped && "scale-95"
+                "flex flex-col items-center justify-center gap-1 py-1 rounded-[20px] transition-all duration-300 relative min-w-[68px] btn-tap-scale",
+                isActive ? "bg-secondary/80 text-foreground font-semibold" : "bg-transparent text-muted-foreground"
               )}
             >
               <Icon
                 className={cn(
-                  "w-[21px] h-[21px] transition-colors duration-200",
+                  "w-[20px] h-[20px] transition-colors duration-200",
                   isActive ? "text-foreground" : "text-muted-foreground"
                 )}
                 strokeWidth={isActive ? 2.5 : 2}
               />
               <span
                 className={cn(
-                  "text-[9px] font-bold tracking-tight transition-colors duration-200 uppercase",
+                  "text-[9px] font-bold tracking-wider transition-colors duration-200 uppercase font-mono",
                   isActive ? "text-foreground" : "text-muted-foreground"
                 )}
               >
-                {item.label}
+                {item.label.split(' ')[0]} {/* Shorten labels if necessary */}
               </span>
               
-              {item.id === 'data-health' && anomalyCount > 0 && (
-                <span className="absolute top-1.5 right-4 w-1.5 h-1.5 rounded-full bg-red-500 border border-background" />
+              {item.id === 'profile' && anomalyCount > 0 && (
+                <span className="absolute top-1.5 right-4 w-1.5 h-1.5 rounded-full bg-destructive border border-background" />
               )}
             </button>
           );

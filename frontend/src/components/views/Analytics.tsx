@@ -31,7 +31,12 @@ interface AnalyticsData {
   strava_activity_count: number;
 }
 
-const COLORS = ['hsl(var(--foreground))', 'hsl(var(--foreground) / 0.8)', 'hsl(var(--foreground) / 0.6)', 'hsl(var(--foreground) / 0.4)', 'hsl(var(--foreground) / 0.2)'];
+const COLORS = [
+  'hsl(var(--accent-blue))',
+  'hsl(var(--accent-orange))',
+  'hsl(var(--accent-violet))',
+  'hsl(var(--accent-green))',
+];
 
 export const Analytics: React.FC = () => {
   const [data, setData] = useState<AnalyticsData | null>(null);
@@ -59,8 +64,8 @@ export const Analytics: React.FC = () => {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-20 space-y-4">
-        <Loader2 className="w-8 h-8 animate-spin text-foreground" />
-        <p className="text-muted-foreground font-medium">Analyzing your progress...</p>
+        <Loader2 className="w-8 h-8 animate-spin text-accent-blue" />
+        <p className="text-muted-foreground font-semibold font-heading text-sm">Analyzing your progress...</p>
       </div>
     );
   }
@@ -68,9 +73,9 @@ export const Analytics: React.FC = () => {
   if (error || !data) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center space-y-4 px-6">
-        <AlertCircle className="w-12 h-12 text-red-500" />
+        <AlertCircle className="w-12 h-12 text-destructive" />
         <div>
-          <h3 className="text-xl font-bold text-foreground">Analytics Unavailable</h3>
+          <h3 className="text-xl font-bold text-foreground font-heading">Analytics Unavailable</h3>
           <p className="text-muted-foreground text-sm max-w-xs mx-auto mt-1">
             {error || 'We couldn\'t load your analytics data at this time.'}
           </p>
@@ -83,19 +88,20 @@ export const Analytics: React.FC = () => {
     <motion.div 
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-8 pt-4 pb-24"
+      className="space-y-8 pt-2 pb-24"
     >
-      <header className="flex items-center justify-between">
-        <div>
-          <h2 className="text-3xl font-bold text-foreground tracking-tight">Analytics</h2>
-          <p className="text-muted-foreground text-sm font-medium mt-1">Your performance at a glance</p>
+      <header className="flex items-end justify-between px-1">
+        <div className="space-y-1">
+          <h2 className="text-4xl font-extrabold tracking-tight text-foreground font-heading">Analytics</h2>
+          <p className="text-muted-foreground text-sm font-medium">Your performance at a glance</p>
         </div>
         <button 
           onClick={() => (window as any).setActiveView?.('ai-insights')}
-          className="p-3 bg-foreground text-background rounded-full hover:bg-foreground/80 transition-colors shadow-lg"
+          className="flex items-center gap-1.5 px-4.5 py-2.5 bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-all duration-250 shadow-[0_4px_14px_rgba(0,0,0,0.1)] btn-tap-scale text-xs font-bold font-heading"
           title="AI Insights"
         >
-          <ArrowRight className="w-5 h-5" />
+          AI Insights
+          <ArrowRight className="w-4 h-4 stroke-[2.5]" />
         </button>
       </header>
 
@@ -106,47 +112,53 @@ export const Analytics: React.FC = () => {
           label="Active Days"
           value={data.total_workouts}
           subtext={`${data.gym_session_count} Gym • ${data.strava_activity_count} Strava`}
+          accent="blue"
         />
         <StatCard 
           icon={<Calendar className="w-4 h-4" />}
           label="This Week"
           value={data.workouts_this_week}
           subtext="Activities"
+          accent="violet"
         />
       </div>
 
       {/* Focus Insights */}
-      <div className="bg-secondary/50 rounded-[24px] p-6 space-y-4">
+      <div className="ios-card bg-card border border-border p-6 space-y-4">
         <div className="flex items-center gap-2">
-          <Activity className="w-4 h-4 text-foreground" />
-          <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-[0.05em]">Focus Distribution</span>
+          <div className="p-2 rounded-xl bg-accent-orange-bg text-accent-orange shrink-0">
+            <Activity className="w-4 h-4" />
+          </div>
+          <span className="text-[11px] font-extrabold text-muted-foreground uppercase tracking-widest font-heading">Focus Distribution</span>
         </div>
         
-        <div className="grid grid-cols-2 gap-8">
+        <div className="grid grid-cols-2 gap-8 pt-1">
           <div className="space-y-1">
-            <p className="text-[10px] font-bold text-muted-foreground uppercase">Most Trained</p>
-            <p className="text-xl font-bold text-foreground">{data.most_trained}</p>
+            <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider font-mono">Most Trained</p>
+            <p className="text-2xl font-black text-foreground font-heading tracking-tight leading-tight">{data.most_trained}</p>
           </div>
           <div className="space-y-1">
-            <p className="text-[10px] font-bold text-muted-foreground uppercase">Least Trained</p>
-            <p className="text-xl font-bold text-foreground">{data.least_trained}</p>
+            <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider font-mono">Least Trained</p>
+            <p className="text-2xl font-black text-foreground font-heading tracking-tight leading-tight">{data.least_trained}</p>
           </div>
         </div>
       </div>
 
       {/* Volume Chart */}
-      <div className="bg-card rounded-[24px] p-6 border border-border shadow-sm space-y-6">
+      <div className="ios-card bg-card p-6 border border-border space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Dumbbell className="w-4 h-4 text-foreground" />
-            <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-[0.05em]">Volume by Muscle Group</span>
+            <div className="p-2 rounded-xl bg-accent-green-bg text-accent-green shrink-0">
+              <Dumbbell className="w-4 h-4" />
+            </div>
+            <span className="text-[11px] font-extrabold text-muted-foreground uppercase tracking-widest font-heading">Volume by Muscle Group</span>
           </div>
-          <span className="text-[10px] font-bold text-muted-foreground uppercase">kg • ALL TIME</span>
+          <span className="ios-badge bg-secondary text-muted-foreground font-mono">kg • ALL TIME</span>
         </div>
 
-        <div className="h-[250px] w-full">
+        <div className="h-[250px] w-full pr-2">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data.volume_per_muscle} layout="vertical" margin={{ left: -20, right: 20 }}>
+            <BarChart data={data.volume_per_muscle} layout="vertical" margin={{ left: -20, right: 10 }}>
               <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="hsl(var(--border))" />
               <XAxis type="number" hide />
               <YAxis 
@@ -154,18 +166,27 @@ export const Analytics: React.FC = () => {
                 type="category" 
                 axisLine={false} 
                 tickLine={false}
-                tick={{ fontSize: 10, fontWeight: 600, fill: 'currentColor' }}
+                tick={{ fontSize: 10, fontWeight: 700, fill: 'hsl(var(--muted-foreground))', fontFamily: 'var(--font-heading)' }}
                 width={80}
               />
               <Tooltip 
-                cursor={{ fill: 'hsl(var(--secondary))' }}
-                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                cursor={{ fill: 'hsl(var(--secondary) / 0.4)', radius: 6 }}
+                contentStyle={{ 
+                  borderRadius: '16px', 
+                  border: '1px solid hsl(var(--border))', 
+                  background: 'hsl(var(--card))',
+                  boxShadow: '0 8px 30px rgba(0,0,0,0.06)',
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '12px'
+                }}
+                labelStyle={{ fontWeight: '800', fontFamily: 'var(--font-heading)', color: 'hsl(var(--foreground))' }}
+                itemStyle={{ fontWeight: '600', color: 'hsl(var(--accent-blue))' }}
               />
               <Bar 
                 dataKey="volume" 
                 fill="hsl(var(--foreground))" 
-                radius={[0, 4, 4, 0]}
-                barSize={20}
+                radius={[0, 6, 6, 0]}
+                barSize={18}
               >
                 {data.volume_per_muscle.map((_, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -175,20 +196,38 @@ export const Analytics: React.FC = () => {
           </ResponsiveContainer>
         </div>
       </div>
-
     </motion.div>
   );
 };
 
-const StatCard: React.FC<{ icon: React.ReactNode, label: string, value: number | string, subtext: string }> = ({ icon, label, value, subtext }) => (
-  <div className="bg-secondary/50 rounded-[24px] p-5 space-y-3">
-    <div className="flex items-center gap-2">
-      <div className="text-foreground">{icon}</div>
-      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{label}</span>
+interface StatCardProps {
+  icon: React.ReactNode;
+  label: string;
+  value: number | string;
+  subtext: string;
+  accent?: 'blue' | 'orange' | 'violet' | 'green';
+}
+
+const StatCard: React.FC<StatCardProps> = ({ icon, label, value, subtext, accent = 'blue' }) => {
+  const accentColors = {
+    blue: 'bg-accent-blue-bg text-accent-blue',
+    orange: 'bg-accent-orange-bg text-accent-orange',
+    violet: 'bg-accent-violet-bg text-accent-violet',
+    green: 'bg-accent-green-bg text-accent-green',
+  };
+
+  return (
+    <div className="ios-card bg-card border border-border p-5 space-y-3 btn-tap-scale">
+      <div className="flex items-center gap-2">
+        <div className={`p-2 rounded-xl shrink-0 ${accentColors[accent]}`}>
+          {icon}
+        </div>
+        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest font-heading">{label}</span>
+      </div>
+      <div>
+        <div className="text-3xl font-black text-foreground font-mono tracking-tight">{value}</div>
+        <p className="text-[10.5px] font-semibold text-muted-foreground/80 mt-1 leading-relaxed">{subtext}</p>
+      </div>
     </div>
-    <div>
-      <div className="text-3xl font-bold text-foreground">{value}</div>
-      <p className="text-[10px] font-semibold text-muted-foreground mt-1">{subtext}</p>
-    </div>
-  </div>
-);
+  );
+};

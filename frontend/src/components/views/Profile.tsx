@@ -85,41 +85,45 @@ export const Profile: React.FC = () => {
 
   return (
     <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="space-y-8 pt-4 pb-32 px-3 md:px-4"
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="space-y-10 pt-2 pb-32 px-1"
     >
-      <header className="flex items-center gap-4 px-1">
-        <div className="w-16 h-16 bg-foreground rounded-full flex items-center justify-center">
-          <User className="text-background w-8 h-8" />
+      <header className="flex items-center gap-5 px-1">
+        <div className="w-16 h-16 bg-foreground rounded-full flex items-center justify-center text-background font-black text-xl font-heading shadow-md border border-border select-none">
+          FR
         </div>
         <div>
-          <h2 className="text-3xl font-bold text-foreground tracking-tight leading-tight">
+          <h2 className="text-3xl font-extrabold text-foreground tracking-tight leading-tight font-heading">
             @fayyadrc
           </h2>
-          <p className="text-muted-foreground text-sm font-medium mt-1">Standard Plan</p>
+          <span className="ios-badge bg-accent-blue-bg text-accent-blue mt-1 inline-block">
+            Standard Plan
+          </span>
         </div>
       </header>
 
       {/* Activity Calendar Section */}
       <div className="space-y-4">
-        <h3 className="px-2 text-[11px] font-bold text-[#8E8E93] uppercase tracking-[0.05em]">Activity Tracker</h3>
+        <h3 className="px-2 text-[11px] font-bold text-muted-foreground uppercase tracking-[0.1em] font-mono">Activity Tracker</h3>
         <ActivityCalendar activities={activities} />
       </div>
 
       {/* Settings List */}
-      <div className="space-y-1">
-        <h3 className="px-2 text-[11px] font-bold text-muted-foreground uppercase tracking-[0.05em] mb-3">Preferences</h3>
-        <ProfileItem 
-          icon={<Bell className="w-5 h-5" />} 
-          label="Data Health" 
-          onClick={() => (window as any).setActiveView?.('data-health')}
-        />
-        <ProfileItem 
-          icon={theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />} 
-          label="Dark Mode" 
-          onClick={toggleTheme}
-        />
+      <div className="space-y-3">
+        <h3 className="px-2 text-[11px] font-bold text-muted-foreground uppercase tracking-[0.1em] font-mono mb-1">Preferences</h3>
+        <div className="grid grid-cols-1 gap-2.5">
+          <ProfileItem 
+            icon={<Bell className="w-5 h-5 stroke-[2.2] text-accent-blue" />} 
+            label="Data Health Scan" 
+            onClick={() => (window as any).setActiveView?.('data-health')}
+          />
+          <ProfileItem 
+            icon={theme === 'dark' ? <Sun className="w-5 h-5 stroke-[2.2] text-accent-orange" /> : <Moon className="w-5 h-5 stroke-[2.2] text-accent-violet" />} 
+            label={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'} 
+            onClick={toggleTheme}
+          />
+        </div>
       </div>
     </motion.div>
   );
@@ -128,12 +132,12 @@ export const Profile: React.FC = () => {
 const ProfileItem: React.FC<{ icon: React.ReactNode, label: string, onClick?: () => void }> = ({ icon, label, onClick }) => (
   <button 
     onClick={onClick}
-    className="w-full flex items-center justify-between p-4 bg-card hover:bg-secondary transition-colors rounded-2xl border border-border"
+    className="w-full flex items-center justify-between p-4 bg-card hover:bg-secondary/50 transition-all rounded-[20px] border border-border shadow-[0_2px_12px_rgba(0,0,0,0.01)] btn-tap-scale"
   >
-    <div className="flex items-center gap-3">
-      <div className="text-foreground">{icon}</div>
-      <span className="text-[15px] font-semibold text-foreground">{label}</span>
+    <div className="flex items-center gap-4">
+      <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-secondary/80 text-foreground shrink-0">{icon}</div>
+      <span className="text-[14px] font-semibold text-foreground tracking-tight">{label}</span>
     </div>
-    <ChevronDown className="w-4 h-4 text-muted-foreground -rotate-90" />
+    <ChevronDown className="w-4 h-4 text-muted-foreground/75 -rotate-90 stroke-[2.5]" />
   </button>
 );
