@@ -130,29 +130,30 @@ export const DataHealth: React.FC<DataHealthProps> = ({ onAnomalyCountChange, on
   // ─── Empty state: no sessions ───
   if (sessions.length === 0) {
     return (
-      <div className="space-y-10 animate-fade-up">
+      <div className="space-y-8 pt-2 pb-24 animate-fade-up">
         <header className="space-y-4">
           {onBack && (
             <button 
               onClick={onBack}
-              className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors -ml-1"
+              className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-all duration-200 -ml-1 px-3 py-1.5 rounded-full hover:bg-secondary/80 btn-tap-scale text-xs font-bold uppercase tracking-wider"
             >
-              <ChevronLeft className="w-5 h-5" />
-              <span className="text-[13px] font-bold uppercase tracking-wider">Back to Profile</span>
+              <ChevronLeft className="w-4 h-4" />
+              Back to Profile
             </button>
           )}
           <div className="space-y-2">
-            <h2 className="text-[28px] md:text-3xl font-bold tracking-tight text-primary">Data Health</h2>
-            <p className="text-muted-foreground text-sm">Review anomalies in your workout data.</p>
+            <h2 className="text-4xl font-extrabold tracking-tight text-foreground font-heading">Data Health</h2>
+            <p className="text-muted-foreground text-sm font-medium">Review anomalies in your workout data.</p>
           </div>
         </header>
-        <div className="py-20 flex flex-col items-center justify-center text-center space-y-4">
-          <div className="w-16 h-16 glass-surface rounded-full flex items-center justify-center">
+
+        <div className="py-20 flex flex-col items-center justify-center text-center space-y-4 bg-card border border-border shadow-sm rounded-[28px] p-8">
+          <div className="w-16 h-16 bg-secondary rounded-[20px] flex items-center justify-center">
             <Inbox className="w-8 h-8 text-muted-foreground" />
           </div>
-          <div>
-            <h3 className="text-lg font-bold text-primary">No Data to Scan</h3>
-            <p className="text-muted-foreground text-sm max-w-xs">
+          <div className="space-y-2">
+            <h3 className="text-lg font-bold text-foreground font-heading">No Data to Scan</h3>
+            <p className="text-muted-foreground text-sm max-w-xs mx-auto">
               Log some workouts first, then come back here to check for data inconsistencies.
             </p>
           </div>
@@ -162,91 +163,98 @@ export const DataHealth: React.FC<DataHealthProps> = ({ onAnomalyCountChange, on
   }
 
   return (
-    <div className="space-y-10 animate-fade-up">
+    <div className="space-y-8 pt-2 pb-24 animate-fade-up">
       <header className="space-y-4">
         {onBack && (
           <button 
             onClick={onBack}
-            className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors -ml-1"
+            className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-all duration-200 -ml-1 px-3 py-1.5 rounded-full hover:bg-secondary/80 btn-tap-scale text-xs font-bold uppercase tracking-wider w-fit"
           >
-            <ChevronLeft className="w-5 h-5" />
-            <span className="text-[13px] font-bold uppercase tracking-wider">Back to Profile</span>
+            <ChevronLeft className="w-4 h-4" />
+            Back to Profile
           </button>
         )}
         <div className="space-y-2">
-          <h2 className="text-[28px] md:text-3xl font-bold tracking-tight text-primary">Data Health</h2>
-          <p className="text-muted-foreground text-sm">
+          <h2 className="text-4xl font-extrabold tracking-tight text-foreground font-heading">Data Health</h2>
+          <p className="text-muted-foreground text-sm font-medium">
             Scanned {Math.min(sessions.length, 5)} recent session{Math.min(sessions.length, 5) !== 1 ? 's' : ''} for anomalies.
           </p>
         </div>
       </header>
 
       {anomalies.length === 0 ? (
-        <div className="py-20 flex flex-col items-center justify-center text-center space-y-4 animate-slide-up">
-          <div className="w-16 h-16 glass-surface rounded-full flex items-center justify-center">
-            <Inbox className="w-8 h-8 text-muted-foreground" />
+        <div className="py-20 flex flex-col items-center justify-center text-center space-y-4 bg-card border border-border shadow-sm rounded-[28px] p-8 animate-slide-up">
+          <div className="w-16 h-16 bg-accent-green-bg text-accent-green rounded-[20px] flex items-center justify-center">
+            <Inbox className="w-8 h-8" />
           </div>
-          <div>
-            <h3 className="text-lg font-bold text-primary">Zero issues found</h3>
-            <p className="text-muted-foreground text-sm max-w-xs">Your data is clean and consistent. High quality insights guaranteed.</p>
+          <div className="space-y-2">
+            <h3 className="text-lg font-bold text-foreground font-heading">Zero Issues Found</h3>
+            <p className="text-muted-foreground text-sm max-w-xs mx-auto">
+              Your data is clean and consistent. High quality insights guaranteed.
+            </p>
           </div>
         </div>
       ) : (
-        <div className="glass-surface rounded-2xl overflow-hidden animate-slide-up">
-          <Table>
-            <TableHeader className="bg-foreground/[0.02] border-b border-foreground/10">
-              <TableRow className="hover:bg-transparent border-none">
-                <TableHead className="w-[180px] font-bold text-xs uppercase tracking-widest py-4">Issue</TableHead>
-                <TableHead className="font-bold text-xs uppercase tracking-widest">Detail</TableHead>
-                <TableHead className="w-[100px] font-bold text-xs uppercase tracking-widest">Severity</TableHead>
-                <TableHead className="w-[160px] text-right font-bold text-xs uppercase tracking-widest">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {anomalies.map((a, idx) => (
-                <TableRow key={a.id} className={`group transition-colors border-foreground/10 hover:bg-foreground/5 stagger-${Math.min(idx + 1, 5)}`}>
-                  <TableCell className="font-semibold text-primary">
-                    <div className="flex items-center gap-2">
-                      <AlertCircle className={a.severity === 'high' ? "text-destructive w-4 h-4" : "text-amber-500 w-4 h-4"} />
-                      {a.issue}
+        <div className="space-y-4.5 animate-slide-up">
+          {anomalies.map((a, idx) => (
+            <div
+              key={a.id}
+              className={`bg-card border border-border shadow-[0_2px_12px_rgba(0,0,0,0.015)] rounded-[24px] overflow-hidden hover:shadow-md transition-all duration-300 group btn-tap-scale p-6 stagger-${Math.min(idx + 1, 5)}`}
+            >
+              <div className="flex flex-col sm:flex-row gap-5 items-start justify-between">
+                <div className="flex items-start gap-4">
+                  <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${
+                    a.severity === 'high' 
+                      ? 'bg-accent-orange-bg text-accent-orange border border-accent-orange/10' 
+                      : 'bg-accent-blue-bg text-accent-blue border border-accent-blue/10'
+                  }`}>
+                    <AlertCircle className="w-5.5 h-5.5 stroke-[2.2]" />
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h4 className="text-lg font-extrabold text-foreground font-heading tracking-tight leading-tight">
+                        {a.issue}
+                      </h4>
+                      <span className={`ios-badge uppercase ${
+                        a.severity === 'high' 
+                          ? 'bg-accent-orange-bg text-accent-orange' 
+                          : 'bg-accent-blue-bg text-accent-blue'
+                      }`}>
+                        {a.severity} severity
+                      </span>
+                      {a.date && (
+                        <span className="ios-badge bg-secondary text-muted-foreground font-mono">
+                          {a.date}
+                        </span>
+                      )}
                     </div>
-                  </TableCell>
-                  <TableCell className="text-sm text-muted-foreground leading-relaxed">
-                    {a.detail}
-                    {a.date && (
-                      <div className="mt-1 text-[10px] font-mono opacity-50 uppercase">{a.date}</div>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={a.severity === 'high' ? "destructive" : "secondary"} className={`capitalize font-bold text-[10px] px-2 py-0 ${a.severity !== 'high' && 'glass-surface'}`}>
-                      {a.severity}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-8 w-8 p-0 hover:text-destructive hover:bg-foreground/10"
-                        title="Ignore"
-                        onClick={() => handleAction(a.id, 'ignore')}
-                      >
-                        <X className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        className="h-8 px-3 text-xs glass-surface text-primary border-foreground/20 hover:bg-foreground/10"
-                        onClick={() => handleAction(a.id, 'fix')}
-                      >
-                        Note Fix
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                    <p className="text-[13.5px] font-medium leading-relaxed text-muted-foreground">
+                      {a.detail}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex sm:flex-col gap-2 w-full sm:w-auto shrink-0 justify-end self-end sm:self-center">
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    className="flex-1 sm:flex-initial h-9 px-4 text-[12px] font-bold rounded-xl glass-surface text-primary border border-border hover:bg-secondary/80 transition-all btn-tap-scale"
+                    onClick={() => handleAction(a.id, 'fix')}
+                  >
+                    Note Fix
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="flex-1 sm:flex-initial h-9 px-4 text-[12px] font-bold rounded-xl hover:text-destructive hover:bg-destructive/5 transition-all text-muted-foreground btn-tap-scale"
+                    onClick={() => handleAction(a.id, 'ignore')}
+                  >
+                    Ignore
+                  </Button>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </div>

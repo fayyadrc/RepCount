@@ -111,30 +111,30 @@ export const QuickLog: React.FC = () => {
 
   return (
     <motion.div 
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-10 pt-4 pb-24"
+      className="space-y-8 pt-2 pb-24"
     >
-      <header>
-        <div className="flex items-center gap-3 mb-1">
-          <h2 className="text-3xl font-bold text-foreground tracking-tight">Log your workout</h2>
-          {isSubmitting && <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />}
+      <header className="space-y-2">
+        <div className="flex items-center gap-3">
+          <h2 className="text-4xl font-extrabold text-foreground tracking-tight font-heading">Log your workout</h2>
+          {isSubmitting && <Loader2 className="w-5 h-5 animate-spin text-accent-blue" />}
         </div>
-        <p className="text-muted-foreground text-sm font-medium">
-          Start typing in natural language and let RepCount worry about the details.
+        <p className="text-muted-foreground text-[14px] font-medium leading-relaxed max-w-xl">
+          Start typing in natural language and let <span className="font-semibold text-foreground">RepCount</span> worry about the details.
         </p>
       </header>
 
       {/* Input Section */}
-      <div className="bg-card rounded-[24px] border border-border shadow-sm overflow-hidden min-h-[400px] flex flex-col group relative">
-        {/* Action Button - Top Right Circle Tick */}
-        <div className="absolute top-6 right-6 z-10">
+      <div className="bg-card rounded-[28px] border border-border shadow-sm focus-within:shadow-md focus-within:border-border/80 overflow-hidden min-h-[380px] flex flex-col group relative transition-all duration-300">
+        {/* Action Button - Floating Circular Submit Button in bottom right */}
+        <div className="absolute bottom-6 right-6 z-10">
           <button
             onClick={handleSubmit}
             disabled={isSubmitting || !input.trim()}
-            className="w-12 h-12 flex items-center justify-center bg-foreground text-background rounded-full hover:scale-[1.05] active:scale-[0.95] transition-all disabled:opacity-10 shadow-xl shadow-foreground/10 group-focus-within:shadow-foreground/20"
+            className="w-14 h-14 flex items-center justify-center bg-foreground text-background rounded-full hover:scale-105 active:scale-95 transition-all disabled:opacity-20 shadow-lg shadow-foreground/10 group-focus-within:shadow-foreground/20 btn-tap-scale"
           >
-            {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check className="w-6 h-6" />}
+            {isSubmitting ? <Loader2 className="w-6 h-6 animate-spin" /> : <Check className="w-7 h-7 stroke-[2.5]" />}
           </button>
         </div>
 
@@ -143,8 +143,13 @@ export const QuickLog: React.FC = () => {
           onChange={setInput}
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}
-          placeholder="What did you do today?"
+          placeholder="e.g. Benched 80kg for 8 reps, followed by 10 reps to failure..."
         />
+        
+        {/* Subtle keyboard shortcut indicator */}
+        <div className="px-8 pb-6 text-[11px] font-bold text-muted-foreground font-mono uppercase tracking-wider select-none pointer-events-none">
+          Press ⌘ + Enter to log
+        </div>
       </div>
 
       {/* Captured Data Section */}
@@ -153,45 +158,48 @@ export const QuickLog: React.FC = () => {
           <motion.div 
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
-            className="space-y-6"
+            className="space-y-6 pt-4"
           >
             <div className="flex items-center gap-2 px-1">
-              <Sparkles className="w-4 h-4 text-orange-500" />
-              <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-[0.05em]">Captured Exercises</span>
+              <Sparkles className="w-4 h-4 text-accent-orange" />
+              <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-[0.1em] font-mono">Captured Exercises</span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {lastLogged.map((entry, idx) => (
                 <motion.div 
                   key={entryDisplayIds[idx]}
-                  initial={{ opacity: 0, x: -10 }}
+                  initial={{ opacity: 0, x: -12 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: idx * 0.05 }}
-                  className="bg-secondary/50 rounded-[24px] p-6 space-y-4"
+                  className="bg-card rounded-[24px] border border-border p-6 space-y-4 shadow-sm hover:shadow-md transition-shadow"
                 >
-                  <div className="flex justify-between items-start">
-                    <h4 className="text-lg font-bold text-foreground capitalize">{entry.exercise}</h4>
-                    <div className="px-3 py-1 bg-background rounded-full border border-border text-[10px] font-bold text-muted-foreground uppercase">
+                  <div className="flex justify-between items-start gap-2">
+                    <h4 className="text-lg font-bold text-foreground capitalize font-heading leading-tight">{entry.exercise}</h4>
+                    <span className="ios-badge bg-accent-orange-bg text-accent-orange shrink-0">
                       SET 1
-                    </div>
+                    </span>
                   </div>
                   
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-6">
                     <div className="flex flex-col">
-                      <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">Weight</span>
-                      <span className="text-lg font-bold text-foreground">{entry.weight}<span className="text-xs text-muted-foreground ml-0.5">{entry.weightUnit}</span></span>
+                      <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest font-mono">Weight</span>
+                      <span className="text-xl font-extrabold text-foreground font-mono mt-0.5">
+                        {entry.weight}
+                        <span className="text-xs text-muted-foreground ml-0.5 font-sans font-medium uppercase">{entry.weightUnit}</span>
+                      </span>
                     </div>
                     <div className="w-px h-8 bg-border" />
                     <div className="flex flex-col">
-                      <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">Reps</span>
-                      <span className="text-lg font-bold text-foreground">{entry.reps}</span>
+                      <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest font-mono">Reps</span>
+                      <span className="text-xl font-extrabold text-foreground font-mono mt-0.5">{entry.reps}</span>
                     </div>
                   </div>
 
                   {entry.notes && (
-                    <div className="flex items-start gap-1.5 pt-2">
-                      <CheckCircle2 className="w-3 h-3 text-green-500 mt-0.5" />
-                      <p className="text-[11px] font-semibold text-muted-foreground line-clamp-2">
+                    <div className="flex items-start gap-2 pt-3 border-t border-border/50">
+                      <Check className="w-4 h-4 text-accent-green mt-0.5 shrink-0" strokeWidth={2.5} />
+                      <p className="text-[12px] font-semibold text-muted-foreground leading-normal">
                         {entry.notes}
                       </p>
                     </div>
@@ -203,9 +211,9 @@ export const QuickLog: React.FC = () => {
             <div className="flex justify-center pt-4">
               <button 
                 onClick={() => setLastLogged(null)}
-                className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest hover:text-foreground transition-colors"
+                className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest hover:text-foreground transition-colors font-mono btn-tap-scale"
               >
-                Clear History
+                Clear captured log
               </button>
             </div>
           </motion.div>

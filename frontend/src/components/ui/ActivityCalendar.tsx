@@ -94,27 +94,52 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
     }
   };
 
+  const getActivityColors = (type: ActivityType) => {
+    switch (type) {
+      case 'run': 
+        return 'bg-accent-orange-bg text-accent-orange border-accent-orange/20';
+      case 'cycle': 
+        return 'bg-accent-violet-bg text-accent-violet border-accent-violet/20';
+      case 'strength': 
+        return 'bg-accent-blue-bg text-accent-blue border-accent-blue/20';
+      case 'walk': 
+        return 'bg-secondary/70 text-muted-foreground border-border';
+      case 'swim': 
+        return 'bg-accent-blue-bg text-accent-blue border-accent-blue/20';
+      case 'hike': 
+        return 'bg-accent-orange-bg text-accent-orange border-accent-orange/20';
+      case 'yoga': 
+        return 'bg-accent-violet-bg text-accent-violet border-accent-violet/20';
+      case 'hiit': 
+        return 'bg-accent-green-bg text-accent-green border-accent-green/20';
+      case 'cardio': 
+        return 'bg-accent-green-bg text-accent-green border-accent-green/20';
+      default: 
+        return 'bg-secondary text-foreground border-border';
+    }
+  };
+
   return (
-    <div className="bg-card rounded-[24px] md:rounded-[32px] p-4 md:p-6 shadow-sm border border-border w-full overflow-hidden">
+    <div className="bg-card rounded-[28px] p-4 md:p-6 shadow-sm border border-border w-full overflow-hidden">
       <div className="flex justify-between items-center mb-6 px-1">
         <div>
-          <h4 className="text-[17px] md:text-[20px] font-bold text-foreground tracking-tight">
-            {monthName} <span className="text-muted-foreground font-medium ml-1">{year}</span>
+          <h4 className="text-[18px] md:text-[20px] font-extrabold text-foreground tracking-tight font-heading">
+            {monthName} <span className="text-muted-foreground font-medium ml-1 font-sans">{year}</span>
           </h4>
         </div>
-        <div className="flex gap-1">
-          <button onClick={() => changeMonth(-1)} className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-secondary flex items-center justify-center hover:bg-secondary/80 transition-colors active:scale-90">
-            <ChevronLeft className="w-5 h-5 text-foreground" />
+        <div className="flex gap-2">
+          <button onClick={() => changeMonth(-1)} className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-secondary flex items-center justify-center hover:bg-accent transition-all duration-200 active:scale-90 border border-border/50 btn-tap-scale">
+            <ChevronLeft className="w-4 h-4 text-foreground" />
           </button>
-          <button onClick={() => changeMonth(1)} className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-secondary flex items-center justify-center hover:bg-secondary/80 transition-colors active:scale-90">
-            <ChevronRight className="w-5 h-5 text-foreground" />
+          <button onClick={() => changeMonth(1)} className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-secondary flex items-center justify-center hover:bg-accent transition-all duration-200 active:scale-90 border border-border/50 btn-tap-scale">
+            <ChevronRight className="w-4 h-4 text-foreground" />
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-7 gap-y-4 md:gap-y-6">
+      <div className="grid grid-cols-7 gap-1 md:gap-2">
         {daysOfWeek.map((day, i) => (
-          <div key={i} className="text-center text-[11px] md:text-[13px] font-bold text-muted-foreground uppercase tracking-wider">
+          <div key={i} className="text-center text-[10px] md:text-[11px] font-extrabold text-muted-foreground/80 uppercase tracking-widest font-mono py-1">
             {day}
           </div>
         ))}
@@ -122,39 +147,40 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
         <AnimatePresence mode="wait">
           <motion.div 
             key={`${year}-${month}`}
-            initial={{ opacity: 0, x: 10 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -10 }}
-            transition={{ duration: 0.2 }}
-            className="col-span-7 grid grid-cols-7 gap-y-4 md:gap-y-6"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.15 }}
+            className="col-span-7 grid grid-cols-7 gap-1 md:gap-2"
           >
             {calendarDays.map((cell, i) => {
               const activity = cell.dateKey ? activities[cell.dateKey] : null;
               const isCurrent = cell.month === 'current';
               
               return (
-                <div key={i} className="flex flex-col items-center justify-start min-h-[60px] md:min-h-[85px]">
+                <div key={i} className="flex items-center justify-center aspect-square p-0.5">
                   {isCurrent ? (
                     activity ? (
-                      <div className="relative flex flex-col items-center">
-                        <motion.div 
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          className="w-10 h-10 md:w-14 md:h-14 bg-foreground rounded-full flex items-center justify-center text-background relative shadow-lg"
-                        >
-                          {renderIcon(activity.type)}
-                        </motion.div>
-                        <span className="mt-1 md:mt-2 text-[10px] md:text-[13px] font-medium text-muted-foreground">
-                          {cell.day}
-                        </span>
-                      </div>
+                      <motion.div 
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className={cn(
+                          "w-full h-full rounded-[14px] md:rounded-[18px] flex flex-col items-center justify-center relative cursor-pointer border shadow-[0_2px_8px_rgba(0,0,0,0.01)] transition-all",
+                          getActivityColors(activity.type)
+                        )}
+                      >
+                        <span className="text-xs md:text-[14px] font-extrabold font-mono mt-0.5 leading-none">{cell.day}</span>
+                        <div className="mt-1">
+                          {renderIcon(activity.type, "w-3 h-3 md:w-4 md:h-4 stroke-[2.2]")}
+                        </div>
+                      </motion.div>
                     ) : (
-                      <div className="w-10 h-10 md:w-14 md:h-14 border border-border rounded-full flex items-center justify-center text-[12px] md:text-[15px] font-medium text-foreground">
+                      <div className="w-full h-full bg-card hover:bg-secondary/40 border border-border/80 rounded-[14px] md:rounded-[18px] flex items-center justify-center text-xs md:text-[14px] font-bold text-foreground/80 transition-colors font-mono">
                         {cell.day}
                       </div>
                     )
                   ) : (
-                    <span className="text-[12px] md:text-[15px] font-medium text-muted-foreground/50 pt-2 md:pt-4">
+                    <span className="text-[11px] md:text-xs font-semibold text-muted-foreground/20 font-mono select-none">
                       {cell.day}
                     </span>
                   )}
