@@ -9,7 +9,7 @@ import { Profile } from '@/components/views/Profile';
 import { History } from '@/components/views/History';
 import { WorkoutDetails } from '@/components/views/WorkoutDetails';
 import { Analytics } from '@/components/views/Analytics';
-import { AIInsights } from '@/components/views/AIInsights';
+import { AIInsights } from '@/components/views/AI_Insights';
 import { ViewState } from '@/lib/types';
 import { Toaster } from '@/components/ui/toaster';
 import { AnimatePresence } from 'framer-motion';
@@ -107,14 +107,14 @@ function AppContent() {
 
   return (
     <>
-      <Shell 
-        activeView={activeView} 
-        setActiveView={setActiveView} 
+      <Shell
+        activeView={activeView}
+        setActiveView={setActiveView}
         anomalyCount={anomalyCount}
       >
         <AnimatePresence mode="wait">
-          <ViewErrorBoundary 
-            key={activeView} 
+          <ViewErrorBoundary
+            key={activeView}
             onReset={() => setActiveView('quick-log')}
           >
             {renderView()}
