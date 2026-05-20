@@ -53,11 +53,12 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
 
   const [editingId, setEditingId] = React.useState<string | null>(null);
   const [isDeletingId, setIsDeletingId] = React.useState<string | null>(null);
-  const [editValues, setEditValues] = React.useState<{ weight: number, reps: number, exercise: string, notes: string }>({
+  const [editValues, setEditValues] = React.useState<{ weight: number, reps: number, exercise: string, notes: string, weightUnit: string }>({
     weight: 0,
     reps: 0,
     exercise: '',
-    notes: ''
+    notes: '',
+    weightUnit: 'kg'
   });
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
@@ -205,7 +206,8 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
                   weight: entry.weight,
                   reps: entry.reps,
                   exercise: entry.exercise,
-                  notes: entry.notes || ''
+                  notes: entry.notes || '',
+                  weightUnit: entry.weightUnit || 'kg'
                 });
               };
 
@@ -214,8 +216,7 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
                 try {
                   await updateLog(id, {
                     ...editValues,
-                    sets: 1, 
-                    weightUnit: 'kg'
+                    sets: 1
                   });
                   setEditingId(null);
                   toast({ title: "Updated", description: "Log entry updated successfully." });
@@ -246,7 +247,7 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
                     <div className="flex justify-between items-start gap-2">
                       <h4 className="text-lg font-bold text-foreground capitalize font-heading leading-tight">{exercise}</h4>
                       <span className="ios-badge bg-accent-blue-bg text-accent-blue">
-                        {exVolume.toLocaleString()} kg
+                        {exVolume.toLocaleString()} {sets[0]?.weightUnit || 'kg'}
                       </span>
                     </div>
                     
@@ -260,7 +261,7 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
                             <div key={j} className="flex flex-col gap-3 p-4 bg-secondary/30 rounded-2xl border border-border">
                               <div className="flex items-center gap-2">
                                 <div className="flex-1">
-                                  <label className="text-[9px] font-bold text-muted-foreground uppercase ml-1 font-mono">Weight (kg)</label>
+                                  <label className="text-[9px] font-bold text-muted-foreground uppercase ml-1 font-mono">Weight ({editValues.weightUnit})</label>
                                   <input 
                                     type="number" 
                                     value={editValues.weight}
@@ -302,7 +303,7 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
                           <div key={j} className="group flex items-center justify-between text-sm py-3 border-b border-border/50 last:border-0">
                             <div className="flex items-center gap-3">
                               <span className="text-[9px] font-bold text-muted-foreground/80 uppercase w-10 font-mono">Set {j+1}</span>
-                              <span className="font-extrabold text-foreground font-mono">{set.weight}<span className="text-[10px] text-muted-foreground font-sans font-medium ml-0.5 uppercase">kg</span></span>
+                              <span className="font-extrabold text-foreground font-mono">{set.weight}<span className="text-[10px] text-muted-foreground font-sans font-medium ml-0.5 uppercase">{set.weightUnit || 'kg'}</span></span>
                               <span className="text-muted-foreground/50">×</span>
                               <span className="font-extrabold text-foreground font-mono">{set.reps}<span className="text-[10px] text-muted-foreground font-sans font-medium ml-0.5 uppercase">reps</span></span>
                             </div>
