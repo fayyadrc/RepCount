@@ -53,11 +53,12 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
 
   const [editingId, setEditingId] = React.useState<string | null>(null);
   const [isDeletingId, setIsDeletingId] = React.useState<string | null>(null);
-  const [editValues, setEditValues] = React.useState<{ weight: number, reps: number, exercise: string, notes: string }>({
+  const [editValues, setEditValues] = React.useState<{ weight: number, reps: number, exercise: string, notes: string, weightUnit: string }>({
     weight: 0,
     reps: 0,
     exercise: '',
-    notes: ''
+    notes: '',
+    weightUnit: 'kg'
   });
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
@@ -109,19 +110,21 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
       <header className="space-y-4">
         <button 
           onClick={onBack}
-          className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors"
+          className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-all btn-tap-scale group"
         >
-          <ChevronLeft className="w-4 h-4" />
-          <span className="text-[10px] font-bold uppercase tracking-widest">Back to History</span>
+          <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center border border-border/40 group-hover:bg-accent transition-colors">
+            <ChevronLeft className="w-4 h-4 text-foreground stroke-[2.5]" />
+          </div>
+          <span className="text-[10px] font-extrabold uppercase tracking-widest font-mono">Back to History</span>
         </button>
         <div>
-          <h2 className="text-3xl font-bold text-foreground tracking-tight">
+          <h2 className="text-3xl font-extrabold text-foreground tracking-tight font-heading leading-tight">
             {isPureStrava && primaryStravaActivity && selectedSession.stravaActivities!.length === 1 
               ? primaryStravaActivity.name 
               : "Workout Details"
             }
           </h2>
-          <p className="text-muted-foreground text-sm font-medium mt-1">
+          <p className="text-muted-foreground text-[11px] font-bold uppercase tracking-wider font-mono mt-1.5">
             {new Date(selectedSession.date + 'T00:00:00').toLocaleDateString('en-US', {
               weekday: 'long',
               month: 'long',
@@ -135,7 +138,7 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
       <div className="grid grid-cols-2 gap-4">
         {selectedSession.entries.length > 0 && (
           <StatCard 
-            icon={<Weight className="w-4 h-4" />}
+            icon={<Weight className="w-4 h-4 text-accent-blue" />}
             label="Total Volume"
             value={(selectedSession.totalVolumeKg ?? selectedSession.entries.reduce((s, e) => s + e.weight * e.sets * e.reps, 0)).toLocaleString()}
             subtext="kg"
@@ -143,7 +146,7 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
         )}
         {displayDuration > 0 && (
           <StatCard 
-            icon={<Timer className="w-4 h-4" />}
+            icon={<Timer className="w-4 h-4 text-accent-orange" />}
             label="Duration"
             value={formatDuration(displayDuration)}
             subtext="active time"
@@ -151,12 +154,12 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
         )}
         {(displayHr || maxHr > 0) && (
           <StatCard 
-            icon={<Heart className="w-4 h-4 text-red-500/70" />}
+            icon={<Heart className="w-4 h-4 text-destructive" />}
             label="Heart Rate"
             value={
               <div className="flex items-baseline gap-2">
-                <span>{displayHr ? Math.round(displayHr) : '--'}</span>
-                {maxHr > 0 && <span className="text-sm text-gray-400 font-medium">/ {Math.round(maxHr)} max</span>}
+                <span className="font-mono">{displayHr ? Math.round(displayHr) : '--'}</span>
+                {maxHr > 0 && <span className="text-[11px] text-muted-foreground font-sans font-semibold">/ {Math.round(maxHr)} max</span>}
               </div>
             }
             subtext="bpm"
@@ -164,7 +167,7 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
         )}
         {totalCalories > 0 && (
           <StatCard 
-            icon={<Flame className="w-4 h-4 text-orange-500" />}
+            icon={<Flame className="w-4 h-4 text-accent-orange" />}
             label="Calories"
             value={Math.round(totalCalories)}
             subtext="kcal burnt"
@@ -172,7 +175,7 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
         )}
         {isPureStrava && primaryStravaActivity?.distanceMeters && (
           <StatCard 
-            icon={<Activity className="w-4 h-4" />}
+            icon={<Activity className="w-4 h-4 text-accent-blue" />}
             label="Distance"
             value={(primaryStravaActivity.distanceMeters / 1000).toFixed(2)}
             subtext="km"
@@ -185,7 +188,7 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
         <section className="space-y-6">
           <div className="flex items-center gap-2 px-1">
             <Dumbbell className="w-4 h-4 text-foreground" />
-            <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-[0.05em]">Exercise Breakdown</span>
+            <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-[0.1em] font-mono">Exercise Breakdown</span>
           </div>
           
           <div className="space-y-4">
@@ -203,7 +206,8 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
                   weight: entry.weight,
                   reps: entry.reps,
                   exercise: entry.exercise,
-                  notes: entry.notes || ''
+                  notes: entry.notes || '',
+                  weightUnit: entry.weightUnit || 'kg'
                 });
               };
 
@@ -212,8 +216,7 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
                 try {
                   await updateLog(id, {
                     ...editValues,
-                    sets: 1, // Individual rows are usually treated as 1 set in the update logic
-                    weightUnit: 'kg'
+                    sets: 1
                   });
                   setEditingId(null);
                   toast({ title: "Updated", description: "Log entry updated successfully." });
@@ -240,39 +243,39 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
               return Object.entries(grouped).map(([exercise, sets], i) => {
                 const exVolume = sets.reduce((s, e) => s + e.weight * e.sets * e.reps, 0);
                 return (
-                  <div key={i} className="bg-secondary/50 rounded-[24px] p-6 space-y-4">
-                    <div className="flex justify-between items-start">
-                      <h4 className="text-lg font-bold text-foreground capitalize">{exercise}</h4>
-                      <div className="px-3 py-1 bg-background rounded-full border border-border text-[10px] font-bold text-muted-foreground uppercase tracking-tight">
-                        {exVolume.toLocaleString()} kg
-                      </div>
+                  <div key={i} className="bg-card border border-border shadow-[0_2px_12px_rgba(0,0,0,0.01)] rounded-[24px] p-6 space-y-4">
+                    <div className="flex justify-between items-start gap-2">
+                      <h4 className="text-lg font-bold text-foreground capitalize font-heading leading-tight">{exercise}</h4>
+                      <span className="ios-badge bg-accent-blue-bg text-accent-blue">
+                        {exVolume.toLocaleString()} {sets[0]?.weightUnit || 'kg'}
+                      </span>
                     </div>
                     
-                    <div className="space-y-2">
+                    <div className="space-y-1">
                       {sets.map((set, j) => {
                         const isEditing = set.id && editingId === set.id;
                         const isDeleting = set.id && isDeletingId === set.id;
 
                         if (isEditing) {
                           return (
-                            <div key={j} className="flex flex-col gap-3.5 p-4.5 bg-card rounded-2xl border border-foreground/5 shadow-sm">
+                            <div key={j} className="flex flex-col gap-3.5 p-4.5 bg-secondary/30 rounded-2xl border border-border shadow-sm">
                               <div className="flex items-center gap-3">
                                 <div className="flex-1">
-                                  <label className="text-[10px] font-bold text-muted-foreground uppercase ml-1 tracking-wider">Weight (kg)</label>
+                                  <label className="text-[10px] font-bold text-muted-foreground uppercase ml-1 tracking-wider font-mono">Weight ({editValues.weightUnit || 'kg'})</label>
                                   <input 
                                     type="number" 
                                     value={editValues.weight}
                                     onChange={(e) => setEditValues({...editValues, weight: parseFloat(e.target.value)})}
-                                    className="w-full bg-secondary border-0 rounded-xl py-3 px-3.5 text-sm font-bold focus:ring-2 focus:ring-foreground outline-none transition-all mt-1"
+                                    className="w-full bg-card border border-border rounded-xl py-3 px-3.5 text-sm font-bold font-mono focus:ring-2 focus:ring-foreground outline-none transition-all mt-1"
                                   />
                                 </div>
                                 <div className="flex-1">
-                                  <label className="text-[10px] font-bold text-muted-foreground uppercase ml-1 tracking-wider">Reps</label>
+                                  <label className="text-[10px] font-bold text-muted-foreground uppercase ml-1 tracking-wider font-mono">Reps</label>
                                   <input 
                                     type="number" 
                                     value={editValues.reps}
                                     onChange={(e) => setEditValues({...editValues, reps: parseInt(e.target.value)})}
-                                    className="w-full bg-secondary border-0 rounded-xl py-3 px-3.5 text-sm font-bold focus:ring-2 focus:ring-foreground outline-none transition-all mt-1"
+                                    className="w-full bg-card border border-border rounded-xl py-3 px-3.5 text-sm font-bold font-mono focus:ring-2 focus:ring-foreground outline-none transition-all mt-1"
                                   />
                                 </div>
                               </div>
@@ -280,14 +283,14 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
                                 <button 
                                   onClick={() => handleSaveEdit(set.id!)}
                                   disabled={isSubmitting}
-                                  className="flex-1 bg-foreground text-background rounded-xl py-3 text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2 active:scale-[0.97] transition-all hover:opacity-90 disabled:opacity-50 cursor-pointer"
+                                  className="flex-1 bg-foreground text-background rounded-xl py-3 text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2 active:scale-[0.97] transition-all hover:opacity-90 disabled:opacity-50 cursor-pointer btn-tap-scale font-mono"
                                 >
                                   <Check className="w-4 h-4" /> Save
                                 </button>
                                 <button 
                                   onClick={() => setEditingId(null)}
                                   disabled={isSubmitting}
-                                  className="px-4.5 bg-secondary text-muted-foreground rounded-xl py-3 flex items-center justify-center active:scale-[0.97] transition-all hover:bg-secondary/80 hover:text-foreground cursor-pointer"
+                                  className="px-4.5 bg-card border border-border text-muted-foreground rounded-xl py-3 flex items-center justify-center active:scale-[0.97] transition-all hover:bg-secondary hover:text-foreground cursor-pointer btn-tap-scale"
                                   aria-label="Cancel editing"
                                 >
                                   <X className="w-4 h-4" />
@@ -300,15 +303,15 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
                         return (
                           <div key={j} className="group flex items-center justify-between text-sm py-3 border-b border-border/50 last:border-0 min-h-[56px]">
                             <div className="flex items-center gap-3">
-                              <span className="text-[10px] font-bold text-muted-foreground uppercase w-8">Set {j+1}</span>
-                              <span className="font-bold text-foreground">{set.weight}<span className="text-[10px] text-muted-foreground font-medium ml-0.5">kg</span></span>
-                              <span className="text-muted-foreground">×</span>
-                              <span className="font-bold text-foreground">{set.reps}<span className="text-[10px] text-muted-foreground font-medium ml-0.5">reps</span></span>
+                              <span className="text-[9px] font-bold text-muted-foreground/80 uppercase w-10 font-mono">Set {j+1}</span>
+                              <span className="font-extrabold text-foreground font-mono">{set.weight}<span className="text-[10px] text-muted-foreground font-sans font-medium ml-0.5 uppercase">{set.weightUnit || 'kg'}</span></span>
+                              <span className="text-muted-foreground/50">×</span>
+                              <span className="font-extrabold text-foreground font-mono">{set.reps}<span className="text-[10px] text-muted-foreground font-sans font-medium ml-0.5 uppercase">reps</span></span>
                             </div>
                             
                             <div className="flex items-center gap-4">
                               {set.notes && !isDeleting && (
-                                <span className="text-[10px] font-bold text-orange-500 uppercase tracking-tight truncate max-w-[100px]">
+                                <span className="ios-badge bg-accent-orange-bg text-accent-orange py-0.5 px-2 rounded-lg text-[9px] truncate max-w-[120px]">
                                   {set.notes}
                                 </span>
                               )}
@@ -317,14 +320,14 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
                                 <div className="flex items-center gap-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
                                   <button 
                                     onClick={() => handleStartEdit(set)}
-                                    className="w-10 h-10 flex items-center justify-center bg-secondary hover:bg-accent rounded-full text-muted-foreground hover:text-foreground active:scale-90 transition-all cursor-pointer"
+                                    className="w-10 h-10 flex items-center justify-center bg-secondary hover:bg-accent rounded-full text-muted-foreground hover:text-foreground active:scale-90 transition-all cursor-pointer btn-tap-scale"
                                     aria-label="Edit set"
                                   >
                                     <Pencil className="w-[18px] h-[18px]" />
                                   </button>
                                   <button 
                                     onClick={() => setIsDeletingId(set.id || null)}
-                                    className="w-10 h-10 flex items-center justify-center bg-red-500/5 hover:bg-red-500/10 rounded-full text-muted-foreground hover:text-red-500 active:scale-90 transition-all cursor-pointer"
+                                    className="w-10 h-10 flex items-center justify-center bg-destructive/5 hover:bg-destructive/10 rounded-full text-muted-foreground hover:text-destructive active:scale-90 transition-all cursor-pointer btn-tap-scale"
                                     aria-label="Delete set"
                                   >
                                     <Trash2 className="w-[18px] h-[18px]" />
@@ -332,17 +335,17 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
                                 </div>
                               ) : (
                                 <div className="flex items-center gap-2">
-                                  <span className="text-[10px] font-bold text-red-500 uppercase tracking-wider mr-1">Confirm Delete?</span>
+                                  <span className="text-[10px] font-bold text-destructive uppercase font-mono tracking-wider mr-1">Delete?</span>
                                   <button 
                                     onClick={() => handleDelete(set.id!)}
-                                    className="w-10 h-10 flex items-center justify-center bg-red-500 hover:bg-red-600 text-white rounded-full active:scale-90 transition-all cursor-pointer shadow-sm"
+                                    className="w-10 h-10 flex items-center justify-center bg-destructive hover:bg-destructive/90 text-destructive-foreground rounded-full active:scale-90 transition-all cursor-pointer shadow-sm btn-tap-scale"
                                     aria-label="Confirm delete"
                                   >
                                     <Check className="w-[18px] h-[18px]" />
                                   </button>
                                   <button 
                                     onClick={() => setIsDeletingId(null)}
-                                    className="w-10 h-10 flex items-center justify-center bg-secondary hover:bg-accent text-muted-foreground hover:text-foreground rounded-full active:scale-90 transition-all cursor-pointer"
+                                    className="w-10 h-10 flex items-center justify-center bg-secondary hover:bg-accent text-muted-foreground hover:text-foreground rounded-full active:scale-90 transition-all cursor-pointer btn-tap-scale"
                                     aria-label="Cancel delete"
                                   >
                                     <X className="w-[18px] h-[18px]" />
@@ -366,25 +369,25 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
       {hasStrava && (
         <section className="space-y-6">
           <div className="flex items-center gap-2 px-1">
-            <Flame className="w-4 h-4 text-orange-500" />
-            <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-[0.05em]">Strava Activities</span>
+            <Flame className="w-4 h-4 text-accent-orange" />
+            <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-[0.1em] font-mono">Strava Activities</span>
           </div>
           
           <div className="space-y-3">
             {selectedSession.stravaActivities?.map((act, i) => (
-              <div key={i} className="bg-card rounded-[24px] p-5 border border-border shadow-sm flex items-center justify-between">
+              <div key={i} className="bg-card rounded-[24px] p-5 border border-border shadow-[0_2px_12px_rgba(0,0,0,0.01)] flex items-center justify-between hover:shadow-md transition-all">
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center">
-                    {getStravaIcon(act.type, "w-5 h-5 text-orange-600")}
+                  <div className="w-10 h-10 rounded-full bg-accent-orange-bg flex items-center justify-center">
+                    {getStravaIcon(act.type, "w-5 h-5 text-accent-orange")}
                   </div>
                   <div>
-                    <p className="font-bold text-foreground">{act.name}</p>
-                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{act.type}</p>
+                    <p className="font-extrabold text-foreground tracking-tight leading-tight">{act.name}</p>
+                    <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest font-mono mt-0.5">{act.type}</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-bold text-foreground">{formatDuration(act.durationSeconds / 60)}</p>
-                  {act.calories && <p className="text-[10px] font-bold text-orange-500 uppercase tracking-tight">{Math.round(act.calories)} kcal</p>}
+                  <p className="font-extrabold text-foreground font-mono">{formatDuration(act.durationSeconds / 60)}</p>
+                  {act.calories && <p className="text-[10px] font-bold text-accent-orange uppercase tracking-tight font-mono mt-0.5">{Math.round(act.calories)} kcal</p>}
                 </div>
               </div>
             ))}
@@ -396,14 +399,14 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
 };
 
 const StatCard: React.FC<{ icon: React.ReactNode, label: string, value: React.ReactNode, subtext: string }> = ({ icon, label, value, subtext }) => (
-  <div className="bg-secondary/50 rounded-[24px] p-5 space-y-3">
+  <div className="bg-card border border-border shadow-[0_2px_12px_rgba(0,0,0,0.01)] rounded-[24px] p-5 space-y-3.5">
     <div className="flex items-center gap-2">
-      <div className="text-foreground">{icon}</div>
-      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{label}</span>
+      <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-secondary/80 text-foreground shrink-0">{icon}</div>
+      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider font-mono">{label}</span>
     </div>
     <div>
-      <div className="text-2xl font-bold text-foreground">{value}</div>
-      <p className="text-[10px] font-semibold text-muted-foreground mt-1">{subtext}</p>
+      <div className="text-2xl font-extrabold text-foreground font-heading">{value}</div>
+      <p className="text-[10px] font-semibold text-muted-foreground mt-1 uppercase tracking-wide font-mono">{subtext}</p>
     </div>
   </div>
 );

@@ -120,18 +120,18 @@ export const History: React.FC<HistoryProps> = ({ onViewDetails }) => {
 
       {sessions.length === 0 ? (
         <div className="py-24 flex flex-col items-center justify-center text-center space-y-4">
-          <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center">
+          <div className="w-16 h-16 bg-secondary rounded-2xl flex items-center justify-center">
             <Dumbbell className="w-8 h-8 text-muted-foreground" />
           </div>
           <div className="space-y-1">
-            <h3 className="text-lg font-bold text-foreground">No activities yet</h3>
+            <h3 className="text-lg font-bold text-foreground font-heading">No activities yet</h3>
             <p className="text-muted-foreground text-sm max-w-[200px]">
               Start a new session or sync with Strava to see your history.
             </p>
           </div>
         </div>
       ) : (
-        <div className="space-y-4 px-1">
+        <div className="space-y-4.5 px-1">
           {sessions.map((session) => {
             const totalVolume = session.totalVolumeKg
               ?? session.entries.reduce((sum, e) => sum + e.weight * e.sets * e.reps, 0);
@@ -143,112 +143,126 @@ export const History: React.FC<HistoryProps> = ({ onViewDetails }) => {
               month: 'short', 
               day: 'numeric' 
             });
-
+ 
             const hasStrava = session.stravaActivities && session.stravaActivities.length > 0;
             const isPureStrava = session.entries.length === 0 && hasStrava;
             const primaryStravaActivity = isPureStrava ? session.stravaActivities![0] : null;
             const totalCalories = session.stravaActivities?.reduce((sum, act) => sum + (act.calories || 0), 0) || 0;
-
+ 
             return (
               <motion.div
                 key={session.id}
                 layoutId={session.id}
                 onClick={() => onViewDetails?.(session.id)}
-                className="group cursor-pointer bg-secondary/50 rounded-[24px] p-5 hover:bg-secondary transition-all active:scale-[0.98]"
+                className="group cursor-pointer bg-card border border-border shadow-[0_2px_12px_rgba(0,0,0,0.015)] rounded-[24px] p-6 hover:shadow-md hover:border-border/80 transition-all btn-tap-scale"
               >
-                <div className="flex justify-between items-start mb-4">
-                  <div className="space-y-0.5">
-                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.1em]">
+                <div className="flex justify-between items-start mb-5">
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-extrabold text-accent-violet uppercase tracking-widest font-mono">
                       {dayName}
                     </p>
-                    <h4 className="text-lg font-bold text-foreground">{dateFormatted}</h4>
+                    <h4 className="text-xl font-extrabold text-foreground font-heading">{dateFormatted}</h4>
                   </div>
                   <div className="flex items-center gap-2">
                     {hasStrava && (
-                      <div className="w-7 h-7 rounded-full bg-orange-100 flex items-center justify-center">
-                        <Activity className="w-3.5 h-3.5 text-orange-600" />
+                      <div className="w-8 h-8 rounded-full bg-accent-orange-bg flex items-center justify-center">
+                        <Activity className="w-4 h-4 text-accent-orange" />
                       </div>
                     )}
-                    <div className="w-7 h-7 rounded-full bg-background flex items-center justify-center group-hover:translate-x-1 transition-transform">
-                      <ChevronRight className="w-4 h-4 text-foreground" />
+                    <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center group-hover:translate-x-1 transition-transform border border-border/40">
+                      <ChevronRight className="w-4 h-4 text-foreground stroke-[2.5]" />
                     </div>
                   </div>
                 </div>
-
-                <div className="grid grid-cols-2 gap-3 mb-4">
+ 
+                <div className="grid grid-cols-2 gap-3 mb-5">
                   {!isPureStrava && (
-                    <div className="bg-card/60 rounded-2xl p-3 flex flex-col gap-1">
+                    <div className="bg-secondary/40 border border-border/30 rounded-[18px] p-3 flex flex-col gap-1">
                       <div className="flex items-center gap-1.5 text-muted-foreground">
-                        <Weight className="w-3 h-3" />
-                        <span className="text-[9px] font-bold uppercase tracking-wider">Volume</span>
+                        <Weight className="w-3.5 h-3.5 text-accent-blue" />
+                        <span className="text-[9px] font-bold uppercase tracking-wider font-mono">Volume</span>
                       </div>
-                      <span className="text-sm font-bold text-foreground">{totalVolume.toLocaleString()} <span className="text-[10px] text-muted-foreground">kg</span></span>
+                      <span className="text-md font-extrabold text-foreground font-mono leading-none">
+                        {totalVolume.toLocaleString()}{' '}
+                        <span className="text-[10px] text-muted-foreground font-sans font-medium uppercase">kg</span>
+                      </span>
                     </div>
                   )}
                   
                   {session.durationMins && (
-                    <div className="bg-card/60 rounded-2xl p-3 flex flex-col gap-1">
+                    <div className="bg-secondary/40 border border-border/30 rounded-[18px] p-3 flex flex-col gap-1">
                       <div className="flex items-center gap-1.5 text-muted-foreground">
-                        <Timer className="w-3 h-3" />
-                        <span className="text-[9px] font-bold uppercase tracking-wider">Duration</span>
+                        <Timer className="w-3.5 h-3.5 text-accent-orange" />
+                        <span className="text-[9px] font-bold uppercase tracking-wider font-mono">Duration</span>
                       </div>
-                      <span className="text-sm font-bold text-foreground">{formatDuration(session.durationMins)}</span>
+                      <span className="text-md font-extrabold text-foreground font-mono leading-none">
+                        {formatDuration(session.durationMins)}
+                      </span>
                     </div>
                   )}
-
+ 
                   {session.avgHeartRate && (
-                    <div className="bg-card/60 rounded-2xl p-3 flex flex-col gap-1">
-                      <div className="flex items-center gap-1.5 text-red-500/70">
-                        <Heart className="w-3 h-3" />
-                        <span className="text-[9px] font-bold uppercase tracking-wider">Avg HR</span>
-                      </div>
-                      <span className="text-sm font-bold text-foreground">{Math.round(session.avgHeartRate)} <span className="text-[10px] text-muted-foreground">bpm</span></span>
-                    </div>
-                  )}
-
-                  {totalCalories > 0 && (
-                    <div className="bg-card/60 rounded-2xl p-3 flex flex-col gap-1">
-                      <div className="flex items-center gap-1.5 text-orange-500">
-                        <Flame className="w-3 h-3" />
-                        <span className="text-[9px] font-bold uppercase tracking-wider">Calories</span>
-                      </div>
-                      <span className="text-sm font-bold text-foreground">{Math.round(totalCalories)} <span className="text-[10px] text-muted-foreground">kcal</span></span>
-                    </div>
-                  )}
-
-                  {isPureStrava && primaryStravaActivity && (
-                    <div className="bg-card/60 rounded-2xl p-3 flex flex-col gap-1">
+                    <div className="bg-secondary/40 border border-border/30 rounded-[18px] p-3 flex flex-col gap-1">
                       <div className="flex items-center gap-1.5 text-muted-foreground">
-                        {getStravaIcon(primaryStravaActivity.type, "w-3 h-3")}
-                        <span className="text-[9px] font-bold uppercase tracking-wider">{primaryStravaActivity.type}</span>
+                        <Heart className="w-3.5 h-3.5 text-destructive" />
+                        <span className="text-[9px] font-bold uppercase tracking-wider font-mono">Avg HR</span>
+                      </div>
+                      <span className="text-md font-extrabold text-foreground font-mono leading-none">
+                        {Math.round(session.avgHeartRate)}{' '}
+                        <span className="text-[10px] text-muted-foreground font-sans font-medium uppercase">bpm</span>
+                      </span>
+                    </div>
+                  )}
+ 
+                  {totalCalories > 0 && (
+                    <div className="bg-secondary/40 border border-border/30 rounded-[18px] p-3 flex flex-col gap-1">
+                      <div className="flex items-center gap-1.5 text-muted-foreground">
+                        <Flame className="w-3.5 h-3.5 text-accent-orange" />
+                        <span className="text-[9px] font-bold uppercase tracking-wider font-mono">Calories</span>
+                      </div>
+                      <span className="text-md font-extrabold text-foreground font-mono leading-none">
+                        {Math.round(totalCalories)}{' '}
+                        <span className="text-[10px] text-muted-foreground font-sans font-medium uppercase">kcal</span>
+                      </span>
+                    </div>
+                  )}
+ 
+                  {isPureStrava && primaryStravaActivity && (
+                    <div className="bg-secondary/40 border border-border/30 rounded-[18px] p-3 flex flex-col gap-1">
+                      <div className="flex items-center gap-1.5 text-muted-foreground">
+                        {getStravaIcon(primaryStravaActivity.type, "w-3.5 h-3.5 text-accent-blue")}
+                        <span className="text-[9px] font-bold uppercase tracking-wider font-mono">{primaryStravaActivity.type}</span>
                       </div>
                       {primaryStravaActivity.distanceMeters > 0 && (
-                        <span className="text-sm font-bold text-foreground">{(primaryStravaActivity.distanceMeters / 1000).toFixed(2)} <span className="text-[10px] text-muted-foreground">km</span></span>
+                        <span className="text-md font-extrabold text-foreground font-mono leading-none">
+                          {(primaryStravaActivity.distanceMeters / 1000).toFixed(2)}{' '}
+                          <span className="text-[10px] text-muted-foreground font-sans font-medium uppercase">km</span>
+                        </span>
                       )}
                     </div>
                   )}
                 </div>
-
+ 
                 {!isPureStrava && uniqueExercises.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 mt-2">
                     {uniqueExercises.slice(0, 4).map((entry, idx) => (
-                      <div 
+                      <span 
                         key={idx}
-                        className="px-2.5 py-1 bg-foreground/5 rounded-lg text-[10px] font-bold text-foreground/60 uppercase tracking-tight"
+                        className="ios-badge bg-accent-blue-bg text-accent-blue py-0.5 px-2.5 rounded-lg text-[9px]"
                       >
                         {entry.exercise}
-                      </div>
+                      </span>
                     ))}
                     {uniqueExercises.length > 4 && (
-                      <div className="px-2.5 py-1 bg-foreground/5 rounded-lg text-[10px] font-bold text-foreground/40 uppercase tracking-tight">
+                      <span className="ios-badge bg-secondary text-muted-foreground py-0.5 px-2 rounded-lg text-[9px]">
                         +{uniqueExercises.length - 4} more
-                      </div>
+                      </span>
                     )}
                   </div>
                 )}
                 
                 {isPureStrava && session.stravaActivities && (
-                  <p className="text-[11px] font-semibold text-muted-foreground italic">
+                  <p className="text-[12px] font-semibold text-muted-foreground italic leading-normal pt-1">
                     {session.stravaActivities.map(a => a.name).join(', ')}
                   </p>
                 )}
