@@ -15,11 +15,11 @@ load_dotenv()
 
 from contextlib import asynccontextmanager
 from apscheduler.schedulers.background import BackgroundScheduler
-from .modules.health.router import router as health_router
-from .modules.history.router import router as history_router
-from .modules.strava.router import router as strava_router
-from .modules.strava.service import sync_strava_data
-from .modules.analytics.router import router as analytics_router
+from .core.router import router as health_router
+from .stages.stage1_ingestion.router import router as ingestion_router
+from .stages.stage3_recommendation.router import router as recommendation_router
+from .stages.stage4_analytics.router import router as analytics_router
+from .stages.stage1_ingestion.service import sync_strava_data
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -38,6 +38,7 @@ async def lifespan(app: FastAPI):
     scheduler.shutdown()
 
 app = FastAPI(title="GymTracker API", lifespan=lifespan)
+
 
 # Configure CORS for the frontend
 app.add_middleware(
@@ -58,9 +59,10 @@ print(f"🏠 Project root: {BASE_DIR}")
 
 # Include routers
 app.include_router(health_router, prefix="/api", tags=["Health"])
-app.include_router(history_router, prefix="/api", tags=["History"])
-app.include_router(strava_router, prefix="/api", tags=["Strava"])
-app.include_router(analytics_router, prefix="/api", tags=["Analytics"])
+app.include_router(ingestion_router, prefix="/api", tags=["Ingestion"])
+app.include_router(recommendation_router, prefix="/api", tags=["Recommendation"])
+app.include_router(analytics_router, prefix="/api", tags=["Analytics & History"])
+
 
 # Catch-all route to serve the frontend (SPA routing and static files)
 @app.get("/{rest_of_path:path}")

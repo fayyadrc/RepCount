@@ -455,32 +455,3 @@ def categorize_workout(exercises: list[str]) -> dict[str, int]:
         categorized[group] = categorized.get(group, 0) + 1
     
     return categorized
-
-
-# Example usage
-if __name__ == "__main__":
-    # Test basic functionality
-    test_exercises = [
-        "barbell bench press",
-        "bent over row",
-        "leg press",
-        "bicep curl",
-        "tricep rope pushdown",
-        "lateral raise",
-        "leg curl",
-        "hip thrust",
-        "ab wheel",
-        "calf raise",
-        "weird exercise 123"
-    ]
-    
-    print("Exercise Classification:")
-    for exercise in test_exercises:
-        group = get_muscle_group(exercise)
-        secondary = get_secondary_muscles(exercise)
-        print(f"  {exercise:30} -> {group:15} (Secondary: {', '.join(secondary) or 'None'})")
-    
-    print("\nWorkout Composition:")
-    composition = categorize_workout(test_exercises)
-    for group, count in sorted(composition.items(), key=lambda x: x[1], reverse=True):
-        print(f"  {group:15}: {count} exercise(s)")

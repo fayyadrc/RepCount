@@ -35,17 +35,3 @@ class WorkoutSession(BaseModel):
     avgHeartRate: Optional[float] = None
     activityNames: List[str] = []
     stravaActivities: List[StravaActivity] = []
-
-class ParsedWorkoutEntry(BaseModel):
-    id: Optional[str] = None
-    date: str
-    exercise_name: str
-    weight: Optional[float] = None
-    unit: str = "kg"
-    reps: int
-    failure: bool = False
-    rir: Optional[int] = None
-    notes: Optional[str] = None
-
-class ParsedWorkoutLog(BaseModel):
-    entries: List[ParsedWorkoutEntry]
