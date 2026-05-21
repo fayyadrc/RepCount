@@ -255,41 +255,42 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
 
                         if (isEditing) {
                           return (
-                            <div key={j} className="flex flex-col gap-3 p-3 bg-card rounded-xl border border-foreground/5 shadow-sm">
-                              <div className="flex items-center gap-2">
+                            <div key={j} className="flex flex-col gap-3.5 p-4.5 bg-card rounded-2xl border border-foreground/5 shadow-sm">
+                              <div className="flex items-center gap-3">
                                 <div className="flex-1">
-                                  <label className="text-[9px] font-bold text-muted-foreground uppercase ml-1">Weight (kg)</label>
+                                  <label className="text-[10px] font-bold text-muted-foreground uppercase ml-1 tracking-wider">Weight (kg)</label>
                                   <input 
                                     type="number" 
                                     value={editValues.weight}
                                     onChange={(e) => setEditValues({...editValues, weight: parseFloat(e.target.value)})}
-                                    className="w-full bg-secondary border-0 rounded-lg p-2 text-sm font-bold focus:ring-1 focus:ring-foreground outline-none"
+                                    className="w-full bg-secondary border-0 rounded-xl py-3 px-3.5 text-sm font-bold focus:ring-2 focus:ring-foreground outline-none transition-all mt-1"
                                   />
                                 </div>
                                 <div className="flex-1">
-                                  <label className="text-[9px] font-bold text-muted-foreground uppercase ml-1">Reps</label>
+                                  <label className="text-[10px] font-bold text-muted-foreground uppercase ml-1 tracking-wider">Reps</label>
                                   <input 
                                     type="number" 
                                     value={editValues.reps}
                                     onChange={(e) => setEditValues({...editValues, reps: parseInt(e.target.value)})}
-                                    className="w-full bg-secondary border-0 rounded-lg p-2 text-sm font-bold focus:ring-1 focus:ring-foreground outline-none"
+                                    className="w-full bg-secondary border-0 rounded-xl py-3 px-3.5 text-sm font-bold focus:ring-2 focus:ring-foreground outline-none transition-all mt-1"
                                   />
                                 </div>
                               </div>
-                              <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-3 mt-1">
                                 <button 
                                   onClick={() => handleSaveEdit(set.id!)}
                                   disabled={isSubmitting}
-                                  className="flex-1 bg-foreground text-background rounded-lg py-2 text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 active:scale-95 transition-transform"
+                                  className="flex-1 bg-foreground text-background rounded-xl py-3 text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2 active:scale-[0.97] transition-all hover:opacity-90 disabled:opacity-50 cursor-pointer"
                                 >
-                                  <Check className="w-3 h-3" /> Save
+                                  <Check className="w-4 h-4" /> Save
                                 </button>
                                 <button 
                                   onClick={() => setEditingId(null)}
                                   disabled={isSubmitting}
-                                  className="px-3 bg-secondary text-muted-foreground rounded-lg py-2 flex items-center justify-center active:scale-95 transition-transform"
+                                  className="px-4.5 bg-secondary text-muted-foreground rounded-xl py-3 flex items-center justify-center active:scale-[0.97] transition-all hover:bg-secondary/80 hover:text-foreground cursor-pointer"
+                                  aria-label="Cancel editing"
                                 >
-                                  <X className="w-3 h-3" />
+                                  <X className="w-4 h-4" />
                                 </button>
                               </div>
                             </div>
@@ -297,7 +298,7 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
                         }
 
                         return (
-                          <div key={j} className="group flex items-center justify-between text-sm py-2 border-b border-border/50 last:border-0">
+                          <div key={j} className="group flex items-center justify-between text-sm py-3 border-b border-border/50 last:border-0 min-h-[56px]">
                             <div className="flex items-center gap-3">
                               <span className="text-[10px] font-bold text-muted-foreground uppercase w-8">Set {j+1}</span>
                               <span className="font-bold text-foreground">{set.weight}<span className="text-[10px] text-muted-foreground font-medium ml-0.5">kg</span></span>
@@ -313,34 +314,38 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
                               )}
                               
                               {!isDeleting ? (
-                                <div className="flex items-center gap-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
+                                <div className="flex items-center gap-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
                                   <button 
                                     onClick={() => handleStartEdit(set)}
-                                    className="p-1.5 hover:bg-background rounded-lg text-muted-foreground hover:text-foreground transition-colors"
+                                    className="w-10 h-10 flex items-center justify-center bg-secondary hover:bg-accent rounded-full text-muted-foreground hover:text-foreground active:scale-90 transition-all cursor-pointer"
+                                    aria-label="Edit set"
                                   >
-                                    <Pencil className="w-3 h-3" />
+                                    <Pencil className="w-[18px] h-[18px]" />
                                   </button>
                                   <button 
                                     onClick={() => setIsDeletingId(set.id || null)}
-                                    className="p-1.5 hover:bg-red-500/10 rounded-lg text-muted-foreground hover:text-red-500 transition-colors"
+                                    className="w-10 h-10 flex items-center justify-center bg-red-500/5 hover:bg-red-500/10 rounded-full text-muted-foreground hover:text-red-500 active:scale-90 transition-all cursor-pointer"
+                                    aria-label="Delete set"
                                   >
-                                    <Trash2 className="w-3 h-3" />
+                                    <Trash2 className="w-[18px] h-[18px]" />
                                   </button>
                                 </div>
                               ) : (
                                 <div className="flex items-center gap-2">
-                                  <span className="text-[9px] font-bold text-red-500 uppercase">Confirm Delete?</span>
+                                  <span className="text-[10px] font-bold text-red-500 uppercase tracking-wider mr-1">Confirm Delete?</span>
                                   <button 
                                     onClick={() => handleDelete(set.id!)}
-                                    className="p-1.5 bg-red-500 text-background rounded-lg transition-colors"
+                                    className="w-10 h-10 flex items-center justify-center bg-red-500 hover:bg-red-600 text-white rounded-full active:scale-90 transition-all cursor-pointer shadow-sm"
+                                    aria-label="Confirm delete"
                                   >
-                                    <Check className="w-3 h-3" />
+                                    <Check className="w-[18px] h-[18px]" />
                                   </button>
                                   <button 
                                     onClick={() => setIsDeletingId(null)}
-                                    className="p-1.5 bg-secondary text-muted-foreground rounded-lg transition-colors"
+                                    className="w-10 h-10 flex items-center justify-center bg-secondary hover:bg-accent text-muted-foreground hover:text-foreground rounded-full active:scale-90 transition-all cursor-pointer"
+                                    aria-label="Cancel delete"
                                   >
-                                    <X className="w-3 h-3" />
+                                    <X className="w-[18px] h-[18px]" />
                                   </button>
                                 </div>
                               )}
