@@ -208,13 +208,15 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
         {isPureStrava && selectedSession.stravaActivities && (
           (() => {
             const isRun = selectedSession.stravaActivities.some(act => act.type === 'Run');
-            const distanceMeters = selectedSession.stravaActivities.reduce((sum, act) => sum + (act.distanceMeters || 0), 0);
-            if (isRun && distanceMeters > 0) {
+            const runDistanceMeters = selectedSession.stravaActivities
+              .filter(act => act.type === 'Run')
+              .reduce((sum, act) => sum + (act.distanceMeters || 0), 0);
+            if (isRun && runDistanceMeters > 0) {
               return (
                 <StatCard 
                   icon={<Footprints className="w-4 h-4 text-accent-blue" />}
                   label="Distance"
-                  value={(distanceMeters / 1000).toFixed(2)}
+                  value={(runDistanceMeters / 1000).toFixed(2)}
                   subtext="km"
                 />
               );
