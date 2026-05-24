@@ -28,6 +28,8 @@ out/
 
 # Python
 __pycache__/
+pycache/
+*.pyc
 *.py[cod]
 *$py.class
 *.so

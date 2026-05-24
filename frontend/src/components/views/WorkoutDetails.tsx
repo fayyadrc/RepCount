@@ -96,8 +96,40 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
   const isPureStrava = selectedSession.entries.length === 0 && hasStrava;
   const primaryStravaActivity = isPureStrava ? selectedSession.stravaActivities![0] : null;
 
-  const displayDuration = selectedSession.durationMins || (isPureStrava && primaryStravaActivity ? primaryStravaActivity.durationSeconds / 60 : 0);
-  const displayHr = selectedSession.avgHeartRate || (isPureStrava && primaryStravaActivity ? primaryStravaActivity.avgHeartrate : null);
+  const displayDuration = selectedSession.durationMins || (isPureStrava && selectedSession.stravaActivities
+    ? selectedSession.stravaActivities.reduce((sum, act) => sum + act.durationSeconds / 60, 0)
+    : 0);
+
+  const calculatedAvgHr = (() => {
+    if (!selectedSession.stravaActivities || selectedSession.stravaActivities.length === 0) return null;
+
+    const activitiesWithValidHr = selectedSession.stravaActivities.filter(
+      (activity): activity is StravaActivity & { avgHeartrate: number } =>
+        activity.avgHeartrate !== null && activity.avgHeartrate > 0
+    );
+
+    if (activitiesWithValidHr.length === 0) return null;
+
+    const weightedActivities = activitiesWithValidHr.filter(activity => activity.durationSeconds > 0);
+
+    if (weightedActivities.length > 0) {
+      const totalWeightedHr = weightedActivities.reduce(
+        (sum, activity) => sum + activity.avgHeartrate * activity.durationSeconds,
+        0
+      );
+      const totalDurationSeconds = weightedActivities.reduce(
+        (sum, activity) => sum + activity.durationSeconds,
+        0
+      );
+
+      return totalDurationSeconds > 0 ? totalWeightedHr / totalDurationSeconds : null;
+    }
+
+    const validAvgHrs = activitiesWithValidHr.map(activity => activity.avgHeartrate);
+    return validAvgHrs.reduce((a, b) => a + b, 0) / validAvgHrs.length;
+  })();
+  const displayHr = selectedSession.avgHeartRate || calculatedAvgHr;
+
   const maxHr = selectedSession.stravaActivities?.reduce((max, act) => Math.max(max, act.maxHeartrate || 0), 0) || 0;
   const totalCalories = selectedSession.stravaActivities?.reduce((sum, act) => sum + (act.calories || 0), 0) || 0;
 
@@ -173,13 +205,33 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
             subtext="kcal burnt"
           />
         )}
-        {isPureStrava && primaryStravaActivity?.distanceMeters && (
-          <StatCard 
-            icon={<Activity className="w-4 h-4 text-accent-blue" />}
-            label="Distance"
-            value={(primaryStravaActivity.distanceMeters / 1000).toFixed(2)}
-            subtext="km"
-          />
+        {isPureStrava && selectedSession.stravaActivities && (
+          (() => {
+            const isRun = selectedSession.stravaActivities.some(act => act.type === 'Run');
+            const runDistanceMeters = selectedSession.stravaActivities
+              .filter(act => act.type === 'Run')
+              .reduce((sum, act) => sum + (act.distanceMeters || 0), 0);
+            if (isRun && runDistanceMeters > 0) {
+              return (
+                <StatCard 
+                  icon={<Footprints className="w-4 h-4 text-accent-blue" />}
+                  label="Distance"
+                  value={(runDistanceMeters / 1000).toFixed(2)}
+                  subtext="km"
+                />
+              );
+            } else if (!isRun && primaryStravaActivity && primaryStravaActivity.distanceMeters > 0) {
+              return (
+                <StatCard 
+                  icon={getStravaIcon(primaryStravaActivity.type, "w-4 h-4 text-accent-blue")}
+                  label={primaryStravaActivity.type}
+                  value={(primaryStravaActivity.distanceMeters / 1000).toFixed(2)}
+                  subtext="km"
+                />
+              );
+            }
+            return null;
+          })()
         )}
       </div>
 
