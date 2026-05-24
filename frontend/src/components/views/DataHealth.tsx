@@ -120,7 +120,7 @@ export const DataHealth: React.FC<DataHealthProps> = ({ onAnomalyCountChange, on
       return updated;
     });
     toast({
-      title: action === 'ignore' ? "Anomaly Ignored" : "Noted for Correction",
+      title: action === 'ignore' ? "Anomaly Ignored" : "Noted for Correction.",
       description: action === 'ignore'
         ? "Record will remain as-is."
         : "You can correct this in your next Quick Log entry.",
@@ -133,7 +133,7 @@ export const DataHealth: React.FC<DataHealthProps> = ({ onAnomalyCountChange, on
       <div className="space-y-8 pt-2 pb-24 animate-fade-up">
         <header className="space-y-4">
           {onBack && (
-            <button 
+            <button
               onClick={onBack}
               className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-all duration-200 -ml-1 px-3 py-1.5 rounded-full hover:bg-secondary/80 btn-tap-scale text-xs font-bold uppercase tracking-wider"
             >
@@ -166,7 +166,7 @@ export const DataHealth: React.FC<DataHealthProps> = ({ onAnomalyCountChange, on
     <div className="space-y-8 pt-2 pb-24 animate-fade-up">
       <header className="space-y-4">
         {onBack && (
-          <button 
+          <button
             onClick={onBack}
             className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-all duration-200 -ml-1 px-3 py-1.5 rounded-full hover:bg-secondary/80 btn-tap-scale text-xs font-bold uppercase tracking-wider w-fit"
           >
@@ -203,11 +203,10 @@ export const DataHealth: React.FC<DataHealthProps> = ({ onAnomalyCountChange, on
             >
               <div className="flex flex-col sm:flex-row gap-5 items-start justify-between">
                 <div className="flex items-start gap-4">
-                  <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${
-                    a.severity === 'high' 
-                      ? 'bg-accent-orange-bg text-accent-orange border border-accent-orange/10' 
+                  <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${a.severity === 'high'
+                      ? 'bg-accent-orange-bg text-accent-orange border border-accent-orange/10'
                       : 'bg-accent-blue-bg text-accent-blue border border-accent-blue/10'
-                  }`}>
+                    }`}>
                     <AlertCircle className="w-5.5 h-5.5 stroke-[2.2]" />
                   </div>
                   <div className="space-y-2">
@@ -215,11 +214,10 @@ export const DataHealth: React.FC<DataHealthProps> = ({ onAnomalyCountChange, on
                       <h4 className="text-lg font-extrabold text-foreground font-heading tracking-tight leading-tight">
                         {a.issue}
                       </h4>
-                      <span className={`ios-badge uppercase ${
-                        a.severity === 'high' 
-                          ? 'bg-accent-orange-bg text-accent-orange' 
+                      <span className={`ios-badge uppercase ${a.severity === 'high'
+                          ? 'bg-accent-orange-bg text-accent-orange'
                           : 'bg-accent-blue-bg text-accent-blue'
-                      }`}>
+                        }`}>
                         {a.severity} severity
                       </span>
                       {a.date && (
