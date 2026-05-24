@@ -1,0 +1,875 @@
+[
+    {
+        "exercise": "Incline Smith Machine",
+        "date": "2026-04-06",
+        "weight": 30.0,
+        "reps_raw": "13",
+        "total_reps": 13,
+        "volume": 390.0,
+        "notes": "RIR"
+    },
+    {
+        "exercise": "Incline Smith Machine",
+        "date": "2026-04-06",
+        "weight": 35.0,
+        "reps_raw": "7",
+        "total_reps": 7,
+        "volume": 245.0,
+        "notes": "Failure"
+    },
+    {
+        "exercise": "Incline Smith Machine",
+        "date": "2026-04-06",
+        "weight": 35.0,
+        "reps_raw": "7",
+        "total_reps": 7,
+        "volume": 245.0,
+        "notes": "Failure"
+    },
+    {
+        "exercise": "Incline Smith Machine",
+        "date": "2026-04-13",
+        "weight": 30.0,
+        "reps_raw": "10",
+        "total_reps": 10,
+        "volume": 300.0,
+        "notes": "First set"
+    },
+    {
+        "exercise": "Incline Smith Machine",
+        "date": "2026-04-13",
+        "weight": 35.0,
+        "reps_raw": "7",
+        "total_reps": 7,
+        "volume": 245.0,
+        "notes": "Failure"
+    },
+    {
+        "exercise": "Incline Smith Machine",
+        "date": "2026-05-01",
+        "weight": 30.0,
+        "reps_raw": "9",
+        "total_reps": 9,
+        "volume": 270.0,
+        "notes": null
+    },
+    {
+        "exercise": "Incline Smith Machine",
+        "date": "2026-05-01",
+        "weight": 40.0,
+        "reps_raw": "5",
+        "total_reps": 5,
+        "volume": 200.0,
+        "notes": null
+    },
+    {
+        "exercise": "Machine Pec Dec",
+        "date": "2026-04-06",
+        "weight": 6.0,
+        "reps_raw": "12",
+        "total_reps": 12,
+        "volume": 72.0,
+        "notes": null
+    },
+    {
+        "exercise": "Machine Pec Dec",
+        "date": "2026-04-06",
+        "weight": 7.0,
+        "reps_raw": "5",
+        "total_reps": 5,
+        "volume": 35.0,
+        "notes": "Failure"
+    },
+    {
+        "exercise": "Machine Pec Dec",
+        "date": "2026-04-06",
+        "weight": 5.0,
+        "reps_raw": "8",
+        "total_reps": 8,
+        "volume": 40.0,
+        "notes": "fatigued"
+    },
+    {
+        "exercise": "Machine Pec Dec",
+        "date": "2026-04-11",
+        "weight": 6.0,
+        "reps_raw": "8",
+        "total_reps": 8,
+        "volume": 48.0,
+        "notes": null
+    },
+    {
+        "exercise": "Machine Pec Dec",
+        "date": "2026-04-11",
+        "weight": 7.0,
+        "reps_raw": "7",
+        "total_reps": 7,
+        "volume": 49.0,
+        "notes": null
+    },
+    {
+        "exercise": "Machine Pec Dec",
+        "date": "2026-04-21",
+        "weight": 7.0,
+        "reps_raw": "10",
+        "total_reps": 10,
+        "volume": 70.0,
+        "notes": null
+    },
+    {
+        "exercise": "Machine Pec Dec",
+        "date": "2026-04-21",
+        "weight": 8.0,
+        "reps_raw": "5",
+        "total_reps": 5,
+        "volume": 40.0,
+        "notes": null
+    },
+    {
+        "exercise": "Machine Pec Dec",
+        "date": "2026-05-01",
+        "weight": 6.0,
+        "reps_raw": "9",
+        "total_reps": 9,
+        "volume": 54.0,
+        "notes": null
+    },
+    {
+        "exercise": "Machine Pec Dec",
+        "date": "2026-05-01",
+        "weight": 7.0,
+        "reps_raw": "8",
+        "total_reps": 8,
+        "volume": 56.0,
+        "notes": null
+    },
+    {
+        "exercise": "Machine Shoulder Press",
+        "date": "2026-04-13",
+        "weight": 20.0,
+        "reps_raw": "11",
+        "total_reps": 11,
+        "volume": 220.0,
+        "notes": null
+    },
+    {
+        "exercise": "Machine Shoulder Press",
+        "date": "2026-04-13",
+        "weight": 27.5,
+        "reps_raw": "5",
+        "total_reps": 5,
+        "volume": 137.5,
+        "notes": null
+    },
+    {
+        "exercise": "Machine Shoulder Press",
+        "date": "2026-04-21",
+        "weight": 30.0,
+        "reps_raw": "8",
+        "total_reps": 8,
+        "volume": 240.0,
+        "notes": null
+    },
+    {
+        "exercise": "Machine Shoulder Press",
+        "date": "2026-04-21",
+        "weight": 34.0,
+        "reps_raw": "7",
+        "total_reps": 7,
+        "volume": 238.0,
+        "notes": null
+    },
+    {
+        "exercise": "Machine Shoulder Press",
+        "date": "2026-05-01",
+        "weight": 35.0,
+        "reps_raw": "4",
+        "total_reps": 4,
+        "volume": 140.0,
+        "notes": null
+    },
+    {
+        "exercise": "Machine Shoulder Press",
+        "date": "2026-05-01",
+        "weight": 27.5,
+        "reps_raw": "6",
+        "total_reps": 6,
+        "volume": 165.0,
+        "notes": null
+    },
+    {
+        "exercise": "Single Wrist Cable Lateral Raise",
+        "date": "2026-04-06",
+        "weight": 15.0,
+        "reps_raw": "10",
+        "total_reps": 10,
+        "volume": 150.0,
+        "notes": null
+    },
+    {
+        "exercise": "Single Wrist Cable Lateral Raise",
+        "date": "2026-04-06",
+        "weight": 17.5,
+        "reps_raw": "8",
+        "total_reps": 8,
+        "volume": 140.0,
+        "notes": null
+    },
+    {
+        "exercise": "Single Wrist Cable Lateral Raise",
+        "date": "2026-04-13",
+        "weight": 15.0,
+        "reps_raw": "13-Oct",
+        "total_reps": 23,
+        "volume": 345.0,
+        "notes": null
+    },
+    {
+        "exercise": "Single Wrist Cable Lateral Raise",
+        "date": "2026-04-13",
+        "weight": 17.5,
+        "reps_raw": "09-Jul",
+        "total_reps": 16,
+        "volume": 280.0,
+        "notes": null
+    },
+    {
+        "exercise": "Single Wrist Cable Lateral Raise",
+        "date": "2026-04-21",
+        "weight": 15.0,
+        "reps_raw": "12-Oct",
+        "total_reps": 22,
+        "volume": 330.0,
+        "notes": null
+    },
+    {
+        "exercise": "Single Wrist Cable Lateral Raise",
+        "date": "2026-04-21",
+        "weight": 17.5,
+        "reps_raw": "08-Jun",
+        "total_reps": 14,
+        "volume": 245.0,
+        "notes": null
+    },
+    {
+        "exercise": "Single Wrist Cable Lateral Raise",
+        "date": "2026-05-01",
+        "weight": 15.0,
+        "reps_raw": "15-Dec",
+        "total_reps": 27,
+        "volume": 405.0,
+        "notes": null
+    },
+    {
+        "exercise": "Single Wrist Cable Lateral Raise",
+        "date": "2026-05-01",
+        "weight": 17.5,
+        "reps_raw": "08-Jun",
+        "total_reps": 14,
+        "volume": 245.0,
+        "notes": null
+    },
+    {
+        "exercise": "Tricep V Handle Extension",
+        "date": "2026-04-11",
+        "weight": 55.0,
+        "reps_raw": "12",
+        "total_reps": 12,
+        "volume": 660.0,
+        "notes": null
+    },
+    {
+        "exercise": "Tricep V Handle Extension",
+        "date": "2026-04-11",
+        "weight": 65.0,
+        "reps_raw": "9",
+        "total_reps": 9,
+        "volume": 585.0,
+        "notes": null
+    },
+    {
+        "exercise": "Tricep V Handle Extension",
+        "date": "2026-04-21",
+        "weight": 65.0,
+        "reps_raw": "7",
+        "total_reps": 7,
+        "volume": 455.0,
+        "notes": "after overhead ext"
+    },
+    {
+        "exercise": "Tricep V Handle Extension",
+        "date": "2026-04-21",
+        "weight": 65.0,
+        "reps_raw": "5",
+        "total_reps": 5,
+        "volume": 325.0,
+        "notes": null
+    },
+    {
+        "exercise": "Overhead Tricep Extensions",
+        "date": "2026-04-21",
+        "weight": 45.0,
+        "reps_raw": "5",
+        "total_reps": 5,
+        "volume": 225.0,
+        "notes": null
+    },
+    {
+        "exercise": "Overhead Tricep Extensions",
+        "date": "2026-04-21",
+        "weight": 35.0,
+        "reps_raw": "9",
+        "total_reps": 9,
+        "volume": 315.0,
+        "notes": null
+    },
+    {
+        "exercise": "Overhead Tricep Extensions",
+        "date": "2026-05-01",
+        "weight": 35.0,
+        "reps_raw": "9",
+        "total_reps": 9,
+        "volume": 315.0,
+        "notes": null
+    },
+    {
+        "exercise": "Overhead Tricep Extensions",
+        "date": "2026-05-01",
+        "weight": 45.0,
+        "reps_raw": "3",
+        "total_reps": 3,
+        "volume": 135.0,
+        "notes": null
+    },
+    {
+        "exercise": "Single Arm Tricep Extensions",
+        "date": "2026-04-11",
+        "weight": 15.0,
+        "reps_raw": "12-Nov",
+        "total_reps": 23,
+        "volume": 345.0,
+        "notes": null
+    },
+    {
+        "exercise": "Single Arm Tricep Extensions",
+        "date": "2026-04-11",
+        "weight": 25.0,
+        "reps_raw": "04-May",
+        "total_reps": 9,
+        "volume": 225.0,
+        "notes": null
+    },
+    {
+        "exercise": "Single Arm Tricep Extensions",
+        "date": "2026-04-11",
+        "weight": 17.5,
+        "reps_raw": "12-Oct",
+        "total_reps": 22,
+        "volume": 385.0,
+        "notes": "last set"
+    },
+    {
+        "exercise": "Single Arm Tricep Extensions",
+        "date": "2026-05-01",
+        "weight": 25.0,
+        "reps_raw": "08-Aug",
+        "total_reps": 16,
+        "volume": 400.0,
+        "notes": null
+    },
+    {
+        "exercise": "Single Arm Tricep Extensions",
+        "date": "2026-05-01",
+        "weight": 25.0,
+        "reps_raw": "07-May",
+        "total_reps": 12,
+        "volume": 300.0,
+        "notes": null
+    },
+    {
+        "exercise": "Machine Lat Pulldown (Wide Grip)",
+        "date": "2026-04-04",
+        "weight": 50.0,
+        "reps_raw": "11",
+        "total_reps": 11,
+        "volume": 550.0,
+        "notes": null
+    },
+    {
+        "exercise": "Machine Lat Pulldown (Wide Grip)",
+        "date": "2026-04-04",
+        "weight": 65.0,
+        "reps_raw": "6",
+        "total_reps": 6,
+        "volume": 390.0,
+        "notes": null
+    },
+    {
+        "exercise": "Machine Lat Pulldown (Wide Grip)",
+        "date": "2026-04-04",
+        "weight": 65.0,
+        "reps_raw": "5",
+        "total_reps": 5,
+        "volume": 325.0,
+        "notes": null
+    },
+    {
+        "exercise": "Machine Lat Pulldown (Wide Grip)",
+        "date": "2026-04-09",
+        "weight": 65.0,
+        "reps_raw": "9",
+        "total_reps": 9,
+        "volume": 585.0,
+        "notes": null
+    },
+    {
+        "exercise": "Machine Lat Pulldown (Wide Grip)",
+        "date": "2026-04-09",
+        "weight": 65.0,
+        "reps_raw": "7",
+        "total_reps": 7,
+        "volume": 455.0,
+        "notes": null
+    },
+    {
+        "exercise": "Machine Lat Pulldown (Wide Grip)",
+        "date": "2026-04-14",
+        "weight": 50.0,
+        "reps_raw": "12",
+        "total_reps": 12,
+        "volume": 600.0,
+        "notes": null
+    },
+    {
+        "exercise": "Machine Lat Pulldown (Wide Grip)",
+        "date": "2026-04-14",
+        "weight": 65.0,
+        "reps_raw": "6",
+        "total_reps": 6,
+        "volume": 390.0,
+        "notes": null
+    },
+    {
+        "exercise": "Machine Lat Pulldown (Wide Grip)",
+        "date": "2026-04-17",
+        "weight": 35.0,
+        "reps_raw": "6",
+        "total_reps": 6,
+        "volume": 210.0,
+        "notes": "more lat work"
+    },
+    {
+        "exercise": "Machine Lat Pulldown (Wide Grip)",
+        "date": "2026-04-17",
+        "weight": 65.0,
+        "reps_raw": "5",
+        "total_reps": 5,
+        "volume": 325.0,
+        "notes": "1"
+    },
+    {
+        "exercise": "Machine Back Rows (Close Grip)",
+        "date": "2026-04-04",
+        "weight": 50.0,
+        "reps_raw": "12",
+        "total_reps": 12,
+        "volume": 600.0,
+        "notes": null
+    },
+    {
+        "exercise": "Machine Back Rows (Close Grip)",
+        "date": "2026-04-04",
+        "weight": 65.0,
+        "reps_raw": "6",
+        "total_reps": 6,
+        "volume": 390.0,
+        "notes": null
+    },
+    {
+        "exercise": "Machine Back Rows (Close Grip)",
+        "date": "2026-04-09",
+        "weight": 50.0,
+        "reps_raw": "13",
+        "total_reps": 13,
+        "volume": 650.0,
+        "notes": null
+    },
+    {
+        "exercise": "Machine Back Rows (Close Grip)",
+        "date": "2026-04-09",
+        "weight": 65.0,
+        "reps_raw": "5",
+        "total_reps": 5,
+        "volume": 325.0,
+        "notes": null
+    },
+    {
+        "exercise": "Machine Back Rows (Close Grip)",
+        "date": "2026-04-09",
+        "weight": 50.0,
+        "reps_raw": "7",
+        "total_reps": 7,
+        "volume": 350.0,
+        "notes": null
+    },
+    {
+        "exercise": "Machine Back Rows (Close Grip)",
+        "date": "2026-04-14",
+        "weight": 50.0,
+        "reps_raw": "12",
+        "total_reps": 12,
+        "volume": 600.0,
+        "notes": null
+    },
+    {
+        "exercise": "Machine Back Rows (Close Grip)",
+        "date": "2026-04-14",
+        "weight": 65.0,
+        "reps_raw": "6",
+        "total_reps": 6,
+        "volume": 390.0,
+        "notes": null
+    },
+    {
+        "exercise": "Machine Back Rows (Close Grip)",
+        "date": "2026-04-20",
+        "weight": 55.0,
+        "reps_raw": "10",
+        "total_reps": 10,
+        "volume": 550.0,
+        "notes": null
+    },
+    {
+        "exercise": "Machine Back Rows (Close Grip)",
+        "date": "2026-04-20",
+        "weight": 60.0,
+        "reps_raw": "8",
+        "total_reps": 8,
+        "volume": 480.0,
+        "notes": null
+    },
+    {
+        "exercise": "Rope Hammer Curls",
+        "date": "2026-04-09",
+        "weight": 35.0,
+        "reps_raw": "12",
+        "total_reps": 12,
+        "volume": 420.0,
+        "notes": null
+    },
+    {
+        "exercise": "Rope Hammer Curls",
+        "date": "2026-04-09",
+        "weight": 45.0,
+        "reps_raw": "9",
+        "total_reps": 9,
+        "volume": 405.0,
+        "notes": null
+    },
+    {
+        "exercise": "Rope Hammer Curls",
+        "date": "2026-04-09",
+        "weight": 45.0,
+        "reps_raw": "8",
+        "total_reps": 8,
+        "volume": 360.0,
+        "notes": "tried 55 for 3"
+    },
+    {
+        "exercise": "Rope Hammer Curls",
+        "date": "2026-04-11",
+        "weight": 45.0,
+        "reps_raw": "8",
+        "total_reps": 8,
+        "volume": 360.0,
+        "notes": null
+    },
+    {
+        "exercise": "Rope Hammer Curls",
+        "date": "2026-04-11",
+        "weight": 55.0,
+        "reps_raw": "9",
+        "total_reps": 9,
+        "volume": 495.0,
+        "notes": null
+    },
+    {
+        "exercise": "Rope Hammer Curls",
+        "date": "2026-04-14",
+        "weight": 55.0,
+        "reps_raw": "10",
+        "total_reps": 10,
+        "volume": 550.0,
+        "notes": null
+    },
+    {
+        "exercise": "Rope Hammer Curls",
+        "date": "2026-04-14",
+        "weight": 65.0,
+        "reps_raw": "6",
+        "total_reps": 6,
+        "volume": 390.0,
+        "notes": null
+    },
+    {
+        "exercise": "Rear Delt Machine",
+        "date": "2026-04-14",
+        "weight": 5.0,
+        "reps_raw": "12",
+        "total_reps": 12,
+        "volume": 60.0,
+        "notes": null
+    },
+    {
+        "exercise": "Rear Delt Machine",
+        "date": "2026-04-14",
+        "weight": 7.0,
+        "reps_raw": "5",
+        "total_reps": 5,
+        "volume": 35.0,
+        "notes": null
+    },
+    {
+        "exercise": "Rear Delt Flies",
+        "date": "2026-04-09",
+        "weight": 5.0,
+        "reps_raw": "15",
+        "total_reps": 15,
+        "volume": 75.0,
+        "notes": null
+    },
+    {
+        "exercise": "Rear Delt Flies",
+        "date": "2026-04-09",
+        "weight": 15.0,
+        "reps_raw": "8",
+        "total_reps": 8,
+        "volume": 120.0,
+        "notes": null
+    },
+    {
+        "exercise": "Machine Chest Press",
+        "date": "2026-04-17",
+        "weight": 45.0,
+        "reps_raw": "12",
+        "total_reps": 12,
+        "volume": 540.0,
+        "notes": null
+    },
+    {
+        "exercise": "Machine Chest Press",
+        "date": "2026-04-17",
+        "weight": 55.0,
+        "reps_raw": "7",
+        "total_reps": 7,
+        "volume": 385.0,
+        "notes": null
+    },
+    {
+        "exercise": "Machine Chest Press",
+        "date": "2026-04-17",
+        "weight": 55.0,
+        "reps_raw": "5",
+        "total_reps": 5,
+        "volume": 275.0,
+        "notes": null
+    },
+    {
+        "exercise": "T-Bar Row Wide",
+        "date": "2026-04-17",
+        "weight": 30.0,
+        "reps_raw": "12",
+        "total_reps": 12,
+        "volume": 360.0,
+        "notes": null
+    },
+    {
+        "exercise": "T-Bar Row Wide",
+        "date": "2026-04-17",
+        "weight": 35.0,
+        "reps_raw": "10",
+        "total_reps": 10,
+        "volume": 350.0,
+        "notes": null
+    },
+    {
+        "exercise": "T-Bar Row Wide",
+        "date": "2026-04-17",
+        "weight": 40.0,
+        "reps_raw": "6",
+        "total_reps": 6,
+        "volume": 240.0,
+        "notes": null
+    },
+    {
+        "exercise": "Lat Pullovers",
+        "date": "2026-04-17",
+        "weight": 45.0,
+        "reps_raw": "12",
+        "total_reps": 12,
+        "volume": 540.0,
+        "notes": null
+    },
+    {
+        "exercise": "Lat Pullovers",
+        "date": "2026-04-17",
+        "weight": 55.0,
+        "reps_raw": "5",
+        "total_reps": 5,
+        "volume": 275.0,
+        "notes": null
+    },
+    {
+        "exercise": "Lat Pullovers",
+        "date": "2026-04-17",
+        "weight": 35.0,
+        "reps_raw": "5",
+        "total_reps": 5,
+        "volume": 175.0,
+        "notes": "Drop set"
+    },
+    {
+        "exercise": "Cable Chest Flies",
+        "date": "2026-04-17",
+        "weight": 25.0,
+        "reps_raw": "12",
+        "total_reps": 12,
+        "volume": 300.0,
+        "notes": null
+    },
+    {
+        "exercise": "Cable Chest Flies",
+        "date": "2026-04-17",
+        "weight": 35.0,
+        "reps_raw": "10",
+        "total_reps": 10,
+        "volume": 350.0,
+        "notes": null
+    },
+    {
+        "exercise": "Cable Chest Flies",
+        "date": "2026-04-17",
+        "weight": 45.0,
+        "reps_raw": "3",
+        "total_reps": 3,
+        "volume": 135.0,
+        "notes": "5 of 25 instead"
+    },
+    {
+        "exercise": "Rear Delt Flies or Rope Pulls",
+        "date": "2026-04-17",
+        "weight": 35.0,
+        "reps_raw": "14",
+        "total_reps": 14,
+        "volume": 490.0,
+        "notes": null
+    },
+    {
+        "exercise": "Rear Delt Flies or Rope Pulls",
+        "date": "2026-04-17",
+        "weight": 45.0,
+        "reps_raw": "12",
+        "total_reps": 12,
+        "volume": 540.0,
+        "notes": null
+    },
+    {
+        "exercise": "Assisted Chest Dips",
+        "date": "2026-04-11",
+        "weight": 57.5,
+        "reps_raw": "7",
+        "total_reps": 7,
+        "volume": 402.5,
+        "notes": null
+    },
+    {
+        "exercise": "Rope Hammer Curls",
+        "date": "2026-04-18",
+        "weight": 65.0,
+        "reps_raw": "10",
+        "total_reps": 10,
+        "volume": 650.0,
+        "notes": null
+    },
+    {
+        "exercise": "Rope Hammer Curls",
+        "date": "2026-04-18",
+        "weight": 65.0,
+        "reps_raw": "9",
+        "total_reps": 9,
+        "volume": 585.0,
+        "notes": null
+    },
+    {
+        "exercise": "Reverse Cable Curls",
+        "date": "2026-04-18",
+        "weight": 45.0,
+        "reps_raw": "5",
+        "total_reps": 5,
+        "volume": 225.0,
+        "notes": "Light"
+    },
+    {
+        "exercise": "Reverse Cable Curls",
+        "date": "2026-04-18",
+        "weight": 55.0,
+        "reps_raw": "11",
+        "total_reps": 11,
+        "volume": 605.0,
+        "notes": null
+    },
+    {
+        "exercise": "JM Press",
+        "date": "2026-04-18",
+        "weight": 35.0,
+        "reps_raw": "9",
+        "total_reps": 9,
+        "volume": 315.0,
+        "notes": null
+    },
+    {
+        "exercise": "JM Press",
+        "date": "2026-04-18",
+        "weight": 45.0,
+        "reps_raw": "6",
+        "total_reps": 6,
+        "volume": 270.0,
+        "notes": null
+    },
+    {
+        "exercise": "V-Bar Tricep Extension",
+        "date": "2026-04-18",
+        "weight": 65.0,
+        "reps_raw": "8",
+        "total_reps": 8,
+        "volume": 520.0,
+        "notes": null
+    },
+    {
+        "exercise": "V-Bar Tricep Extension",
+        "date": "2026-04-18",
+        "weight": 75.0,
+        "reps_raw": "3",
+        "total_reps": 3,
+        "volume": 225.0,
+        "notes": "Nope"
+    },
+    {
+        "exercise": "Shoulder Press",
+        "date": "2026-04-18",
+        "weight": 30.0,
+        "reps_raw": "8",
+        "total_reps": 8,
+        "volume": 240.0,
+        "notes": null
+    },
+    {
+        "exercise": "Shoulder Press",
+        "date": "2026-04-18",
+        "weight": 35.0,
+        "reps_raw": "7",
+        "total_reps": 7,
+        "volume": 245.0,
+        "notes": null
+    }
+]
