@@ -101,9 +101,32 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
     : 0);
 
   const calculatedAvgHr = (() => {
-    if (!selectedSession.stravaActivities) return null;
-    const validAvgHrs = selectedSession.stravaActivities.map(a => a.avgHeartrate).filter((hr): hr is number => hr !== null && hr > 0);
-    return validAvgHrs.length > 0 ? validAvgHrs.reduce((a, b) => a + b, 0) / validAvgHrs.length : null;
+    if (!selectedSession.stravaActivities || selectedSession.stravaActivities.length === 0) return null;
+
+    const activitiesWithValidHr = selectedSession.stravaActivities.filter(
+      (activity): activity is StravaActivity & { avgHeartrate: number } =>
+        activity.avgHeartrate !== null && activity.avgHeartrate > 0
+    );
+
+    if (activitiesWithValidHr.length === 0) return null;
+
+    const weightedActivities = activitiesWithValidHr.filter(activity => activity.durationSeconds > 0);
+
+    if (weightedActivities.length > 0) {
+      const totalWeightedHr = weightedActivities.reduce(
+        (sum, activity) => sum + activity.avgHeartrate * activity.durationSeconds,
+        0
+      );
+      const totalDurationSeconds = weightedActivities.reduce(
+        (sum, activity) => sum + activity.durationSeconds,
+        0
+      );
+
+      return totalDurationSeconds > 0 ? totalWeightedHr / totalDurationSeconds : null;
+    }
+
+    const validAvgHrs = activitiesWithValidHr.map(activity => activity.avgHeartrate);
+    return validAvgHrs.reduce((a, b) => a + b, 0) / validAvgHrs.length;
   })();
   const displayHr = selectedSession.avgHeartRate || calculatedAvgHr;
 
