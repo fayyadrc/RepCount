@@ -96,8 +96,17 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
   const isPureStrava = selectedSession.entries.length === 0 && hasStrava;
   const primaryStravaActivity = isPureStrava ? selectedSession.stravaActivities![0] : null;
 
-  const displayDuration = selectedSession.durationMins || (isPureStrava && primaryStravaActivity ? primaryStravaActivity.durationSeconds / 60 : 0);
-  const displayHr = selectedSession.avgHeartRate || (isPureStrava && primaryStravaActivity ? primaryStravaActivity.avgHeartrate : null);
+  const displayDuration = selectedSession.durationMins || (isPureStrava && selectedSession.stravaActivities
+    ? selectedSession.stravaActivities.reduce((sum, act) => sum + act.durationSeconds / 60, 0)
+    : 0);
+
+  const calculatedAvgHr = (() => {
+    if (!selectedSession.stravaActivities) return null;
+    const validAvgHrs = selectedSession.stravaActivities.map(a => a.avgHeartrate).filter((hr): hr is number => hr !== null && hr > 0);
+    return validAvgHrs.length > 0 ? validAvgHrs.reduce((a, b) => a + b, 0) / validAvgHrs.length : null;
+  })();
+  const displayHr = selectedSession.avgHeartRate || calculatedAvgHr;
+
   const maxHr = selectedSession.stravaActivities?.reduce((max, act) => Math.max(max, act.maxHeartrate || 0), 0) || 0;
   const totalCalories = selectedSession.stravaActivities?.reduce((sum, act) => sum + (act.calories || 0), 0) || 0;
 
@@ -173,13 +182,31 @@ export const WorkoutDetails: React.FC<WorkoutDetailsProps> = ({ sessionId, onBac
             subtext="kcal burnt"
           />
         )}
-        {isPureStrava && primaryStravaActivity?.distanceMeters && (
-          <StatCard 
-            icon={<Activity className="w-4 h-4 text-accent-blue" />}
-            label="Distance"
-            value={(primaryStravaActivity.distanceMeters / 1000).toFixed(2)}
-            subtext="km"
-          />
+        {isPureStrava && selectedSession.stravaActivities && (
+          (() => {
+            const isRun = selectedSession.stravaActivities.some(act => act.type === 'Run');
+            const distanceMeters = selectedSession.stravaActivities.reduce((sum, act) => sum + (act.distanceMeters || 0), 0);
+            if (isRun && distanceMeters > 0) {
+              return (
+                <StatCard 
+                  icon={<Footprints className="w-4 h-4 text-accent-blue" />}
+                  label="Distance"
+                  value={(distanceMeters / 1000).toFixed(2)}
+                  subtext="km"
+                />
+              );
+            } else if (!isRun && primaryStravaActivity && primaryStravaActivity.distanceMeters > 0) {
+              return (
+                <StatCard 
+                  icon={getStravaIcon(primaryStravaActivity.type, "w-4 h-4 text-accent-blue")}
+                  label={primaryStravaActivity.type}
+                  value={(primaryStravaActivity.distanceMeters / 1000).toFixed(2)}
+                  subtext="km"
+                />
+              );
+            }
+            return null;
+          })()
         )}
       </div>
 

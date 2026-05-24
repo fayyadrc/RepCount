@@ -39,7 +39,7 @@ def main():
         return False
 
     # Path to CSV
-    csv_path = Path(__file__).parent.parent / "data" / "gym_logs_FINAL.csv"
+    csv_path = Path(__file__).parent.parent.parent / "data" / "gym_logs_FINAL.csv"
     
     if not csv_path.exists():
         print(f"❌ Could not find {csv_path}")

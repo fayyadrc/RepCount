@@ -148,6 +148,21 @@ export const History: React.FC<HistoryProps> = ({ onViewDetails }) => {
             const isPureStrava = session.entries.length === 0 && hasStrava;
             const primaryStravaActivity = isPureStrava ? session.stravaActivities![0] : null;
             const totalCalories = session.stravaActivities?.reduce((sum, act) => sum + (act.calories || 0), 0) || 0;
+
+            const displayDuration = session.durationMins || (isPureStrava && session.stravaActivities
+              ? session.stravaActivities.reduce((sum, act) => sum + act.durationSeconds / 60, 0)
+              : 0);
+
+            const validAvgHrs = session.stravaActivities?.map(a => a.avgHeartrate).filter((hr): hr is number => hr !== null && hr > 0) || [];
+            const calculatedAvgHr = validAvgHrs.length > 0
+              ? Math.round(validAvgHrs.reduce((a, b) => a + b, 0) / validAvgHrs.length)
+              : null;
+            const displayAvgHr = session.avgHeartRate || calculatedAvgHr;
+
+            const maxHr = session.stravaActivities?.reduce((max, act) => Math.max(max, act.maxHeartrate || 0), 0) || 0;
+
+            const isRun = session.stravaActivities?.some(act => act.type === 'Run') || false;
+            const runDistanceMeters = session.stravaActivities?.reduce((sum, act) => sum + (act.distanceMeters || 0), 0) || 0;
  
             return (
               <motion.div
@@ -189,26 +204,39 @@ export const History: React.FC<HistoryProps> = ({ onViewDetails }) => {
                     </div>
                   )}
                   
-                  {session.durationMins && (
+                  {displayDuration > 0 && (
                     <div className="bg-secondary/40 border border-border/30 rounded-[18px] p-3 flex flex-col gap-1">
                       <div className="flex items-center gap-1.5 text-muted-foreground">
                         <Timer className="w-3.5 h-3.5 text-accent-orange" />
                         <span className="text-[9px] font-bold uppercase tracking-wider font-mono">Duration</span>
                       </div>
                       <span className="text-md font-extrabold text-foreground font-mono leading-none">
-                        {formatDuration(session.durationMins)}
+                        {formatDuration(displayDuration)}
                       </span>
                     </div>
                   )}
  
-                  {session.avgHeartRate && (
+                  {displayAvgHr && (
                     <div className="bg-secondary/40 border border-border/30 rounded-[18px] p-3 flex flex-col gap-1">
                       <div className="flex items-center gap-1.5 text-muted-foreground">
                         <Heart className="w-3.5 h-3.5 text-destructive" />
                         <span className="text-[9px] font-bold uppercase tracking-wider font-mono">Avg HR</span>
                       </div>
                       <span className="text-md font-extrabold text-foreground font-mono leading-none">
-                        {Math.round(session.avgHeartRate)}{' '}
+                        {Math.round(displayAvgHr)}{' '}
+                        <span className="text-[10px] text-muted-foreground font-sans font-medium uppercase">bpm</span>
+                      </span>
+                    </div>
+                  )}
+ 
+                  {maxHr > 0 && (
+                    <div className="bg-secondary/40 border border-border/30 rounded-[18px] p-3 flex flex-col gap-1">
+                      <div className="flex items-center gap-1.5 text-muted-foreground">
+                        <Activity className="w-3.5 h-3.5 text-rose-500" />
+                        <span className="text-[9px] font-bold uppercase tracking-wider font-mono">Max HR</span>
+                      </div>
+                      <span className="text-md font-extrabold text-foreground font-mono leading-none">
+                        {Math.round(maxHr)}{' '}
                         <span className="text-[10px] text-muted-foreground font-sans font-medium uppercase">bpm</span>
                       </span>
                     </div>
@@ -227,7 +255,20 @@ export const History: React.FC<HistoryProps> = ({ onViewDetails }) => {
                     </div>
                   )}
  
-                  {isPureStrava && primaryStravaActivity && (
+                  {isPureStrava && isRun && runDistanceMeters > 0 && (
+                    <div className="bg-secondary/40 border border-border/30 rounded-[18px] p-3 flex flex-col gap-1">
+                      <div className="flex items-center gap-1.5 text-muted-foreground">
+                        <Footprints className="w-3.5 h-3.5 text-accent-blue" />
+                        <span className="text-[9px] font-bold uppercase tracking-wider font-mono">Distance</span>
+                      </div>
+                      <span className="text-md font-extrabold text-foreground font-mono leading-none">
+                        {(runDistanceMeters / 1000).toFixed(2)}{' '}
+                        <span className="text-[10px] text-muted-foreground font-sans font-medium uppercase">km</span>
+                      </span>
+                    </div>
+                  )}
+ 
+                  {isPureStrava && !isRun && primaryStravaActivity && (
                     <div className="bg-secondary/40 border border-border/30 rounded-[18px] p-3 flex flex-col gap-1">
                       <div className="flex items-center gap-1.5 text-muted-foreground">
                         {getStravaIcon(primaryStravaActivity.type, "w-3.5 h-3.5 text-accent-blue")}
