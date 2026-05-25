@@ -104,7 +104,7 @@ export const Profile: React.FC = () => {
       </header>
 
       {/* Activity Calendar Section */}
-      <div className="space-y-4">
+      <div className="space-y-4 max-w-lg">
         <h3 className="px-2 text-[11px] font-bold text-muted-foreground uppercase tracking-[0.1em] font-mono">Activity Tracker</h3>
         <ActivityCalendar activities={activities} />
       </div>

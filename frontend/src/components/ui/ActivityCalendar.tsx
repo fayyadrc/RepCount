@@ -120,26 +120,26 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
   };
 
   return (
-    <div className="bg-card rounded-[28px] p-4 md:p-6 shadow-sm border border-border w-full overflow-hidden">
-      <div className="flex justify-between items-center mb-6 px-1">
+    <div className="bg-card rounded-[24px] p-4 md:p-5 shadow-sm border border-border w-full overflow-hidden">
+      <div className="flex justify-between items-center mb-4 px-1">
         <div>
-          <h4 className="text-[18px] md:text-[20px] font-extrabold text-foreground tracking-tight font-heading">
+          <h4 className="text-[16px] md:text-[18px] font-extrabold text-foreground tracking-tight font-heading">
             {monthName} <span className="text-muted-foreground font-medium ml-1 font-sans">{year}</span>
           </h4>
         </div>
-        <div className="flex gap-2">
-          <button onClick={() => changeMonth(-1)} className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-secondary flex items-center justify-center hover:bg-accent transition-all duration-200 active:scale-90 border border-border/50 btn-tap-scale">
+        <div className="flex gap-1.5">
+          <button onClick={() => changeMonth(-1)} className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-secondary flex items-center justify-center hover:bg-accent transition-all duration-200 active:scale-90 border border-border/50 btn-tap-scale">
             <ChevronLeft className="w-4 h-4 text-foreground" />
           </button>
-          <button onClick={() => changeMonth(1)} className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-secondary flex items-center justify-center hover:bg-accent transition-all duration-200 active:scale-90 border border-border/50 btn-tap-scale">
+          <button onClick={() => changeMonth(1)} className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-secondary flex items-center justify-center hover:bg-accent transition-all duration-200 active:scale-90 border border-border/50 btn-tap-scale">
             <ChevronRight className="w-4 h-4 text-foreground" />
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-7 gap-1 md:gap-2">
+      <div className="grid grid-cols-7 gap-1 md:gap-1.5">
         {daysOfWeek.map((day, i) => (
-          <div key={i} className="text-center text-[10px] md:text-[11px] font-extrabold text-muted-foreground/80 uppercase tracking-widest font-mono py-1">
+          <div key={i} className="text-center text-[10px] font-extrabold text-muted-foreground/80 uppercase tracking-widest font-mono py-0.5">
             {day}
           </div>
         ))}
@@ -151,7 +151,7 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.15 }}
-            className="col-span-7 grid grid-cols-7 gap-1 md:gap-2"
+            className="col-span-7 grid grid-cols-7 gap-1 md:gap-1.5"
           >
             {calendarDays.map((cell, i) => {
               const activity = cell.dateKey ? activities[cell.dateKey] : null;
@@ -165,17 +165,17 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         className={cn(
-                          "w-full h-full rounded-[14px] md:rounded-[18px] flex flex-col items-center justify-center relative cursor-pointer border shadow-[0_2px_8px_rgba(0,0,0,0.01)] transition-all",
+                          "w-full h-full rounded-[12px] md:rounded-[14px] flex flex-col items-center justify-center relative cursor-pointer border shadow-[0_2px_8px_rgba(0,0,0,0.01)] transition-all",
                           getActivityColors(activity.type)
                         )}
                       >
-                        <span className="text-xs md:text-[14px] font-extrabold font-mono mt-0.5 leading-none">{cell.day}</span>
+                        <span className="text-xs md:text-[13px] font-extrabold font-mono mt-0.5 leading-none">{cell.day}</span>
                         <div className="mt-1">
-                          {renderIcon(activity.type, "w-3 h-3 md:w-4 md:h-4 stroke-[2.2]")}
+                          {renderIcon(activity.type, "w-3 h-3 md:w-3.5 md:h-3.5 stroke-[2.2]")}
                         </div>
                       </motion.div>
                     ) : (
-                      <div className="w-full h-full bg-card hover:bg-secondary/40 border border-border/80 rounded-[14px] md:rounded-[18px] flex items-center justify-center text-xs md:text-[14px] font-bold text-foreground/80 transition-colors font-mono">
+                      <div className="w-full h-full bg-card hover:bg-secondary/40 border border-border/80 rounded-[12px] md:rounded-[14px] flex items-center justify-center text-xs md:text-[13px] font-bold text-foreground/80 transition-colors font-mono">
                         {cell.day}
                       </div>
                     )
