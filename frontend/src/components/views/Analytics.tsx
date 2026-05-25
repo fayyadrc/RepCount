@@ -20,12 +20,15 @@ import {
   AlertCircle,
   Loader2,
   ArrowRight,
+  ArrowLeft,
   ChevronDown,
   Search,
   X,
   Trophy,
   Flame,
-  History
+  History,
+  Sparkles,
+  Plus
 } from 'lucide-react';
 
 interface ExerciseHistoryPoint {
@@ -66,6 +69,57 @@ const COLORS = [
   'hsl(var(--accent-green))',
 ];
 
+interface RecommendedExercise {
+  name: string;
+  defaultWeight: number;
+  unit: string;
+  reps: number;
+  targetSets: number;
+  type: 'Compound' | 'Isolation';
+  muscle: string;
+}
+
+const SPLIT_CONFIG: Record<'Push' | 'Pull' | 'Legs' | 'Upper' | 'Lower', RecommendedExercise[]> = {
+  Push: [
+    { name: "Bench Press", defaultWeight: 40, unit: "kg", reps: 8, targetSets: 4, type: "Compound", muscle: "Chest" },
+    { name: "Incline Dumbbell Press", defaultWeight: 16, unit: "kg", reps: 10, targetSets: 3, type: "Compound", muscle: "Chest" },
+    { name: "Dumbbell Shoulder Press", defaultWeight: 14, unit: "kg", reps: 10, targetSets: 3, type: "Compound", muscle: "Shoulders" },
+    { name: "Lateral Raise", defaultWeight: 8, unit: "kg", reps: 12, targetSets: 4, type: "Isolation", muscle: "Shoulders" },
+    { name: "Tricep Rope Pushdown", defaultWeight: 15, unit: "kg", reps: 12, targetSets: 3, type: "Isolation", muscle: "Triceps" },
+  ],
+  Pull: [
+    { name: "Pullup", defaultWeight: 0, unit: "kg", reps: 8, targetSets: 3, type: "Compound", muscle: "Back" },
+    { name: "Barbell Row", defaultWeight: 40, unit: "kg", reps: 10, targetSets: 4, type: "Compound", muscle: "Back" },
+    { name: "Lat Pulldown", defaultWeight: 45, unit: "kg", reps: 10, targetSets: 3, type: "Compound", muscle: "Back" },
+    { name: "Bicep Curl", defaultWeight: 12, unit: "kg", reps: 12, targetSets: 3, type: "Isolation", muscle: "Biceps" },
+    { name: "Hammer Curl", defaultWeight: 12, unit: "kg", reps: 12, targetSets: 3, type: "Isolation", muscle: "Biceps" },
+    { name: "Face Pull", defaultWeight: 17.5, unit: "kg", reps: 15, targetSets: 4, type: "Isolation", muscle: "Shoulders" },
+  ],
+  Legs: [
+    { name: "Barbell Squat", defaultWeight: 60, unit: "kg", reps: 8, targetSets: 4, type: "Compound", muscle: "Quads" },
+    { name: "Romanian Deadlift", defaultWeight: 50, unit: "kg", reps: 10, targetSets: 4, type: "Compound", muscle: "Hamstrings" },
+    { name: "Leg Press", defaultWeight: 100, unit: "kg", reps: 10, targetSets: 3, type: "Compound", muscle: "Quads" },
+    { name: "Leg Curl", defaultWeight: 30, unit: "kg", reps: 12, targetSets: 3, type: "Isolation", muscle: "Hamstrings" },
+    { name: "Calf Raise", defaultWeight: 40, unit: "kg", reps: 15, targetSets: 4, type: "Isolation", muscle: "Calves" },
+    { name: "Hip Thrust", defaultWeight: 80, unit: "kg", reps: 10, targetSets: 3, type: "Compound", muscle: "Glutes" },
+  ],
+  Upper: [
+    { name: "Bench Press", defaultWeight: 40, unit: "kg", reps: 8, targetSets: 4, type: "Compound", muscle: "Chest" },
+    { name: "Pullup", defaultWeight: 0, unit: "kg", reps: 8, targetSets: 3, type: "Compound", muscle: "Back" },
+    { name: "Dumbbell Shoulder Press", defaultWeight: 14, unit: "kg", reps: 10, targetSets: 3, type: "Compound", muscle: "Shoulders" },
+    { name: "Barbell Row", defaultWeight: 40, unit: "kg", reps: 10, targetSets: 3, type: "Compound", muscle: "Back" },
+    { name: "Tricep Rope Pushdown", defaultWeight: 15, unit: "kg", reps: 12, targetSets: 3, type: "Isolation", muscle: "Triceps" },
+    { name: "Bicep Curl", defaultWeight: 12, unit: "kg", reps: 12, targetSets: 3, type: "Isolation", muscle: "Biceps" },
+  ],
+  Lower: [
+    { name: "Barbell Squat", defaultWeight: 60, unit: "kg", reps: 8, targetSets: 4, type: "Compound", muscle: "Quads" },
+    { name: "Romanian Deadlift", defaultWeight: 50, unit: "kg", reps: 10, targetSets: 4, type: "Compound", muscle: "Hamstrings" },
+    { name: "Bulgarian Split Squat", defaultWeight: 12, unit: "kg", reps: 10, targetSets: 3, type: "Compound", muscle: "Quads" },
+    { name: "Calf Raise", defaultWeight: 40, unit: "kg", reps: 15, targetSets: 4, type: "Isolation", muscle: "Calves" },
+    { name: "Hanging Leg Raise", defaultWeight: 0, unit: "kg", reps: 12, targetSets: 3, type: "Isolation", muscle: "Abs" },
+  ]
+};
+
 export const Analytics: React.FC = () => {
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -75,6 +129,70 @@ export const Analytics: React.FC = () => {
   const [selectedExercise, setSelectedExercise] = useState<ExerciseStats | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  // Recommended Workout States
+  const [activeSection, setActiveSection] = useState<'general' | 'recommendations'>('general');
+  const [activeSplit, setActiveSplit] = useState<'Push' | 'Pull' | 'Legs' | 'Upper' | 'Lower'>('Push');
+
+  // Lookup helper for historical exercise stats
+  const findExerciseStats = (name: string): ExerciseStats | null => {
+    if (!data?.exercises_by_muscle) return null;
+    const searchName = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+    
+    for (const muscleGroup of Object.values(data.exercises_by_muscle)) {
+      for (const stats of muscleGroup) {
+        const statsName = stats.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+        if (statsName === searchName || statsName.includes(searchName) || searchName.includes(statsName)) {
+          return stats;
+        }
+      }
+    }
+    return null;
+  };
+
+  // Generate smart recommendations based on lifting history
+  const getExerciseRecommendation = (ex: RecommendedExercise) => {
+    const stats = findExerciseStats(ex.name);
+    if (!stats) {
+      return {
+        weight: ex.defaultWeight,
+        unit: ex.unit,
+        reps: ex.reps,
+        isNew: true,
+        reason: `Starting weight calibrated for ${ex.name}. Start comfortable and adjust as needed.`,
+      };
+    }
+
+    const isCompound = ex.type === 'Compound';
+    const increment = isCompound ? 2.5 : 1.25;
+    const recommendedWeight = stats.max_weight + increment;
+
+    return {
+      weight: recommendedWeight,
+      unit: stats.unit,
+      reps: ex.reps,
+      isNew: false,
+      reason: `Based on your all-time best of ${stats.max_weight}${stats.unit}. Added +${increment}${stats.unit} for progressive overload.`,
+    };
+  };
+
+  // Natural language formatter to link to QuickLog view
+  const handleLogWorkout = (splitName: string, exercises: RecommendedExercise[]) => {
+    const rawTextLines = [`${splitName} Workout - Recommended Split` ];
+    
+    exercises.forEach(ex => {
+      const rec = getExerciseRecommendation(ex);
+      if (rec.weight > 0) {
+        rawTextLines.push(`${ex.name}: ${ex.targetSets} sets of ${rec.reps} reps at ${rec.weight}${rec.unit}`);
+      } else {
+        rawTextLines.push(`${ex.name}: ${ex.targetSets} sets of ${rec.reps} bodyweight reps`);
+      }
+    });
+
+    const rawText = rawTextLines.join('\n');
+    localStorage.setItem('gym_tracker_draft', rawText);
+    (window as any).setActiveView?.('quick-log');
+  };
 
   useEffect(() => {
     const fetchAnalytics = async () => {
@@ -117,6 +235,177 @@ export const Analytics: React.FC = () => {
     );
   }
 
+  if (activeSection === 'recommendations') {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="space-y-8 pt-2 pb-24"
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-1">
+          <button
+            onClick={() => setActiveSection('general')}
+            className="flex items-center gap-2 px-3.5 py-2 bg-secondary hover:bg-secondary/80 text-muted-foreground hover:text-foreground rounded-full text-xs font-bold font-heading border border-border hover:border-border/80 transition-all btn-tap-scale shadow-[0_2px_8px_rgba(0,0,0,0.01)]"
+          >
+            <ArrowLeft className="w-3.5 h-3.5 stroke-[2.5]" />
+            Back
+          </button>
+          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-accent-violet-bg rounded-full border border-accent-violet/10 shadow-[0_2px_8px_rgba(0,0,0,0.01)]">
+            <Sparkles className="w-3.5 h-3.5 text-accent-violet fill-accent-violet/10" />
+            <span className="text-[10px] font-extrabold uppercase tracking-widest text-accent-violet font-heading">AI Assistant</span>
+          </div>
+        </div>
+
+        <div className="space-y-1.5 px-1 font-heading">
+          <h2 className="text-3xl font-black tracking-tight text-foreground leading-tight">Recommended Routines</h2>
+          <p className="text-muted-foreground text-sm font-semibold font-sans leading-relaxed">Select a split below. We have analyzed your lifting history to recommend target weights for progressive overload.</p>
+        </div>
+
+        {/* iOS-style Segmented Tab Controller */}
+        <div className="px-1">
+          <div className="bg-secondary/40 p-1.5 rounded-[22px] border border-border/80 flex items-center justify-between gap-1 overflow-x-auto scrollbar-none shadow-[inset_0_2px_4px_rgba(0,0,0,0.01)]">
+            {(['Push', 'Pull', 'Legs', 'Upper', 'Lower'] as const).map((split) => {
+              const isActive = activeSplit === split;
+              const splitIcons = {
+                Push: <Flame className="w-3.5 h-3.5" />,
+                Pull: <Dumbbell className="w-3.5 h-3.5" />,
+                Legs: <TrendingUp className="w-3.5 h-3.5" />,
+                Upper: <Activity className="w-3.5 h-3.5" />,
+                Lower: <Calendar className="w-3.5 h-3.5" />
+              };
+              
+              return (
+                <button
+                  key={split}
+                  onClick={() => setActiveSplit(split)}
+                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-3.5 rounded-[18px] text-xs font-black font-heading transition-all whitespace-nowrap btn-tap-scale ${
+                    isActive
+                      ? 'bg-card text-foreground shadow-[0_4px_16px_rgba(0,0,0,0.04)] border border-border/50'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  {splitIcons[split]}
+                  <span className="hidden sm:inline">{split} Split</span>
+                  <span className="sm:hidden">{split}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Exercises in current split - Asymmetric Premium Cards */}
+        <div className="space-y-6 px-1">
+          {SPLIT_CONFIG[activeSplit].map((ex, index) => {
+            const rec = getExerciseRecommendation(ex);
+            
+            return (
+              <motion.div
+                key={ex.name}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+                className="bg-card border border-border rounded-[28px] overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.015)] hover:shadow-md transition-all duration-300 group flex flex-col md:flex-row btn-tap-scale"
+              >
+                {/* Main panel (left/top) */}
+                <div className="p-6 flex-1 flex flex-col justify-between space-y-6 border-b md:border-b-0 md:border-r border-border/50">
+                  {/* Category/Type Indicators */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="ios-badge bg-secondary text-muted-foreground uppercase text-[9px] py-0.5 tracking-wider">
+                        {ex.muscle}
+                      </span>
+                      <span className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest font-mono">
+                        {ex.type}
+                      </span>
+                    </div>
+
+                    <span className={`ios-badge uppercase text-[9.5px] font-black ${
+                      rec.isNew 
+                        ? 'bg-accent-orange-bg text-accent-orange' 
+                        : 'bg-accent-green-bg text-accent-green'
+                    }`}>
+                      {rec.isNew ? 'Calibrating' : 'Overload Ready'}
+                    </span>
+                  </div>
+
+                  {/* Title & Large Metric Display */}
+                  <div className="space-y-4">
+                    <h4 className="text-2xl font-black text-foreground font-heading tracking-tight leading-tight group-hover:text-accent-violet transition-colors">
+                      {ex.name}
+                    </h4>
+
+                    {/* Numeric target blocks */}
+                    <div className="flex items-end gap-8 pt-1">
+                      <div className="space-y-0.5">
+                        <span className="text-[9px] uppercase font-black text-muted-foreground/60 tracking-widest font-mono">Target Weight</span>
+                        <p className="text-3xl font-black text-foreground font-mono mt-0.5 leading-none tracking-tight">
+                          {rec.weight > 0 ? (
+                            <>
+                              {rec.weight}{' '}
+                              <span className="text-[11px] font-bold text-muted-foreground font-sans uppercase">kg</span>
+                            </>
+                          ) : (
+                            <span className="text-xl font-bold text-muted-foreground font-sans">Bodyweight</span>
+                          )}
+                        </p>
+                      </div>
+
+                      <div className="h-10 w-px bg-border/80" />
+
+                      <div className="space-y-0.5">
+                        <span className="text-[9px] uppercase font-black text-muted-foreground/60 tracking-widest font-mono">Routine Sets</span>
+                        <p className="text-3xl font-black text-foreground font-mono mt-0.5 leading-none tracking-tight">
+                          {ex.targetSets}{' '}
+                          <span className="text-[11px] font-bold text-muted-foreground font-sans uppercase">sets</span>
+                        </p>
+                      </div>
+
+                      <div className="h-10 w-px bg-border/80" />
+
+                      <div className="space-y-0.5">
+                        <span className="text-[9px] uppercase font-black text-muted-foreground/60 tracking-widest font-mono">Target Reps</span>
+                        <p className="text-3xl font-black text-foreground font-mono mt-0.5 leading-none tracking-tight">
+                          {rec.reps}{' '}
+                          <span className="text-[11px] font-bold text-muted-foreground font-sans uppercase">reps</span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Reasoning Sidebar (right/bottom) */}
+                <div className="p-6 md:w-[32%] bg-secondary/25 flex flex-col justify-center relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-accent-violet/5 rounded-full blur-xl pointer-events-none" />
+                  
+                  <div className="flex items-center gap-1.5 mb-2 select-none">
+                    <Sparkles className="w-3.5 h-3.5 text-accent-violet shrink-0" />
+                    <span className="text-[9px] uppercase font-black text-accent-violet tracking-widest font-mono">AI Rationale</span>
+                  </div>
+                  
+                  <p className="text-[12.5px] font-semibold leading-relaxed text-muted-foreground/90 italic relative z-10">
+                    "{rec.reason}"
+                  </p>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {/* Action Log split */}
+        <div className="pt-4 px-1">
+          <button
+            onClick={() => handleLogWorkout(activeSplit, SPLIT_CONFIG[activeSplit])}
+            className="w-full py-4.5 bg-gradient-to-r from-accent-violet to-accent-blue hover:opacity-95 text-white font-extrabold tracking-tight rounded-2xl shadow-lg shadow-accent-violet/10 hover:shadow-accent-violet/20 transition-all duration-300 text-sm tracking-wide text-center flex items-center justify-center gap-2 btn-tap-scale"
+          >
+            <Plus className="w-4 h-4 stroke-[3.5] text-white" />
+            Log {activeSplit} Workout
+          </button>
+        </div>
+      </motion.div>
+    );
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -128,14 +417,24 @@ export const Analytics: React.FC = () => {
           <h2 className="text-4xl font-extrabold tracking-tight text-foreground font-heading">Analytics</h2>
           <p className="text-muted-foreground text-sm font-medium">Your performance at a glance</p>
         </div>
-        <button
-          onClick={() => (window as any).setActiveView?.('ai-insights')}
-          className="flex items-center gap-1.5 px-4.5 py-2.5 bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-all duration-250 shadow-[0_4px_14px_rgba(0,0,0,0.1)] btn-tap-scale text-xs font-bold font-heading"
-          title="AI Insights"
-        >
-          AI Insights
-          <ArrowRight className="w-4 h-4 stroke-[2.5]" />
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setActiveSection('recommendations')}
+            className="flex items-center gap-1.5 px-4.5 py-2.5 bg-accent-violet-bg text-accent-violet border border-accent-violet/20 rounded-full hover:bg-accent-violet-bg/85 transition-all duration-250 shadow-[0_4px_12px_rgba(0,0,0,0.03)] btn-tap-scale text-xs font-extrabold font-heading"
+            title="Recommended Workouts"
+          >
+            <Sparkles className="w-3.5 h-3.5 fill-accent-violet/10" />
+            Routines
+          </button>
+          <button
+            onClick={() => (window as any).setActiveView?.('ai-insights')}
+            className="flex items-center gap-1.5 px-4.5 py-2.5 bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-all duration-250 shadow-[0_4px_14px_rgba(0,0,0,0.1)] btn-tap-scale text-xs font-bold font-heading"
+            title="AI Insights"
+          >
+            Insights
+            <ArrowRight className="w-4 h-4 stroke-[2.5]" />
+          </button>
+        </div>
       </header>
 
       {/* Exercise Filter Dropdown */}
@@ -431,6 +730,39 @@ export const Analytics: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           className="space-y-8"
         >
+          {/* Recommended routines banner */}
+          <div className="px-1">
+            <button
+              onClick={() => setActiveSection('recommendations')}
+              className="w-full relative overflow-hidden bg-gradient-to-br from-accent-violet-bg via-accent-violet-bg/60 to-accent-blue-bg/40 border border-accent-violet/20 hover:border-accent-violet/30 rounded-[28px] p-6 text-left shadow-[0_8px_30px_rgba(0,0,0,0.02)] transition-all group btn-tap-scale"
+            >
+              <div className="absolute top-0 right-0 w-44 h-44 bg-accent-violet/10 rounded-full blur-3xl -mr-10 -mt-10 group-hover:bg-accent-violet/15 transition-all" />
+              <div className="absolute bottom-0 right-12 w-32 h-32 bg-accent-blue/5 rounded-full blur-2xl -mr-6 -mb-6" />
+              
+              <div className="flex items-start justify-between">
+                <div className="space-y-2 max-w-[70%]">
+                  <span className="ios-badge bg-accent-violet/15 text-accent-violet mb-1.5 inline-block">
+                    AI Recommended Splits
+                  </span>
+                  <h3 className="text-xl font-extrabold text-foreground font-heading tracking-tight leading-tight">
+                    Ready for your next session?
+                  </h3>
+                  <p className="text-muted-foreground text-xs font-semibold leading-relaxed mt-1">
+                    View personalized workout recommendations for Push, Pull, Legs, Upper, and Lower splits computed using progressive overload.
+                  </p>
+                </div>
+                <div className="w-12 h-12 bg-accent-violet text-accent-violet-bg rounded-2xl flex items-center justify-center shadow-lg shadow-accent-violet/20 shrink-0 group-hover:scale-105 transition-transform">
+                  <Sparkles className="w-6 h-6 fill-accent-violet-bg/30" />
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-1 mt-5 text-[11px] font-black text-accent-violet uppercase tracking-wider font-heading">
+                View Recommendations
+                <ArrowRight className="w-3.5 h-3.5 stroke-[2.5] group-hover:translate-x-1 transition-transform" />
+              </div>
+            </button>
+          </div>
+
           {/* Overview Cards */}
           <div className="grid grid-cols-2 gap-4">
             <StatCard
