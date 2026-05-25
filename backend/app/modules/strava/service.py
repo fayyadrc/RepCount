@@ -44,7 +44,7 @@ def safe_get(url, token, params=None):
         )
 
         if res.status_code == 429:
-            print("⏳ Rate limit hit, sleeping 60s...")
+            print("Rate limit hit, sleeping 60s...")
             time.sleep(60)
             continue
 
@@ -148,5 +148,63 @@ def sync_strava_data():
     except Exception as e:
         print(f"❌ Error during Strava sync: {e}")
 
+def fetch_and_save_single_activity(activity_id: int):
+    """Fetches live details for a single activity from Strava and updates the Supabase database."""
+    print(f"🚀 Fetching single activity {activity_id} from Strava...", flush=True)
+    try:
+        token, _ = get_access_token()
+        detailed = safe_get(f"{BASE_URL}/activities/{activity_id}", token)
+        
+        summary = {
+            "id": activity_id,
+            "name": detailed.get("name"),
+            "type": detailed.get("type"),
+            "start_date": detailed.get("start_date"),
+            "distance_meters": detailed.get("distance"),
+            "duration_seconds": detailed.get("moving_time"),
+            "elevation_gain": detailed.get("total_elevation_gain"),
+            "avg_speed_mps": detailed.get("average_speed"),
+            "max_speed_mps": detailed.get("max_speed"),
+            "avg_heartrate": detailed.get("average_heartrate"),
+            "max_heartrate": detailed.get("max_heartrate"),
+            "avg_cadence": detailed.get("average_cadence"),
+            "avg_temp": detailed.get("average_temp"),
+            "calories": detailed.get("calories") or detailed.get("kilojoules")
+        }
+        
+        url = os.environ.get("SUPABASE_URL")
+        key = os.environ.get("SUPABASE_KEY")
+        
+        if not url or not key:
+            print("❌ Missing Supabase credentials! Cannot sync activity.", flush=True)
+            return
+            
+        supabase: Client = create_client(url, key)
+        supabase.table("strava_activities").upsert(summary).execute()
+        print(f"✅ Successfully synced activity {activity_id} to Supabase!", flush=True)
+        
+    except Exception as e:
+        print(f"❌ Error syncing single activity {activity_id}: {e}", flush=True)
+
+def delete_activity_from_db(activity_id: int):
+    """Deletes a Strava activity from Supabase database by ID."""
+    print(f"🗑️ Deleting activity {activity_id} from Supabase...", flush=True)
+    try:
+        url = os.environ.get("SUPABASE_URL")
+        key = os.environ.get("SUPABASE_KEY")
+        
+        if not url or not key:
+            print("❌ Missing Supabase credentials! Cannot delete activity.", flush=True)
+            return
+            
+        supabase: Client = create_client(url, key)
+        supabase.table("strava_activities").delete().eq("id", activity_id).execute()
+        print(f"✅ Successfully deleted activity {activity_id} from Supabase!", flush=True)
+        
+    except Exception as e:
+        print(f"❌ Error deleting activity {activity_id}: {e}", flush=True)
+
+
 if __name__ == "__main__":
     sync_strava_data()
+

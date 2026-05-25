@@ -204,8 +204,8 @@ export const DataHealth: React.FC<DataHealthProps> = ({ onAnomalyCountChange, on
               <div className="flex flex-col sm:flex-row gap-5 items-start justify-between">
                 <div className="flex items-start gap-4">
                   <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${a.severity === 'high'
-                      ? 'bg-accent-orange-bg text-accent-orange border border-accent-orange/10'
-                      : 'bg-accent-blue-bg text-accent-blue border border-accent-blue/10'
+                    ? 'bg-accent-orange-bg text-accent-orange border border-accent-orange/10'
+                    : 'bg-accent-blue-bg text-accent-blue border border-accent-blue/10'
                     }`}>
                     <AlertCircle className="w-5.5 h-5.5 stroke-[2.2]" />
                   </div>
@@ -215,8 +215,8 @@ export const DataHealth: React.FC<DataHealthProps> = ({ onAnomalyCountChange, on
                         {a.issue}
                       </h4>
                       <span className={`ios-badge uppercase ${a.severity === 'high'
-                          ? 'bg-accent-orange-bg text-accent-orange'
-                          : 'bg-accent-blue-bg text-accent-blue'
+                        ? 'bg-accent-orange-bg text-accent-orange'
+                        : 'bg-accent-blue-bg text-accent-blue'
                         }`}>
                         {a.severity} severity
                       </span>
