@@ -14,6 +14,7 @@ import { ViewState } from '@/lib/types';
 import { Toaster } from '@/components/ui/toaster';
 import { AnimatePresence } from 'framer-motion';
 import { WorkoutProvider, useWorkoutStore } from '@/lib/workout-store';
+import { useTheme } from '@/hooks/use-theme';
 
 // ─── Error Boundary ───
 
@@ -71,6 +72,7 @@ function AppContent() {
   const [activeView, setActiveView] = useState<ViewState>('quick-log');
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
   const { sessions } = useWorkoutStore();
+  const { theme, setTheme } = useTheme();
 
   // Expose setActiveView globally for simple navigation from nested components
   React.useEffect(() => {
@@ -89,7 +91,7 @@ function AppContent() {
       case 'next-session':
         return <NextSession />;
       case 'profile':
-        return <Profile />;
+        return <Profile theme={theme} setTheme={setTheme} />;
       case 'data-health':
         return <DataHealth onAnomalyCountChange={setAnomalyCount} onBack={() => setActiveView('profile')} />;
       case 'history':

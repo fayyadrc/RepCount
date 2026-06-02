@@ -77,6 +77,7 @@ interface RecommendedExercise {
   targetSets: number;
   type: 'Compound' | 'Isolation';
   muscle: string;
+  occurrence_count?: number;
 }
 
 interface RecommendationResult {
@@ -151,6 +152,9 @@ export const Analytics: React.FC = () => {
   // Backend recommendation results, keyed by normalised exercise name
   const [recommendations, setRecommendations] = useState<Record<string, RecommendationResult>>({});
   const [recLoading, setRecLoading] = useState(false);
+
+  // Dynamic splits discovered from actual DB data (replaces hardcoded SPLIT_CONFIG)
+  const [dynamicSplits, setDynamicSplits] = useState<Record<string, RecommendedExercise[]> | null>(null);
 
   // Lookup helper for historical exercise stats
   const findExerciseStats = (name: string): ExerciseStats | null => {
@@ -261,22 +265,37 @@ export const Analytics: React.FC = () => {
     const fetchRecommendations = async () => {
       try {
         setRecLoading(true);
-        // Collect every unique exercise across all 5 splits
-        const allExercises = Array.from(
-          new Set(
-            Object.values(SPLIT_CONFIG).flatMap(split => split.map(ex => ex.name))
-          )
-        );
-        const qs = encodeURIComponent(allExercises.join(','));
-        const res = await fetch(`/api/recommendations?exercises=${qs}`);
-        if (!res.ok) throw new Error('Failed to fetch recommendations');
-        const recs: RecommendationResult[] = await res.json();
-        // Key by exercise name for O(1) lookup
-        const map: Record<string, RecommendationResult> = {};
-        recs.forEach(r => { map[r.exercise] = r; });
-        setRecommendations(map);
+        const res = await fetch('/api/recommendations/dynamic');
+        if (!res.ok) throw new Error('Failed to fetch dynamic recommendations');
+        const result = await res.json();
+
+        // Use dynamic splits from DB data if available
+        if (result.splits && Object.values(result.splits).some((s: any) => s.length > 0)) {
+          setDynamicSplits(result.splits);
+        }
+
+        // Store recommendations keyed by exercise name
+        if (result.recommendations) {
+          setRecommendations(result.recommendations);
+        }
       } catch (err) {
-        console.warn('Recommendation fetch failed, falling back to heuristics:', err);
+        console.warn('Dynamic recommendations unavailable, falling back to defaults:', err);
+        // Fallback: use hardcoded splits with the original endpoint
+        try {
+          const allExercises = Array.from(
+            new Set(
+              Object.values(SPLIT_CONFIG).flatMap(split => split.map(ex => ex.name))
+            )
+          );
+          const qs = encodeURIComponent(allExercises.join(','));
+          const fallbackRes = await fetch(`/api/recommendations?exercises=${qs}`);
+          if (fallbackRes.ok) {
+            const recs: RecommendationResult[] = await fallbackRes.json();
+            const map: Record<string, RecommendationResult> = {};
+            recs.forEach(r => { map[r.exercise] = r; });
+            setRecommendations(map);
+          }
+        } catch { /* silently fall back to client-side heuristics */ }
       } finally {
         setRecLoading(false);
       }
@@ -308,6 +327,9 @@ export const Analytics: React.FC = () => {
       </div>
     );
   }
+
+  // Compute current exercises for the active split (prefer dynamic DB data over hardcoded)
+  const currentSplitExercises: RecommendedExercise[] = dynamicSplits?.[activeSplit] ?? SPLIT_CONFIG[activeSplit] ?? [];
 
   if (activeSection === 'recommendations') {
     return (
@@ -370,7 +392,15 @@ export const Analytics: React.FC = () => {
 
         {/* Exercises in current split - Asymmetric Premium Cards */}
         <div className="space-y-6 px-1">
-          {SPLIT_CONFIG[activeSplit].map((ex, index) => {
+          {currentSplitExercises.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 text-center space-y-3 px-6">
+              <div className="p-4 rounded-2xl bg-secondary/60">
+                <Dumbbell className="w-8 h-8 text-muted-foreground/30" />
+              </div>
+              <p className="text-sm font-bold text-muted-foreground font-heading">No {activeSplit} exercises logged yet</p>
+              <p className="text-xs text-muted-foreground/60 max-w-[260px] leading-relaxed">Log a workout containing {activeSplit.toLowerCase()} exercises and they’ll appear here with personalised recommendations.</p>
+            </div>
+          ) : currentSplitExercises.map((ex, index) => {
             const rec = getExerciseRecommendation(ex);
 
             // ── Fatigue badge config ──────────────────────────────────────
@@ -405,6 +435,11 @@ export const Analytics: React.FC = () => {
                       <span className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest font-mono">
                         {ex.type}
                       </span>
+                      {ex.occurrence_count != null && (
+                        <span className="text-[9px] font-bold text-muted-foreground/40 font-mono">
+                          {ex.occurrence_count} sets
+                        </span>
+                      )}
                     </div>
 
                     <span className={`ios-badge uppercase text-[9.5px] font-black ${badge.cls}`}>
@@ -511,15 +546,17 @@ export const Analytics: React.FC = () => {
         </div>
 
         {/* Action Log split */}
-        <div className="pt-4 px-1">
-          <button
-            onClick={() => handleLogWorkout(activeSplit, SPLIT_CONFIG[activeSplit])}
-            className="w-full py-4.5 bg-accent-blue hover:bg-accent-blue/90 text-white font-extrabold tracking-tight rounded-2xl shadow-lg shadow-accent-blue/10 hover:shadow-accent-blue/20 transition-all duration-300 text-sm tracking-wide text-center flex items-center justify-center gap-2 btn-tap-scale"
-          >
-            <Plus className="w-4 h-4 stroke-[3.5] text-white" />
-            Log {activeSplit} Workout
-          </button>
-        </div>
+        {currentSplitExercises.length > 0 && (
+          <div className="pt-4 px-1">
+            <button
+              onClick={() => handleLogWorkout(activeSplit, currentSplitExercises)}
+              className="w-full py-4.5 bg-accent-blue hover:bg-accent-blue/90 text-white font-extrabold tracking-tight rounded-2xl shadow-lg shadow-accent-blue/10 hover:shadow-accent-blue/20 transition-all duration-300 text-sm tracking-wide text-center flex items-center justify-center gap-2 btn-tap-scale"
+            >
+              <Plus className="w-4 h-4 stroke-[3.5] text-white" />
+              Log {activeSplit} Workout
+            </button>
+          </div>
+        )}
       </motion.div>
     );
   }

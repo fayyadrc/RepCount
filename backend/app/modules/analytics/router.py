@@ -2,10 +2,10 @@
 from fastapi import APIRouter, HTTPException, Query
 from typing import List, Optional
 from .service import AnalyticsService
-from .recommendation_service import generate_recommendation, RecommendationResult
+from .recommendation_service import generate_recommendation, RecommendationResult, classify_exercise, ExerciseCategory
 from .muscle_mapping import get_muscle_info
 from ...db.supabase import supabase
-from collections import defaultdict
+from collections import defaultdict, Counter
 from dataclasses import asdict
 
 router = APIRouter()
@@ -136,3 +136,137 @@ def get_recommendations(
         results.append(asdict(rec))
 
     return results
+
+
+# ─── Muscle → Split mapping ───────────────────────────────────────────────────
+_PUSH_MUSCLES = {"Chest", "Shoulders", "Triceps"}
+_PULL_MUSCLES = {"Back", "Biceps", "Traps", "Forearms"}
+_LEGS_MUSCLES = {"Quads", "Hamstrings", "Glutes", "Calves", "Abs", "Obliques"}
+
+
+@router.get("/recommendations/dynamic")
+def get_dynamic_recommendations():
+    """
+    Auto-discovers exercises from gym_logs, groups them into Push/Pull/Legs/Upper/Lower
+    splits ranked by occurrence count, and generates recommendations for each.
+    """
+    if not supabase:
+        raise HTTPException(status_code=503, detail="Database connection unavailable.")
+
+    empty_splits = {"Push": [], "Pull": [], "Legs": [], "Upper": [], "Lower": []}
+
+    try:
+        response = supabase.table("gym_logs").select(
+            "exercise, weight, reps, date, weight_unit"
+        ).execute()
+        all_logs: list[dict] = response.data or []
+    except Exception as e:
+        print(f"[recommendations/dynamic] Supabase fetch error: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to fetch gym logs: {e}")
+
+    if not all_logs:
+        return {"splits": empty_splits, "recommendations": {}}
+
+    # ── Group logs by normalised exercise name ─────────────────────────────
+    logs_by_exercise: dict[str, list[dict]] = defaultdict(list)
+    exercise_display_names: dict[str, str] = {}  # key → best display name
+
+    for log in all_logs:
+        name_raw = (log.get("exercise") or log.get("exercise_name") or "").strip()
+        if not name_raw or name_raw.lower() == "unknown":
+            continue
+        key = name_raw.lower()
+        logs_by_exercise[key].append(log)
+        # Keep the first-seen casing as display name
+        if key not in exercise_display_names:
+            exercise_display_names[key] = name_raw
+
+    # ── Build per-exercise metadata and group into splits ──────────────────
+    splits: dict[str, list[dict]] = {"Push": [], "Pull": [], "Legs": []}
+    all_recommendations: dict[str, dict] = {}
+
+    for ex_key, logs in logs_by_exercise.items():
+        display_name = exercise_display_names[ex_key]
+        muscle_group = get_muscle_info(display_name)["sub_group"]
+
+        # Determine which split this exercise belongs to
+        if muscle_group in _PUSH_MUSCLES:
+            split = "Push"
+        elif muscle_group in _PULL_MUSCLES:
+            split = "Pull"
+        elif muscle_group in _LEGS_MUSCLES:
+            split = "Legs"
+        else:
+            cat = classify_exercise(display_name, muscle_group)
+            split = "Legs" if cat == ExerciseCategory.LOWER_BODY_COMPOUND else "Push"
+
+        # Filter to kg-unit logs for recommendation engine
+        kg_logs = [
+            log for log in logs
+            if (log.get("weight_unit") or log.get("unit") or "kg").lower()
+            not in ("plate", "plates")
+        ]
+        kg_logs_sorted = sorted(kg_logs, key=lambda r: str(r.get("date") or ""))
+
+        occurrence_count = len(logs)
+
+        # Most common reps value
+        reps_vals = [int(log.get("reps") or 0) for log in logs if int(log.get("reps") or 0) > 0]
+        most_common_reps = Counter(reps_vals).most_common(1)[0][0] if reps_vals else 10
+
+        # Most common sets-per-session (rows per unique date)
+        sets_by_date: dict[str, int] = defaultdict(int)
+        for log in logs:
+            d = str(log.get("date") or "").split("T")[0]
+            if d:
+                sets_by_date[d] += 1
+        session_set_counts = list(sets_by_date.values())
+        most_common_sets = Counter(session_set_counts).most_common(1)[0][0] if session_set_counts else 3
+
+        # Latest weight as default
+        latest_weight = float(kg_logs_sorted[-1].get("weight") or 0) if kg_logs_sorted else 0.0
+
+        # Detect primary unit (kg vs plates)
+        plate_count = sum(
+            1 for log in logs
+            if (log.get("weight_unit") or log.get("unit") or "kg").lower() in ("plate", "plates")
+        )
+        unit = "plates" if plate_count > len(logs) / 2 else "kg"
+
+        # Exercise type from classifier
+        cat = classify_exercise(display_name, muscle_group)
+        ex_type = "Compound" if cat != ExerciseCategory.ISOLATION else "Isolation"
+
+        splits[split].append({
+            "name": display_name,
+            "defaultWeight": latest_weight,
+            "unit": unit,
+            "reps": most_common_reps,
+            "targetSets": most_common_sets,
+            "type": ex_type,
+            "muscle": muscle_group,
+            "occurrence_count": occurrence_count,
+        })
+
+        # Generate recommendation
+        rec: RecommendationResult = generate_recommendation(
+            exercise_name=display_name,
+            muscle_group=muscle_group,
+            history=kg_logs_sorted,
+            default_weight=latest_weight,
+            unit="kg",
+        )
+        all_recommendations[display_name] = asdict(rec)
+
+    # ── Sort each split by occurrence count (most-logged first) ───────────
+    for split_name in splits:
+        splits[split_name].sort(key=lambda x: x["occurrence_count"], reverse=True)
+
+    # ── Derive Upper (Push + Pull) and Lower (Legs) ──────────────────────
+    splits["Upper"] = sorted(
+        splits["Push"] + splits["Pull"],
+        key=lambda x: x["occurrence_count"], reverse=True,
+    )
+    splits["Lower"] = splits["Legs"][:]
+
+    return {"splits": splits, "recommendations": all_recommendations}
