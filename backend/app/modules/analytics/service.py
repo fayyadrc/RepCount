@@ -3,7 +3,7 @@ from typing import Dict, List, Any
 from datetime import datetime, timedelta
 from collections import defaultdict
 from ...db.supabase import supabase
-from .muscle_mapping import get_muscle_group
+from .muscle_mapping import get_muscle_info
 
 class AnalyticsService:
     @staticmethod
@@ -65,7 +65,7 @@ class AnalyticsService:
             if not exercise or exercise.lower() == "unknown":
                 continue
                 
-            muscle = get_muscle_group(exercise)
+            muscle = get_muscle_info(exercise)["sub_group"]
             weight = float(log.get("weight") or 0)
             reps = int(log.get("reps") or 0)
             unit = log.get("weight_unit") or log.get("unit") or "kg"
@@ -148,7 +148,7 @@ class AnalyticsService:
             stats["history"] = sorted_history
             del stats["history_by_date"]
             
-            muscle = get_muscle_group(stats["name"])
+            muscle = get_muscle_info(stats["name"])["sub_group"]
             exercises_by_muscle[muscle].append(stats)
 
         formatted_exercises_by_muscle = {}

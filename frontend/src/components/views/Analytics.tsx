@@ -79,6 +79,20 @@ interface RecommendedExercise {
   muscle: string;
 }
 
+interface RecommendationResult {
+  exercise: string;
+  recommended_weight: number;
+  unit: string;
+  confidence: number;          // 0.0 – 1.0
+  fatigue_state: 'new' | 'clear' | 'overreaching' | 'severe_fatigue';
+  ewma_baseline: number;
+  latest_e1rm: number;
+  drop_pct: number;
+  audit_trail: string;
+  sessions_used: number;
+  category: string;
+}
+
 const SPLIT_CONFIG: Record<'Push' | 'Pull' | 'Legs' | 'Upper' | 'Lower', RecommendedExercise[]> = {
   Push: [
     { name: "Bench Press", defaultWeight: 40, unit: "kg", reps: 8, targetSets: 4, type: "Compound", muscle: "Chest" },
@@ -134,6 +148,10 @@ export const Analytics: React.FC = () => {
   const [activeSection, setActiveSection] = useState<'general' | 'recommendations'>('general');
   const [activeSplit, setActiveSplit] = useState<'Push' | 'Pull' | 'Legs' | 'Upper' | 'Lower'>('Push');
 
+  // Backend recommendation results, keyed by normalised exercise name
+  const [recommendations, setRecommendations] = useState<Record<string, RecommendationResult>>({});
+  const [recLoading, setRecLoading] = useState(false);
+
   // Lookup helper for historical exercise stats
   const findExerciseStats = (name: string): ExerciseStats | null => {
     if (!data?.exercises_by_muscle) return null;
@@ -150,8 +168,31 @@ export const Analytics: React.FC = () => {
     return null;
   };
 
-  // Generate smart recommendations based on lifting history
+  // Generate smart recommendations — backend-first, client-side fallback
   const getExerciseRecommendation = (ex: RecommendedExercise) => {
+    // 1️⃣  Prefer the backend RecommendationResult if available
+    const normalKey = ex.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const backendRec = Object.entries(recommendations).find(([k]) =>
+      k.toLowerCase().replace(/[^a-z0-9]/g, '') === normalKey
+    )?.[1];
+
+    if (backendRec) {
+      const isNew = backendRec.fatigue_state === 'new';
+      const weight = backendRec.recommended_weight;
+      return {
+        weight,
+        unit: backendRec.unit,
+        reps: ex.reps,
+        isNew,
+        fatigue_state: backendRec.fatigue_state,
+        confidence: backendRec.confidence,
+        sessions_used: backendRec.sessions_used,
+        reason: backendRec.audit_trail,
+        fromBackend: true,
+      };
+    }
+
+    // 2️⃣  Client-side fallback — use exercise history max_weight if available
     const stats = findExerciseStats(ex.name);
     if (!stats) {
       return {
@@ -159,7 +200,11 @@ export const Analytics: React.FC = () => {
         unit: ex.unit,
         reps: ex.reps,
         isNew: true,
+        fatigue_state: 'new' as const,
+        confidence: 0,
+        sessions_used: 0,
         reason: `Starting weight calibrated for ${ex.name}. Start comfortable and adjust as needed.`,
+        fromBackend: false,
       };
     }
 
@@ -172,7 +217,11 @@ export const Analytics: React.FC = () => {
       unit: stats.unit,
       reps: ex.reps,
       isNew: false,
+      fatigue_state: 'clear' as const,
+      confidence: 0,
+      sessions_used: 0,
       reason: `Based on your all-time best of ${stats.max_weight}${stats.unit}. Added +${increment}${stats.unit} for progressive overload.`,
+      fromBackend: false,
     };
   };
 
@@ -209,7 +258,32 @@ export const Analytics: React.FC = () => {
       }
     };
 
+    const fetchRecommendations = async () => {
+      try {
+        setRecLoading(true);
+        // Collect every unique exercise across all 5 splits
+        const allExercises = Array.from(
+          new Set(
+            Object.values(SPLIT_CONFIG).flatMap(split => split.map(ex => ex.name))
+          )
+        );
+        const qs = encodeURIComponent(allExercises.join(','));
+        const res = await fetch(`/api/recommendations?exercises=${qs}`);
+        if (!res.ok) throw new Error('Failed to fetch recommendations');
+        const recs: RecommendationResult[] = await res.json();
+        // Key by exercise name for O(1) lookup
+        const map: Record<string, RecommendationResult> = {};
+        recs.forEach(r => { map[r.exercise] = r; });
+        setRecommendations(map);
+      } catch (err) {
+        console.warn('Recommendation fetch failed, falling back to heuristics:', err);
+      } finally {
+        setRecLoading(false);
+      }
+    };
+
     fetchAnalytics();
+    fetchRecommendations();
   }, []);
 
   if (loading) {
@@ -251,9 +325,9 @@ export const Analytics: React.FC = () => {
             <ArrowLeft className="w-3.5 h-3.5 stroke-[2.5]" />
             Back
           </button>
-          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-accent-violet-bg rounded-full border border-accent-violet/10 shadow-[0_2px_8px_rgba(0,0,0,0.01)]">
-            <Sparkles className="w-3.5 h-3.5 text-accent-violet fill-accent-violet/10" />
-            <span className="text-[10px] font-extrabold uppercase tracking-widest text-accent-violet font-heading">AI Assistant</span>
+          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-accent-blue-bg rounded-full border border-accent-blue/10 shadow-[0_2px_8px_rgba(0,0,0,0.01)]">
+            <Sparkles className="w-3.5 h-3.5 text-accent-blue fill-accent-blue/10" />
+            <span className="text-[10px] font-extrabold uppercase tracking-widest text-accent-blue font-heading">AI Assistant</span>
           </div>
         </div>
 
@@ -298,7 +372,20 @@ export const Analytics: React.FC = () => {
         <div className="space-y-6 px-1">
           {SPLIT_CONFIG[activeSplit].map((ex, index) => {
             const rec = getExerciseRecommendation(ex);
-            
+
+            // ── Fatigue badge config ──────────────────────────────────────
+            const fatigueBadge: Record<string, { label: string; cls: string }> = {
+              new:            { label: 'Calibrating',   cls: 'bg-accent-orange-bg text-accent-orange' },
+              clear:          { label: 'Overload Ready', cls: 'bg-accent-green-bg text-accent-green' },
+              overreaching:   { label: 'Scaled Load',   cls: 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400' },
+              severe_fatigue: { label: 'Deload',        cls: 'bg-red-500/10 text-red-500' },
+            };
+            const badge = fatigueBadge[rec.fatigue_state] ?? fatigueBadge['clear'];
+
+            // ── Confidence bar ─────────────────────────────────────────────
+            const confidencePct = Math.round((rec.confidence ?? 0) * 100);
+            const sessionsUsed = rec.sessions_used ?? 0;
+
             return (
               <motion.div
                 key={ex.name}
@@ -320,18 +407,14 @@ export const Analytics: React.FC = () => {
                       </span>
                     </div>
 
-                    <span className={`ios-badge uppercase text-[9.5px] font-black ${
-                      rec.isNew 
-                        ? 'bg-accent-orange-bg text-accent-orange' 
-                        : 'bg-accent-green-bg text-accent-green'
-                    }`}>
-                      {rec.isNew ? 'Calibrating' : 'Overload Ready'}
+                    <span className={`ios-badge uppercase text-[9.5px] font-black ${badge.cls}`}>
+                      {badge.label}
                     </span>
                   </div>
 
                   {/* Title & Large Metric Display */}
                   <div className="space-y-4">
-                    <h4 className="text-2xl font-black text-foreground font-heading tracking-tight leading-tight group-hover:text-accent-violet transition-colors">
+                    <h4 className="text-2xl font-black text-foreground font-heading tracking-tight leading-tight group-hover:text-accent-blue transition-colors">
                       {ex.name}
                     </h4>
 
@@ -372,20 +455,55 @@ export const Analytics: React.FC = () => {
                       </div>
                     </div>
                   </div>
+
+                  {/* Confidence Bar */}
+                  {rec.fromBackend && (
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] uppercase font-black text-muted-foreground/50 tracking-widest font-mono">
+                          Engine Confidence
+                        </span>
+                        <span className="text-[9px] font-black font-mono text-muted-foreground/70">
+                          {sessionsUsed}/{12} sessions · {confidencePct}%
+                        </span>
+                      </div>
+                      <div className="h-1.5 w-full rounded-full bg-secondary/80 overflow-hidden">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${confidencePct}%` }}
+                          transition={{ duration: 0.6, delay: index * 0.05 + 0.2, ease: 'easeOut' }}
+                          className={`h-full rounded-full ${
+                            confidencePct >= 80 ? 'bg-accent-green' :
+                            confidencePct >= 40 ? 'bg-accent-blue' :
+                            'bg-accent-orange'
+                          }`}
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
 
-                {/* Reasoning Sidebar (right/bottom) */}
+                {/* Audit Trail / Reasoning Sidebar (right/bottom) */}
                 <div className="p-6 md:w-[32%] bg-secondary/25 flex flex-col justify-center relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-accent-violet/5 rounded-full blur-xl pointer-events-none" />
-                  
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-accent-blue/5 rounded-full blur-xl pointer-events-none" />
+
                   <div className="flex items-center gap-1.5 mb-2 select-none">
-                    <Sparkles className="w-3.5 h-3.5 text-accent-violet shrink-0" />
-                    <span className="text-[9px] uppercase font-black text-accent-violet tracking-widest font-mono">AI Rationale</span>
+                    <Sparkles className="w-3.5 h-3.5 text-accent-blue shrink-0" />
+                    <span className="text-[9px] uppercase font-black text-accent-blue tracking-widest font-mono">
+                      {rec.fromBackend ? 'Audit Trail' : 'AI Suggestion'}
+                    </span>
                   </div>
-                  
-                  <p className="text-[12.5px] font-semibold leading-relaxed text-muted-foreground/90 italic relative z-10">
-                    "{rec.reason}"
-                  </p>
+
+                  {recLoading && !rec.fromBackend ? (
+                    <div className="flex items-center gap-2 text-muted-foreground/60">
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                      <span className="text-[11px] font-semibold">Analysing sessions…</span>
+                    </div>
+                  ) : (
+                    <p className="text-[12px] font-semibold leading-relaxed text-muted-foreground/90 italic relative z-10">
+                      &ldquo;{rec.reason}&rdquo;
+                    </p>
+                  )}
                 </div>
               </motion.div>
             );
@@ -396,7 +514,7 @@ export const Analytics: React.FC = () => {
         <div className="pt-4 px-1">
           <button
             onClick={() => handleLogWorkout(activeSplit, SPLIT_CONFIG[activeSplit])}
-            className="w-full py-4.5 bg-gradient-to-r from-accent-violet to-accent-blue hover:opacity-95 text-white font-extrabold tracking-tight rounded-2xl shadow-lg shadow-accent-violet/10 hover:shadow-accent-violet/20 transition-all duration-300 text-sm tracking-wide text-center flex items-center justify-center gap-2 btn-tap-scale"
+            className="w-full py-4.5 bg-accent-blue hover:bg-accent-blue/90 text-white font-extrabold tracking-tight rounded-2xl shadow-lg shadow-accent-blue/10 hover:shadow-accent-blue/20 transition-all duration-300 text-sm tracking-wide text-center flex items-center justify-center gap-2 btn-tap-scale"
           >
             <Plus className="w-4 h-4 stroke-[3.5] text-white" />
             Log {activeSplit} Workout
@@ -420,10 +538,10 @@ export const Analytics: React.FC = () => {
         <div className="flex gap-2">
           <button
             onClick={() => setActiveSection('recommendations')}
-            className="flex items-center gap-1.5 px-4.5 py-2.5 bg-accent-violet-bg text-accent-violet border border-accent-violet/20 rounded-full hover:bg-accent-violet-bg/85 transition-all duration-250 shadow-[0_4px_12px_rgba(0,0,0,0.03)] btn-tap-scale text-xs font-extrabold font-heading"
+            className="flex items-center gap-1.5 px-4.5 py-2.5 bg-accent-blue-bg text-accent-blue border border-accent-blue/20 rounded-full hover:bg-accent-blue-bg/85 transition-all duration-250 shadow-[0_4px_12px_rgba(0,0,0,0.03)] btn-tap-scale text-xs font-extrabold font-heading"
             title="Recommended Workouts"
           >
-            <Sparkles className="w-3.5 h-3.5 fill-accent-violet/10" />
+            <Sparkles className="w-3.5 h-3.5 fill-accent-blue/10" />
             Routines
           </button>
           <button
