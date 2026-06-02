@@ -18,7 +18,7 @@ echo "🚀 Starting GymTracker AI..."
 # 1. Start the FastAPI backend
 echo "🐍 Starting FastAPI backend server..."
 if [ -d ".venv" ]; then
-  .venv/bin/uvicorn backend.app.main:app --port 8002 &
+  .venv/bin/uvicorn backend.app.main:app --reload --port 8002 &
   BACKEND_PID=$!
 else
   echo "❌ Error: Virtual environment .venv not found in root directory."

@@ -4,11 +4,15 @@ import { motion } from 'framer-motion';
 import { ActivityCalendar, DayActivity, ActivityType } from '@/components/ui/ActivityCalendar';
 import { useWorkoutStore } from '@/lib/workout-store';
 import { WorkoutSession } from '@/lib/types';
-import { useTheme } from '@/hooks/use-theme';
+import type { Theme } from '@/hooks/use-theme';
 
-export const Profile: React.FC = () => {
+interface ProfileProps {
+  theme: Theme;
+  setTheme: (t: Theme) => void;
+}
+
+export const Profile: React.FC<ProfileProps> = ({ theme, setTheme }) => {
   const { sessions } = useWorkoutStore();
-  const { theme, setTheme } = useTheme();
 
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
