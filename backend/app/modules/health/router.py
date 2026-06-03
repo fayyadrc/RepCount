@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 from ...db.supabase import supabase
+from .service import keep_alive_ping
 
 router = APIRouter()
 
@@ -20,3 +21,12 @@ def health_check():
         "backend_connected": True,
         "database_connected": supabase_ok
     }
+
+@router.get("/health/keep-alive")
+def trigger_keep_alive():
+    """
+    Manually triggers the keep-alive ping to test functionality.
+    """
+    keep_alive_ping()
+    return {"message": "Keep-alive ping triggered successfully"}
+

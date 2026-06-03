@@ -16,6 +16,7 @@ load_dotenv()
 from contextlib import asynccontextmanager
 from apscheduler.schedulers.background import BackgroundScheduler
 from .modules.health.router import router as health_router
+from .modules.health.service import keep_alive_ping
 from .modules.history.router import router as history_router
 from .modules.strava.router import router as strava_router
 from .modules.strava.service import sync_strava_data
@@ -27,6 +28,10 @@ async def lifespan(app: FastAPI):
     scheduler = BackgroundScheduler()
     # Run every 12 hours
     scheduler.add_job(sync_strava_data, 'interval', hours=12)
+    
+    # Ping self every 14 minutes to keep Render instance awake
+    scheduler.add_job(keep_alive_ping, 'interval', minutes=14)
+    
     scheduler.start()
     
     # Optionally trigger an immediate run on startup
