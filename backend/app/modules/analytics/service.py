@@ -3,7 +3,7 @@ from typing import Dict, List, Any
 from datetime import datetime, timedelta
 from collections import defaultdict
 from ...db.supabase import supabase
-from .muscle_mapping import get_muscle_info
+from .muscle_mapping import get_muscle_info, normalize_exercise_name
 
 class AnalyticsService:
     @staticmethod
@@ -61,10 +61,11 @@ class AnalyticsService:
             return round(w * (1 + r / 30.0), 1)
 
         for log in gym_data:
-            exercise = log.get("exercise") or log.get("exercise_name")
-            if not exercise or exercise.lower() == "unknown":
+            exercise_raw = log.get("exercise") or log.get("exercise_name")
+            if not exercise_raw or exercise_raw.lower() == "unknown":
                 continue
-                
+
+            exercise = normalize_exercise_name(exercise_raw)
             muscle = get_muscle_info(exercise)["sub_group"]
             weight = float(log.get("weight") or 0)
             reps = int(log.get("reps") or 0)
@@ -74,8 +75,7 @@ class AnalyticsService:
             # 1 row in the db = 1 set
             volume_by_muscle[muscle] += weight * reps
 
-            # Clean and normalize exercise name
-            ex_name = exercise.strip()
+            ex_name = exercise
             ex_key = ex_name.lower()
             
             if unit.lower() in ["plate", "plates"]:

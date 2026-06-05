@@ -4,7 +4,7 @@ from typing import List
 from ...db.supabase import supabase
 from .schemas import WorkoutSession, WorkoutEntry
 from .service import HistoryService
-from ..analytics.muscle_mapping import get_muscle_info
+from ..analytics.muscle_mapping import get_muscle_info, normalize_exercise_name
 
 router = APIRouter()
 
@@ -56,12 +56,14 @@ async def quick_log_workout(request: Request, log_data: RawLogRequest):
         records_to_insert = []
         
         for entry in parsed_data.entries:
+            canonical_name = normalize_exercise_name(entry.exercise_name)
+            entry.exercise_name = canonical_name
             records_to_insert.append({
                 "date": entry.date,
-                "exercise": entry.exercise_name,
-                "exercise_name": entry.exercise_name,
-                "exercise_group": get_muscle_info(entry.exercise_name)["main_group"],
-                "sub_muscle_group": get_muscle_info(entry.exercise_name)["sub_group"],
+                "exercise": canonical_name,
+                "exercise_name": canonical_name,
+                "exercise_group": get_muscle_info(canonical_name)["main_group"],
+                "sub_muscle_group": get_muscle_info(canonical_name)["sub_group"],
                 "weight": entry.weight if entry.weight is not None else 0.0,
                 "weight_unit": entry.unit,
                 "set_number": 1,
