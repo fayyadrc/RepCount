@@ -2,8 +2,56 @@
 # Used as the source of truth until the database explicitly stores muscle groups.
 # Continuously expanded based on real gym data and exercise science.
 
-from typing import Optional, Dict, Any, List
+import re
+from typing import Optional, Dict, Any, List, Tuple
 from difflib import SequenceMatcher
+
+# Equipment / qualifier prefixes stripped before alias matching (longest first).
+_EQUIPMENT_PREFIXES = (
+    "smith machine",
+    "cable machine",
+    "machine assisted",
+    "resistance band",
+    "smith",
+    "machine",
+    "cable",
+    "barbell",
+    "dumbbell",
+    "dumbell",
+    "seated",
+    "standing",
+    "incline",
+    "decline",
+    "single arm",
+    "single wirst",  # common typo for wrist
+    "single wrist",
+    "one arm",
+    "assisted",
+    "weighted",
+    "rope",
+    "v-bar",
+    "v bar",
+    "ez bar",
+    "ez-bar",
+)
+
+# Common shorthand / typo fixes applied before matching.
+_TYPO_FIXES = {
+    "pec dec": "pec deck",
+    "db press": "dumbbell press",
+    "db bench": "dumbbell bench",
+    "v handle": "v-bar",
+    "flies": "fly",
+    "flys": "fly",
+    "curls": "curl",
+    "rows": "row",
+    "pulldowns": "pulldown",
+    "pulldown": "pulldown",
+    "extensions": "extension",
+    "presses": "press",
+    "raises": "raise",
+    "shrugs": "shrug",
+}
 
 # The detailed breakdown of specific muscles (Sub Groups)
 SUB_MUSCLE_GROUPS = {
@@ -21,7 +69,8 @@ SUB_MUSCLE_GROUPS = {
     "Back": [
         "pullup", "pull up", "pull-up", "weighted pullup", "assisted pullup", "chinup", 
         "chin up", "chin-up", "weighted chinup", "barbell row", "bent over row", "bent-over row",
-        "t-bar row", "t bar row", "landmine row", "seated row", "seated cable row", "machine row",
+        "t-bar row", "t bar row", "t bar row wide", "landmine row", "seated row", "seated cable row",
+        "machine row", "machine back rows", "back rows",
         "dumbbell row", "single arm row", "one arm dumbbell row", "chest supported row", 
         "incline row", "inverted row", "ring row", "cable row", "seal row", "lat pulldown", 
         "wide grip lat pulldown", "close grip lat pulldown", "reverse grip lat pulldown", 
@@ -79,8 +128,9 @@ SUB_MUSCLE_GROUPS = {
         "barbell skullcrusher", "dumbbell skullcrusher", "ez bar skull crusher", 
         "hammer strength skull crusher", "dips", "tricep dips", "bench dips", "assisted dips", 
         "weighted dips", "machine dips", "lever dips", "close grip bench press", 
-        "close grip barbell press", "close grip dumbbell press", "tricep pushdown", 
+        "close grip barbell press", "close grip dumbbell press",         "tricep pushdown", 
         "tricep rope pushdown", "tricep bar pushdown", "reverse grip pushdown", "v-bar pushdown",
+        "v handle extension", "tricep v handle extension",
         "machine tricep pushdown", "overhead rope extension", "single arm extension", "kickback", 
         "dumbbell kickback", "cable kickback", "jm press", "board press", "narrow push up", 
         "decline bench dips", "resistance band extension", "machine assisted tricep dip"
@@ -164,6 +214,143 @@ SECONDARY_MUSCLES = {
     "dips": ["chest", "shoulders"],
     "rows": ["biceps", "shoulders"],
 }
+
+def _normalize_for_match(name: str) -> str:
+    """Collapse an exercise name to alphanumeric lowercase for fuzzy/substring matching."""
+    name = name.lower().strip()
+    name = re.sub(r"\([^)]*\)", "", name)
+    for typo, fix in _TYPO_FIXES.items():
+        name = re.sub(rf"\b{re.escape(typo)}\b", fix, name)
+    return re.sub(r"[^a-z0-9]", "", name)
+
+
+def _strip_equipment_prefixes(name: str) -> str:
+    """Remove leading equipment/qualifier words to improve alias matching."""
+    stripped = name.lower().strip()
+    changed = True
+    while changed:
+        changed = False
+        for prefix in _EQUIPMENT_PREFIXES:
+            if stripped.startswith(prefix + " "):
+                stripped = stripped[len(prefix) + 1 :].strip()
+                changed = True
+                break
+    return stripped
+
+
+def _title_case_exercise(name: str) -> str:
+    """Convert a canonical alias to a consistent display name."""
+    titled = []
+    for word in re.split(r"(\s+|-)", name.strip()):
+        if not word or word.isspace() or word == "-":
+            titled.append(word if word != "-" else "-")
+            continue
+        if word.lower() in {"rdl", "ghd", "jm"}:
+            titled.append(word.upper())
+        else:
+            titled.append(word.capitalize())
+    return "".join(titled)
+
+
+def _build_alias_index() -> List[Tuple[str, str]]:
+    """Return (alias, sub_group) pairs sorted longest-first for greedy matching."""
+    phrases: List[Tuple[str, str]] = []
+    for group, exercises in SUB_MUSCLE_GROUPS.items():
+        for alias in exercises:
+            phrases.append((alias, group))
+    phrases.sort(key=lambda item: len(item[0]), reverse=True)
+    return phrases
+
+
+_ALIAS_INDEX: Optional[List[Tuple[str, str]]] = None
+
+
+def _get_alias_index() -> List[Tuple[str, str]]:
+    global _ALIAS_INDEX
+    if _ALIAS_INDEX is None:
+        _ALIAS_INDEX = _build_alias_index()
+    return _ALIAS_INDEX
+
+
+def _find_best_alias(name: str) -> Optional[str]:
+    """
+    Match a raw exercise name to the best-known alias from SUB_MUSCLE_GROUPS.
+    Returns the matched alias string, or None if no confident match is found.
+    """
+    if not name:
+        return None
+
+    raw = name.lower().strip()
+    stripped = _strip_equipment_prefixes(raw)
+    candidates = [raw]
+    if stripped and stripped != raw:
+        candidates.append(stripped)
+
+    normalized_candidates = [
+        (c, _normalize_for_match(c))
+        for c in candidates
+        if c and len(_normalize_for_match(c)) >= 5
+    ]
+
+    # 1. Exact match (raw or stripped)
+    for candidate in candidates:
+        for alias, _ in _get_alias_index():
+            if candidate == alias:
+                return alias
+
+    # 2. Normalized exact match
+    for _candidate, norm in normalized_candidates:
+        for alias, _ in _get_alias_index():
+            if norm == _normalize_for_match(alias):
+                return alias
+
+    # 3. Normalized substring match (longest alias wins)
+    best_alias: Optional[str] = None
+    best_len = 0
+    for _candidate, norm in normalized_candidates:
+        for alias, _ in _get_alias_index():
+            norm_alias = _normalize_for_match(alias)
+            if len(norm_alias) < 8:
+                continue
+            if norm_alias in norm and len(norm_alias) > best_len:
+                best_alias = alias
+                best_len = len(norm_alias)
+    if best_alias:
+        return best_alias
+
+    # 4. Fuzzy match — only when the candidate name is specific enough
+    best_ratio = 0.84
+    fuzzy_best: Optional[str] = None
+    for _candidate, norm in normalized_candidates:
+        if len(norm) < 8:
+            continue
+        for alias, _ in _get_alias_index():
+            norm_alias = _normalize_for_match(alias)
+            if len(norm_alias) < 8:
+                continue
+            ratio = SequenceMatcher(None, norm, norm_alias).ratio()
+            if ratio > best_ratio:
+                best_ratio = ratio
+                fuzzy_best = alias
+    return fuzzy_best
+
+
+def normalize_exercise_name(exercise_name: str) -> str:
+    """
+    Map a raw exercise name to a canonical form using the SUB_MUSCLE_GROUPS alias list.
+
+    Used at write-time (Quick Log) and read-time (analytics) so that variations like
+    "Machine Pec Dec", "pec deck", and "Pec Dec" all resolve to the same canonical name.
+    """
+    if not exercise_name or not exercise_name.strip():
+        return exercise_name
+
+    raw = exercise_name.strip()
+    matched = _find_best_alias(raw)
+    if matched:
+        return _title_case_exercise(matched)
+    return _title_case_exercise(raw)
+
 
 def get_muscle_info(exercise_name: str, strict: bool = False) -> Dict[str, str]:
     """

@@ -1,12 +1,26 @@
-from fastapi import APIRouter, HTTPException, Request
+import os
+from fastapi import APIRouter, HTTPException, Request, Depends, Security
+from fastapi.security import APIKeyHeader
 from pydantic import BaseModel
 from typing import List
 from ...db.supabase import supabase
 from .schemas import WorkoutSession, WorkoutEntry
 from .service import HistoryService
-from ..analytics.muscle_mapping import get_muscle_info
+from ..analytics.muscle_mapping import get_muscle_info, normalize_exercise_name
 
 router = APIRouter()
+
+# ---------------------------------------------------------------------------
+# API Key authentication (used by the Telegram bot and any future bots/scripts)
+# ---------------------------------------------------------------------------
+_API_KEY_HEADER = APIKeyHeader(name="X-Bot-API-Key", auto_error=True)
+
+def _require_api_key(api_key: str = Security(_API_KEY_HEADER)) -> str:
+    """Validate the X-Bot-API-Key header against BOT_API_KEY env var."""
+    expected = os.environ.get("BOT_API_KEY")
+    if not expected or api_key != expected:
+        raise HTTPException(status_code=403, detail="Could not validate credentials")
+    return api_key
 
 class RawLogRequest(BaseModel):
     raw_text: str
@@ -33,7 +47,11 @@ def get_workout_history():
     return HistoryService.process_workout_history(gym_data, strava_data)
 
 @router.post("/log/quick")
-async def quick_log_workout(request: Request, log_data: RawLogRequest):
+async def quick_log_workout(
+    request: Request,
+    log_data: RawLogRequest,
+    api_key: str = Depends(_require_api_key),
+):
     if not supabase:
         raise HTTPException(status_code=500, detail="Supabase client not configured")
 
@@ -56,12 +74,14 @@ async def quick_log_workout(request: Request, log_data: RawLogRequest):
         records_to_insert = []
         
         for entry in parsed_data.entries:
+            canonical_name = normalize_exercise_name(entry.exercise_name)
+            entry.exercise_name = canonical_name
             records_to_insert.append({
                 "date": entry.date,
-                "exercise": entry.exercise_name,
-                "exercise_name": entry.exercise_name,
-                "exercise_group": get_muscle_info(entry.exercise_name)["main_group"],
-                "sub_muscle_group": get_muscle_info(entry.exercise_name)["sub_group"],
+                "exercise": canonical_name,
+                "exercise_name": canonical_name,
+                "exercise_group": get_muscle_info(canonical_name)["main_group"],
+                "sub_muscle_group": get_muscle_info(canonical_name)["sub_group"],
                 "weight": entry.weight if entry.weight is not None else 0.0,
                 "weight_unit": entry.unit,
                 "set_number": 1,

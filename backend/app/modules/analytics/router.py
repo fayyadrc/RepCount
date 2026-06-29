@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException, Query
 from typing import List, Optional
 from .service import AnalyticsService
 from .recommendation_service import generate_recommendation, RecommendationResult, classify_exercise, ExerciseCategory
-from .muscle_mapping import get_muscle_info
+from .muscle_mapping import get_muscle_info, normalize_exercise_name
 from ...db.supabase import supabase
 from collections import defaultdict, Counter
 from dataclasses import asdict
@@ -90,7 +90,8 @@ def get_recommendations(
         name_raw = (log.get("exercise") or log.get("exercise_name") or "").strip()
         if not name_raw or name_raw.lower() == "unknown":
             continue
-        logs_by_exercise[name_raw.lower()].append(log)
+        canonical = normalize_exercise_name(name_raw)
+        logs_by_exercise[canonical.lower()].append(log)
 
     # Sort each bucket chronologically
     for key in logs_by_exercise:
@@ -175,11 +176,11 @@ def get_dynamic_recommendations():
         name_raw = (log.get("exercise") or log.get("exercise_name") or "").strip()
         if not name_raw or name_raw.lower() == "unknown":
             continue
-        key = name_raw.lower()
+        canonical = normalize_exercise_name(name_raw)
+        key = canonical.lower()
         logs_by_exercise[key].append(log)
-        # Keep the first-seen casing as display name
         if key not in exercise_display_names:
-            exercise_display_names[key] = name_raw
+            exercise_display_names[key] = canonical
 
     # ── Build per-exercise metadata and group into splits ──────────────────
     splits: dict[str, list[dict]] = {"Push": [], "Pull": [], "Legs": []}

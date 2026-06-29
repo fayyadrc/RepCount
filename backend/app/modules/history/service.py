@@ -5,7 +5,7 @@ from collections import defaultdict
 import uuid
 import httpx
 from .schemas import WorkoutSession, WorkoutEntry, StravaActivity, ParsedWorkoutLog
-from ..analytics.muscle_mapping import get_muscle_info
+from ..analytics.muscle_mapping import get_muscle_info, normalize_exercise_name
 
 from dotenv import load_dotenv
 from datetime import date, timedelta
@@ -150,7 +150,12 @@ class HistoryService:
 
         ## FIELD EXTRACTION RULES
         ### Exercise Name
-        - Normalize exercise names (e.g., "reverse cable rear delt flies" -> "Reverse Cable Rear Delt Fly")
+        - Normalize to consistent canonical names (Title Case).
+        - Map abbreviations and typos: "pec dec" -> "Pec Deck", "DB" -> "Dumbbell", "RDL" stays "RDL".
+        - Strip redundant equipment prefixes when the exercise is clear: "Machine Pec Dec" -> "Pec Deck".
+        - Use singular form: "flies" -> "Fly", "curls" -> "Curl".
+        - Prefer standard names: "reverse cable rear delt flies" -> "Rear Delt Fly", "lat pulldown" -> "Lat Pulldown".
+        - Do NOT invent grip/equipment qualifiers unless the user explicitly wrote them.
 
         ### Weight
         - Extract numeric weight value.
@@ -272,11 +277,12 @@ class HistoryService:
         if not supabase:
             return False
             
+        canonical_name = normalize_exercise_name(entry.exercise)
         data = {
-            "exercise": entry.exercise,
-            "exercise_name": entry.exercise,
-            "exercise_group": get_muscle_info(entry.exercise)["main_group"],
-            "sub_muscle_group": get_muscle_info(entry.exercise)["sub_group"],
+            "exercise": canonical_name,
+            "exercise_name": canonical_name,
+            "exercise_group": get_muscle_info(canonical_name)["main_group"],
+            "sub_muscle_group": get_muscle_info(canonical_name)["sub_group"],
             "weight": entry.weight,
             "weight_unit": entry.weightUnit,
             "reps": entry.reps,
