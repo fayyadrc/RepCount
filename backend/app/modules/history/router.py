@@ -1,4 +1,6 @@
-from fastapi import APIRouter, HTTPException, Request
+import os
+from fastapi import APIRouter, HTTPException, Request, Depends, Security
+from fastapi.security import APIKeyHeader
 from pydantic import BaseModel
 from typing import List
 from ...db.supabase import supabase
@@ -7,6 +9,18 @@ from .service import HistoryService
 from ..analytics.muscle_mapping import get_muscle_info, normalize_exercise_name
 
 router = APIRouter()
+
+# ---------------------------------------------------------------------------
+# API Key authentication (used by the Telegram bot and any future bots/scripts)
+# ---------------------------------------------------------------------------
+_API_KEY_HEADER = APIKeyHeader(name="X-Bot-API-Key", auto_error=True)
+
+def _require_api_key(api_key: str = Security(_API_KEY_HEADER)) -> str:
+    """Validate the X-Bot-API-Key header against BOT_API_KEY env var."""
+    expected = os.environ.get("BOT_API_KEY")
+    if not expected or api_key != expected:
+        raise HTTPException(status_code=403, detail="Could not validate credentials")
+    return api_key
 
 class RawLogRequest(BaseModel):
     raw_text: str
@@ -33,7 +47,11 @@ def get_workout_history():
     return HistoryService.process_workout_history(gym_data, strava_data)
 
 @router.post("/log/quick")
-async def quick_log_workout(request: Request, log_data: RawLogRequest):
+async def quick_log_workout(
+    request: Request,
+    log_data: RawLogRequest,
+    api_key: str = Depends(_require_api_key),
+):
     if not supabase:
         raise HTTPException(status_code=500, detail="Supabase client not configured")
 
