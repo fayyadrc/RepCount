@@ -51,7 +51,7 @@ interface HistoryProps {
 }
 
 export const History: React.FC<HistoryProps> = ({ onViewDetails }) => {
-  const { sessions, syncStrava } = useWorkoutStore();
+  const { sessions, syncStrava, refreshSessions } = useWorkoutStore();
   const { toast } = useToast();
   const [isSyncing, setIsSyncing] = useState(false);
 
@@ -59,6 +59,7 @@ export const History: React.FC<HistoryProps> = ({ onViewDetails }) => {
     setIsSyncing(true);
     try {
       await syncStrava();
+      await refreshSessions();
       toast({
         title: "Strava Sync Started",
         description: "Fetching your latest activities from Strava.",
@@ -98,19 +99,21 @@ export const History: React.FC<HistoryProps> = ({ onViewDetails }) => {
     >
       <header className="flex justify-between items-end px-1">
         <div>
-          <h2 className="text-3xl font-bold text-foreground tracking-tight">History</h2>
+          <h2 className="text-2xl font-bold text-foreground tracking-tight md:text-3xl">History</h2>
           <p className="text-muted-foreground text-sm font-medium mt-1">Your past sessions and activities</p>
         </div>
         <div className="flex gap-2 mb-1">
           <button 
             onClick={handleSync}
             disabled={isSyncing}
+            aria-label="Sync Strava"
             className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center hover:bg-secondary/80 transition-colors disabled:opacity-50"
           >
             <RefreshCw className={`w-4 h-4 text-foreground ${isSyncing ? 'animate-spin' : ''}`} />
           </button>
           <button 
-            onClick={() => (window as any).setActiveView?.('quick-log')}
+            onClick={() => (window as { setActiveView?: (view: string) => void }).setActiveView?.('quick-log')}
+            aria-label="Start new session"
             className="w-10 h-10 rounded-full bg-foreground flex items-center justify-center hover:scale-105 transition-transform active:scale-95"
           >
             <Plus className="w-5 h-5 text-background" />

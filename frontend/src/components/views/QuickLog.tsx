@@ -2,12 +2,12 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { CheckCircle2, Loader2, Sparkles, AlertCircle, Check } from 'lucide-react';
+import { Loader2, Sparkles, Check } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useWorkoutStore } from '@/lib/workout-store';
 import { NotesInput } from '@/components/layout/NotesInput';
 import type { WorkoutEntry } from '@/lib/types';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
 interface APIParsedWorkoutEntry {
   date: string;
@@ -37,7 +37,8 @@ export const QuickLog: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [lastLogged, setLastLogged] = useState<WorkoutEntry[] | null>(null);
   const { toast } = useToast();
-  const { addSession, sessions } = useWorkoutStore();
+  const { addSession, refreshSessions } = useWorkoutStore();
+  const reduceMotion = useReducedMotion();
 
   // Autosave draft on input change
   useEffect(() => {
@@ -91,6 +92,7 @@ export const QuickLog: React.FC = () => {
       if (result.length === 0) throw new Error("No workout data could be extracted.");
 
       addSession(result, input);
+      await refreshSessions();
       setLastLogged(result);
       setInput('');
       localStorage.removeItem(STORAGE_KEY);
@@ -111,13 +113,13 @@ export const QuickLog: React.FC = () => {
 
   return (
     <motion.div 
-      initial={{ opacity: 0, y: 12 }}
+      initial={reduceMotion ? false : { opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-8 pt-2 pb-24"
+      className="space-y-6 pt-2 pb-24 md:space-y-8"
     >
       <header className="space-y-2">
         <div className="flex items-center gap-3">
-          <h2 className="text-4xl font-extrabold text-foreground tracking-tight font-heading">Log your workout</h2>
+          <h2 className="text-3xl font-extrabold text-foreground tracking-tight font-heading md:text-4xl">Log your workout</h2>
           {isSubmitting && <Loader2 className="w-5 h-5 animate-spin text-accent-blue" />}
         </div>
         <p className="text-muted-foreground text-[14px] font-medium leading-relaxed max-w-xl">
@@ -126,15 +128,16 @@ export const QuickLog: React.FC = () => {
       </header>
 
       {/* Input Section */}
-      <div className="bg-card rounded-[28px] border border-border shadow-sm focus-within:shadow-md focus-within:border-border/80 overflow-hidden min-h-[380px] flex flex-col group relative transition-all duration-300">
-        {/* Action Button - Floating Circular Submit Button in bottom right */}
-        <div className="absolute bottom-6 right-6 z-10">
+      <div className="bg-card rounded-[28px] border border-border shadow-sm focus-within:shadow-md focus-within:border-border/80 overflow-hidden min-h-[320px] md:min-h-[380px] flex flex-col group relative transition-all duration-300">
+        <div className="absolute bottom-16 right-4 z-10 md:bottom-6 md:right-6">
           <button
+            type="button"
             onClick={handleSubmit}
             disabled={isSubmitting || !input.trim()}
-            className="w-14 h-14 flex items-center justify-center bg-foreground text-background rounded-full hover:scale-105 active:scale-95 transition-all disabled:opacity-20 shadow-lg shadow-foreground/10 group-focus-within:shadow-foreground/20 btn-tap-scale"
+            aria-label="Save workout"
+            className="w-12 h-12 md:w-14 md:h-14 flex items-center justify-center bg-foreground text-background rounded-full hover:scale-105 active:scale-95 transition-all disabled:opacity-20 shadow-lg shadow-foreground/10 group-focus-within:shadow-foreground/20 btn-tap-scale"
           >
-            {isSubmitting ? <Loader2 className="w-6 h-6 animate-spin" /> : <Check className="w-7 h-7 stroke-[2.5]" />}
+            {isSubmitting ? <Loader2 className="w-5 h-5 md:w-6 md:h-6 animate-spin" /> : <Check className="w-6 h-6 md:w-7 md:h-7 stroke-[2.5]" />}
           </button>
         </div>
 
@@ -146,9 +149,8 @@ export const QuickLog: React.FC = () => {
           placeholder="e.g. Benched 80kg for 8 reps, followed by 10 reps to failure..."
         />
         
-        {/* Subtle keyboard shortcut indicator */}
-        <div className="px-8 pb-6 text-[11px] font-bold text-muted-foreground font-mono uppercase tracking-wider select-none pointer-events-none">
-          Press ⌘ + Enter to log
+        <div className="px-6 pb-5 md:px-8 md:pb-6 text-[11px] font-bold text-muted-foreground font-mono uppercase tracking-wider select-none pointer-events-none">
+          Press ⌘/Ctrl + Enter to log
         </div>
       </div>
 
